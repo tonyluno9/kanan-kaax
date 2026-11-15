@@ -538,6 +538,7 @@
   function textoCelda(c) {
     var q = centro(c), m = estado.mapa, v = VALORES[c] || 0, k, val, u;
     if (m.tipo === "riesgo") { k = t("Posibilidad de fuego", "Chance of fire"); val = Math.round(v) + "%"; u = ""; }
+    else if (m.tipo === "nal") { k = t("NAL espera", "NAL expects") + (m.mes !== null ? " · " + NOML[m.mes] : ""); val = fmt(v); u = m.mes !== null ? t(" fuegos en ese mes", " fires in that month") : t(" fuegos en un año", " fires in a year"); }
     else if (m.tipo === "mes") { k = mesAnio(MES[m.k], ANIO[m.k]); val = fmt(v); u = t(" fuegos vistos por satélite ese mes", " fires seen by satellite that month"); }
     else if (m.tipo === "semana") { k = t("Una semana", "One week"); val = fmt(v); u = t(" fuegos vistos por satélite esa semana", " fires seen by satellite that week"); }
     else { k = t("Un año normal", "A normal year"); val = fmt(v); u = t(" fuegos vistos por satélite en un año (promedio)", " fires seen by satellite in a year (average)"); }
@@ -551,6 +552,7 @@
     if (m.tipo === "mes") { for (c = 0; c < NC; c++) VALORES[c] = F[c][m.k]; }
     else if (m.tipo === "semana") { VALORES = m.valores; }
     else if (m.tipo === "riesgo") { VALORES = m.valores; }
+    else if (m.tipo === "nal") { VALORES = m.valores; }
     else { var n = Math.max(1, aniosComp.length); for (c = 0; c < NC; c++) { var s = 0; for (k = 0; k < T; k++) if (completo[ANIO[k]]) s += F[c][k]; VALORES[c] = s / n; } }
     MAXV = 1; for (c = 0; c < NC; c++) if (VALORES[c] > MAXV) MAXV = VALORES[c];
     var normRiesgo = function (v) { return Math.max(0, (v || 0) / 100); }, normFuego = function (v) { return Math.sqrt(Math.max(0, v || 0) / MAXV); };
@@ -559,10 +561,10 @@
     leyenda();
     var mt = $("modo");
     if (m.tipo === "promedio") mt.style.display = "none";
-    else { mt.style.display = "block"; $("modoTxt").textContent = m.tipo === "mes" ? t("Viendo: ", "Showing: ") + mesAnio(MES[m.k], ANIO[m.k]) : m.tipo === "riesgo" ? t("Viendo: posibilidad de fuego", "Showing: chance of fire") : t("Viendo: una semana", "Showing: one week"); }
+    else { mt.style.display = "block"; $("modoTxt").textContent = m.tipo === "mes" ? t("Viendo: ", "Showing: ") + mesAnio(MES[m.k], ANIO[m.k]) : m.tipo === "nal" ? t("Viendo: predicción de NAL", "Showing: NAL forecast") : m.tipo === "riesgo" ? t("Viendo: posibilidad de fuego", "Showing: chance of fire") : t("Viendo: una semana", "Showing: one week"); }
   }
   function leyenda() {
-    var m = estado.mapa, tit = m.tipo === "riesgo" ? t("Posibilidad de fuego", "Chance of fire") : m.tipo === "mes" ? t("Fuego en ", "Fire in ") + mesAnio(MES[m.k], ANIO[m.k])
+    var m = estado.mapa, tit = m.tipo === "nal" ? t("Fuego que espera NAL", "Fire NAL expects") + (m.mes !== null ? " · " + NOML[m.mes] : "") : m.tipo === "riesgo" ? t("Posibilidad de fuego", "Chance of fire") : m.tipo === "mes" ? t("Fuego en ", "Fire in ") + mesAnio(MES[m.k], ANIO[m.k])
       : m.tipo === "semana" ? t("Fuego en esa semana", "Fire that week") : t("Fuego en un año normal", "Fire in a normal year");
     var max = m.tipo === "riesgo" ? "100%" : fmt(MAXV), rie = m.tipo === "riesgo";
     $("leyenda").setAttribute("title", t("Máximo en el mapa: ", "Map maximum: ") + max);
@@ -819,7 +821,7 @@
   //  Tabs
   // =====================================================================
   var TABS = [["cal", t("Mes por mes", "Month by month")], ["anios", t("Año por año", "Year by year")], ["alertas", t("Lo fuera de lo normal", "What was unusual")], ["reglas", t("¿Se respeta la ley?", "Is the law followed?")],
-    ["tipo", t("¿Quema o incendio?", "Farm burn or wildfire?")], ["riesgo", t("Próxima semana", "Next week")], ["areas", t("Reservas naturales", "Nature reserves")], ["prueba", t("Comprobado con fotos de satélite", "Checked with satellite photos")], ["como", t("¿Es confiable?", "Can I trust it?")]];
+    ["tipo", t("¿Quema o incendio?", "Farm burn or wildfire?")], ["riesgo", t("Próxima semana", "Next week")], ["nal", t("Próximos años · NAL", "Coming years · NAL")], ["areas", t("Reservas naturales", "Nature reserves")], ["prueba", t("Comprobado con fotos de satélite", "Checked with satellite photos")], ["como", t("¿Es confiable?", "Can I trust it?")]];
   $("tabs").innerHTML = TABS.map(function (x) { return '<button role="tab" id="tb-' + x[0] + '" aria-controls="tab-' + x[0] + '" tabindex="-1" data-t="' + x[0] + '">' + x[1] + "</button>"; }).join("") + '<span class="tabs-ind" id="tabsInd" aria-hidden="true"></span>';
   $("tabs").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (b) abrirTab(b.getAttribute("data-t")); });
   // Keyboard: left/right arrows (and Home/End) move between tabs
@@ -839,7 +841,8 @@
     [].forEach.call(document.querySelectorAll(".tab"), function (s) { s.classList.toggle("on", s.id === "tab-" + k); });
     if (MAPA) { MAPA.zona(null); MAPA.imagen(null); if (k !== "areas" && estado.sel.tipo !== "area") MAPA.areas(null); if (k !== "cal") MAPA.puntos(null); }
     if (k !== "riesgo" && estado.mapa.tipo === "riesgo") { estado.mapa = { tipo: "promedio" }; pintarMapa(); }
-    var f = { cal: tabCalendario, anios: tabAnios, alertas: tabAlertas, reglas: tabReglas, tipo: tabReglas, riesgo: tabRiesgo, areas: tabAreas, prueba: tabPrueba, como: tabComo }[k];
+    if (k !== "nal" && estado.mapa.tipo === "nal") { estado.mapa = { tipo: "promedio" }; pintarMapa(); }
+    var f = { cal: tabCalendario, anios: tabAnios, alertas: tabAlertas, reglas: tabReglas, tipo: tabReglas, riesgo: tabRiesgo, nal: tabNal, areas: tabAreas, prueba: tabPrueba, como: tabComo }[k];
     if (f) f();
     moverIndicador();
     if (scroll) { abrirHoja(2); var ps = $("panelScroll"); ps.scrollTo({ top: $("anclaTabs").offsetTop, behavior: QUIETO ? "auto" : "smooth" }); }
@@ -1118,6 +1121,62 @@
     $("vRiesgo").addEventListener("click", function () { vista = estado.vistaR = "riesgo"; poner(); });
     $("vFuego").addEventListener("click", function () { vista = estado.vistaR = "fuego"; poner(); });
     poner();
+  }
+
+  // ---------- NAL: forecast for the coming years ----------
+  // The engine lives in js/nal.js. Every score shown here is computed live from the data file (walk-forward test).
+  var NALM = null;
+  function nal() { if (NALM === null) NALM = window.NAL ? window.NAL.crear(Q) : false; return NALM; }
+  function listaMeses(ms) { var n = ms.map(function (m) { return NOML[m]; }); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + t(" y ", " and ") + n[n.length - 1]; }
+  function tabNal() {
+    var N = nal(), el = $("tab-nal");
+    if (!N || N.anios.length <= N.minEntreno) { el.innerHTML = '<div class="tarjeta"><p class="lead">' + t("Esta región todavía no tiene suficientes años de datos para predecir.", "This region does not have enough years of data to forecast yet.") + "</p></div>"; return; }
+    var Y0 = ANIO[T - 1] + 1, a1 = estado.nalDe || Y0, a2 = Math.max(a1, estado.nalA || a1), nA = a2 - a1 + 1, per = nA === 1 ? "" + a1 : a1 + "–" + a2;
+    var cs = celdasSel(), p = N.predecir(cs), h = Math.max(1, a2 - N.ultimo), v = N.validar(h);
+    while (v.n < 5 && h > 1) v = N.validar(--h);
+    var mS = estado.nalMes === undefined ? null : estado.nalMes;
+    var ord = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, b) { return b[0] - a[0]; });
+    var top = ord.slice(0, 3).map(function (x) { return x[1]; }).sort(function (a, b) { return a - b; }), pico = ord[0][1];
+    function opciones(sel, min) { var o = ""; for (var y = Math.max(Y0, min); y <= Y0 + 4; y++) o += '<option value="' + y + '"' + (y === sel ? " selected" : "") + ">" + y + "</option>"; return o; }
+    var W = 400, H = 210, L = 44, B = 24, Tp = 12, bw = (W - L - 6) / 12, mx = 1, i;
+    for (i = 0; i < 12; i++) mx = Math.max(mx, p.alto[i], p.mes[i]);
+    function Y(x) { return H - B - (H - B - Tp) * x / mx; }
+    var g = ['<svg viewBox="0 0 ' + W + " " + H + '" class="ch" style="width:100%;height:auto" id="barNal">'];
+    for (var e = 0; e <= 4; e++) { var yy = Y(mx * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 4) + '" y1="' + yy + '" y2="' + yy + '" class="ch-grid"/><text x="' + (L - 4) + '" y="' + (yy + 3) + '" font-size="9" text-anchor="end" fill="#6b7486">' + fmt(mx * e / 4) + "</text>"); }
+    for (i = 0; i < 12; i++) {
+      var cx = L + i * bw + bw / 2, esTop = top.indexOf(i) >= 0 && p.total >= 1;
+      g.push('<rect class="ch-bar" style="--i:' + i + '" data-m="' + i + '" x="' + (L + i * bw + 2) + '" y="' + Y(p.mes[i]) + '" width="' + Math.max(1, bw - 4) + '" height="' + (H - B - Y(p.mes[i])) + '" rx="2" fill="' + (esTop ? "#FF6B2C" : "#31688e") + '"' + (mS === i ? ' stroke="#F4F1EA" stroke-width="1.5"' : "") + ' data-tip="' +
+        esc("<b>" + NOML[i] + "</b><br>" + t("NAL espera ", "NAL expects ") + fmt(p.mes[i]) + t(" fuegos", " fires") + "<br>" + t("En años pasados: entre ", "In past years: between ") + fmt(p.bajo[i]) + t(" y ", " and ") + fmt(p.alto[i])) + '"/>');
+      g.push('<path d="M' + cx + " " + Y(p.alto[i]) + "V" + Y(p.bajo[i]) + "M" + (cx - 3) + " " + Y(p.alto[i]) + "h6M" + (cx - 3) + " " + Y(p.bajo[i]) + 'h6" stroke="#F4F1EA" stroke-width="1" opacity=".75" fill="none" pointer-events="none"/>');
+      g.push('<text x="' + cx + '" y="' + (H - 9) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + NOM[i] + "</text>");
+    }
+    g.push("</svg>");
+    var pct = Math.round(v.top3 * 100), mejor = v.errMediano < v.errPersistencia;
+    var frase = p.total < 1 ? enDonde() + t(", NAL casi no espera fuego: el satélite casi no ha visto fuego aquí.", ", NAL expects almost no fire: the satellite has seen almost no fire here.")
+      : enDonde() + t(", NAL espera que en ", ", NAL expects that in ") + per + t(" el fuego llegue sobre todo en ", " fire will come mostly in ") + listaMeses(top) + t(", con lo más fuerte en ", ", peaking in ") + NOML[pico] + ".";
+    var hh = '<div class="tarjeta"><h3>' + t("¿Cuándo y dónde viene el fuego? Lo dice NAL", "When and where is fire coming? Ask NAL") + "</h3>" +
+      '<div class="fila nal-anios"><label>' + t("Del año ", "From ") + '<select id="nalDe">' + opciones(a1, Y0) + "</select></label><label>" + t("al año ", "to ") + '<select id="nalA">' + opciones(a2, a1) + "</select></label></div>" +
+      conclusion(frase) +
+      '<div class="nal-acierto"><div class="grandes">' + pct + '%</div><div class="l"><b>' + t("Acierto de NAL.", "NAL hit rate.") + "</b> " + t("De cada 100 fuegos, ", "Out of every 100 fires, ") + pct + t(" cayeron en los 3 meses que NAL señaló. Probado con ", " fell in the 3 months NAL pointed to. Tested on ") + v.n + t(" años que NAL no había visto.", " years NAL had not seen.") + "</div></div>" +
+      g.join("") +
+      '<p class="lead nal-mapa">' + (mS === null ? t("El mapa muestra dónde espera NAL el fuego en un año. ", "The map shows where NAL expects fire in a year. ") + (TACTIL ? t("Toca", "Tap") : t("Haz clic en", "Click")) + t(" un mes de la gráfica para ver solo ese mes.", " a month in the chart to see only that month.")
+        : t("El mapa muestra solo ", "The map shows only ") + NOML[mS] + '. <button class="link" id="nalTodo">' + t("Ver todo el año", "See the whole year") + "</button>") + "</p>" +
+      comoLeer(t("Cada barra es un mes: mientras más alta, más fuego espera NAL. Las 3 naranjas son los meses de más fuego. La rayita blanca marca entre cuánto y cuánto fuego hubo ese mes en años pasados.", "Each bar is a month: the taller, the more fire NAL expects. The 3 orange ones are the months with the most fire. The white line marks the range of fire seen that month in past years.")) +
+      '<div class="stats"><div class="stat"><div class="n">' + aproxT(p.total) + '</div><div class="l">' + t("fuegos espera NAL aquí en un año. En años pasados hubo entre ", "fires NAL expects here in a year. Past years had between ") + aprox(p.totalBajo) + t(" y ", " and ") + aprox(p.totalAlto) + "." + (nA > 1 ? t(" En los ", " Over the ") + nA + t(" años: ", " years: ") + aprox(p.total * nA) + "." : "") + "</div></div>" +
+      '<div class="stat"><div class="n">' + Math.round(v.donde20 * 100) + '</div><div class="l">' + t("de cada 100 fuegos cayeron en la quinta parte de las zonas que NAL marcó con el color más fuerte", "out of every 100 fires fell in the fifth of the areas NAL marked with the strongest colour") + "</div></div></div>" +
+      "<details><summary>" + t("Cómo funciona NAL y qué no puede decir", "How NAL works and what it cannot say") + "</summary><ul>" +
+      "<li>" + t("NAL aprende de ", "NAL learns from ") + N.anios.length + t(" años de datos ya corregidos (", " years of corrected data (") + N.anios[0] + t(" a ", " to ") + N.ultimo + t("). Para cada zona de 27 km y cada mes mira cuánto fuego hubo. Los años recientes pesan más.", "). For each 27 km area and each month it looks at how much fire there was. Recent years weigh more.") + "</li>" +
+      "<li>" + t("Para probarlo le escondimos un año, le pedimos predecirlo solo con los años anteriores y comparamos con lo que pasó. Así con ", "To test it we hid a year, asked NAL to forecast it using only the years before, and compared with what happened. We did this for ") + v.n + t(" años en toda la región", " years across the whole region") + (h > 1 ? t(", prediciendo con ", ", forecasting ") + h + t(" años de anticipación.", " years ahead.") : ".") + "</li>" +
+      "<li>" + (mejor ? t("En la cantidad de fuego del año se equivoca cerca de ", "On the amount of fire in a year it is off by about ") + Math.round(v.errMediano * 100) + t("%. Decir «será igual que el año pasado» se equivoca ", "%. Saying \"it will be like last year\" is off by ") + Math.round(v.errPersistencia * 100) + "%."
+        : t("En la cantidad de fuego del año, aquí NAL todavía no es mejor que decir «será igual que el año pasado» (", "On the amount of fire in a year, here NAL is not yet better than saying \"it will be like last year\" (") + Math.round(v.errMediano * 100) + t("% contra ", "% versus ") + Math.round(v.errPersistencia * 100) + t("%). Aquí sirve para el cuándo y el dónde, no para el cuánto.", "%). Here it is useful for when and where, not for how much.")) + "</li>" +
+      "<li>" + t("En ", "In ") + Math.round(v.dentroRango * 100) + t(" de cada 100 años probados, el fuego real quedó dentro del rango que NAL dio.", " out of every 100 tested years, the real fire fell inside the range NAL gave.") + "</li>" +
+      "<li>" + t("NAL no puede decir el fuego exacto de un año: la mayoría de los fuegos los enciende la gente y el clima de ese año también cuenta. Todavía no usa el pronóstico del clima, así que espera lo mismo para cada año que elijas.", "NAL cannot tell the exact fire of a year: people start most fires and that year's weather matters too. It does not use the weather forecast yet, so it expects the same for every year you pick.") + "</li></ul></details></div>";
+    el.innerHTML = hh; conTip($("barNal"));
+    $("nalDe").addEventListener("change", function () { estado.nalDe = +this.value; if ((estado.nalA || 0) < estado.nalDe) estado.nalA = estado.nalDe; tabNal(); });
+    $("nalA").addEventListener("change", function () { estado.nalA = +this.value; tabNal(); });
+    $("barNal").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("[data-m]") : null; if (!b) return; var m = +b.getAttribute("data-m"); estado.nalMes = estado.nalMes === m ? undefined : m; tabNal(); });
+    var bt = $("nalTodo"); if (bt) bt.addEventListener("click", function () { estado.nalMes = undefined; tabNal(); });
+    estado.mapa = { tipo: "nal", valores: N.mapa(undefined, mS), mes: mS, per: per }; pararReplay(); pintarMapa();
   }
 
   // ---------- Protected areas ----------
