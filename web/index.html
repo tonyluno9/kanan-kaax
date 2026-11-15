@@ -23,10 +23,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&family=Public+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<link rel="stylesheet" href="css/tokens.css?v=20261116c">
-<link rel="stylesheet" href="css/app.css?v=20261116c">
-<script src="js/iconos.js?v=20261116c"></script>
-<script src="js/contornos.js?v=20261116c"></script>
+<link rel="stylesheet" href="css/tokens.css?v=20261116i">
+<link rel="stylesheet" href="css/app.css?v=20261116i">
+<script src="js/iconos.js?v=20261116i"></script>
+<script src="js/contornos.js?v=20261116i"></script>
 </head>
 <body class="entrando con-heroe">
 <a class="sr-only" href="#panel">Skip to results</a>
@@ -35,6 +35,7 @@
 <div id="mapa">
   <div class="flot capas seg" id="capas" role="group" aria-label="Base map"></div>
   <div class="flot fecha" id="fechaBox"><label><span id="lFecha" class="kicker"></span> <input type="date" id="fecha" class="mono"></label></div>
+  <div class="flot nal-caja" id="nalCaja"><button class="nal-btn" id="btnNal" type="button" aria-expanded="false" aria-controls="nalBarra"></button><div class="nal-barra" id="nalBarra" hidden></div></div>
   <div class="flot modo" id="modo" role="status"><i class="modo-dot" aria-hidden="true"></i><span id="modoTxt"></span><button id="modoX" class="icon-btn sm" aria-label="Close"></button></div>
   <div class="flot leyenda" id="leyenda"></div>
   <div class="flot tiempo" id="tiempo">
@@ -86,7 +87,6 @@
   </div>
   <div class="panel-scroll" id="panelScroll">
     <div class="sec respuestas">
-      <div class="kicker" id="kResp"></div>
       <article class="respuesta" id="r1"></article>
       <article class="respuesta" id="r2"></article>
       <article class="respuesta" id="r3"></article>
@@ -121,7 +121,7 @@
     document.write('<script src="data/' + window.CLAVE_REGION + '.js"><\/script>');
   })();
 </script>
-<script src="js/nal.js?v=20261116c"></script>
-<script src="js/app.js?v=20261116c"></script>
+<script src="js/nal.js?v=20261116i"></script>
+<script src="js/app.js?v=20261116i"></script>
 </body>
 </html>

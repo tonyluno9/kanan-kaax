@@ -143,7 +143,6 @@
   // Language switch shows both options, the current one highlighted: "ES · EN"
   $("btnIdioma").innerHTML = I("globe", 16) + '<span class="idi' + (EN ? "" : " on") + '" lang="es">ES</span><span class="idi-sep" aria-hidden="true">·</span><span class="idi' + (EN ? " on" : "") + '" lang="en">EN</span>';
   $("btnIdioma").setAttribute("aria-label", EN ? "Cambiar a español" : "Switch to English");
-  $("kResp").textContent = t("Lo más importante", "The short answer");
   $("lFecha").textContent = t("Fecha de la foto", "Photo date");
   $("lugarPin").innerHTML = I("pin", 20);
   $("modoX").innerHTML = I("x", 14);
@@ -596,7 +595,7 @@
     ev.stopPropagation(); var v = b.getAttribute("data-vista");
     setTimeout(function () { MAPA.vista(v); pintarMapa(); var nb = document.querySelector('.vista-sw [data-vista="' + v + '"]'); if (nb) nb.focus({ preventScroll: true }); }, 0);
   });
-  $("modoX").addEventListener("click", function () { pararReplay(); if (SEM) { $("repSem").value = 0; pista($("repSem")); etiquetaReproducir(); } estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
+  $("modoX").addEventListener("click", function () { if (estado.mapa.tipo === "nal") { abrirTab("cal"); return; } pararReplay(); if (SEM) { $("repSem").value = 0; pista($("repSem")); etiquetaReproducir(); } estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
 
   // =====================================================================
   //  Selection
@@ -767,6 +766,7 @@
     $("lugarSub").textContent = sub;
     dibujarEscala();
   }
+  function irNal() { if (document.body.classList.contains("panel-oculto") && $("panelMostrar")) $("panelMostrar").click(); abrirTab("nal", true); }
   function dibujarRespuestas() {
     var s = serieSel(), pc = periodoCritico(s), h;
     // 1. When is there most fire? A 12-month strip with the fire months lit (colour + letter, never colour alone)
@@ -780,6 +780,7 @@
         '<div class="minilab">' + NOM.map(function (n, i) { return '<span class="' + (pc.meses.indexOf(i) >= 0 ? "cr" : "") + '">' + n.slice(0, 1) + "</span>"; }).join("") + "</div>";
     }
     $("r1").innerHTML = h;
+
     // 2. How is this year going? Dot + word + colour, then one sentence with rounded numbers
     var y = comoVaElAnio(s), col, est;
     if (y.ratio === null) { col = "var(--text-3)"; est = t("Sin con qué comparar", "Nothing to compare with"); }
@@ -842,6 +843,7 @@
     if (MAPA) { MAPA.zona(null); MAPA.imagen(null); if (k !== "areas" && estado.sel.tipo !== "area") MAPA.areas(null); if (k !== "cal") MAPA.puntos(null); }
     if (k !== "riesgo" && estado.mapa.tipo === "riesgo") { estado.mapa = { tipo: "promedio" }; pintarMapa(); }
     if (k !== "nal" && estado.mapa.tipo === "nal") { estado.mapa = { tipo: "promedio" }; pintarMapa(); }
+    if (k !== "nal") { NAL_ABIERTA = false; barraNal(); }
     var f = { cal: tabCalendario, anios: tabAnios, alertas: tabAlertas, reglas: tabReglas, tipo: tabReglas, riesgo: tabRiesgo, nal: tabNal, areas: tabAreas, prueba: tabPrueba, como: tabComo }[k];
     if (f) f();
     moverIndicador();
@@ -1126,14 +1128,81 @@
   // ---------- NAL: forecast for the coming years ----------
   // The engine lives in js/nal.js. Every score shown here is computed live from the data file (walk-forward test).
   var NALM = null;
-  function nal() { if (NALM === null) NALM = window.NAL ? window.NAL.crear(Q) : false; return NALM; }
+  // The NAL bar on the map (under the base-map switch): pick the years and the month without leaving the map
+  var NAL_ABIERTA = false, NAL_T = 0, NAL_I = 0, NAL_TXT = null;
+  function barraNal() {
+    var b = $("btnNal"), caja = $("nalBarra"), N = nal(); if (!b || !caja) return;
+    if (!N || N.anios.length <= N.minEntreno) { $("nalCaja").style.display = "none"; return; }
+    b.innerHTML = I("chart", 16) + "<span>" + t("Predice con NAL", "Forecast with NAL") + "</span>";
+    b.classList.toggle("on", !!NAL_ABIERTA); b.setAttribute("aria-expanded", NAL_ABIERTA ? "true" : "false"); caja.hidden = !NAL_ABIERTA;
+    clearTimeout(NAL_T); clearInterval(NAL_I);
+    if (!NAL_ABIERTA) { caja.innerHTML = ""; estado.nalRes = false; NAL_TXT = null; return; }
+    var Y0 = ANIO[T - 1] + 1, a1 = estado.nalDe || Y0, a2 = Math.max(a1, estado.nalA || a1), per = a1 === a2 ? "" + a1 : a1 + "–" + a2, mS = estado.nalMes === undefined ? -1 : estado.nalMes;
+    var p = N.predecir(celdasSel()), v = nalVal(a2 - N.ultimo), pct = Math.round(v.top3 * 100);
+    var top = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, c) { return c[0] - a[0]; }).slice(0, 3).map(function (x) { return x[1]; }).sort(function (a, c) { return a - c; });
+    function ops(sel, min) { var o = ""; for (var y = Math.max(Y0, min); y <= Y0 + 4; y++) o += '<option value="' + y + '"' + (y === sel ? " selected" : "") + ">" + y + "</option>"; return o; }
+    function nfu(x) { return x >= 100 ? aprox(x) : x >= 10 ? "" + Math.round(x) : fmt(x); }
+    var meses = '<option value="-1"' + (mS < 0 ? " selected" : "") + ">" + t("Todo el año", "Whole year") + "</option>" + NOML.map(function (n, m) { return '<option value="' + m + '"' + (m === mS ? " selected" : "") + ">" + n + "</option>"; }).join("");
+    // Summary in plain words, written from NAL's own numbers for the place, years and month chosen (nothing typed by hand)
+    function resumen() {
+      if (p.total < 1) return enDonde() + t(", en ", ", in ") + per + t(" el mapa casi no muestra actividad: NAL casi no espera fuego.", " the map shows almost no activity: NAL expects almost no fire.");
+      var ord = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, c) { return c[0] - a[0]; }), txt;
+      if (mS >= 0) {
+        var pos = ord.map(function (x) { return x[1]; }).indexOf(mS) + 1;
+        txt = enDonde() + t(", en ", ", in ") + NOML[mS] + t(" de ", " ") + per + t(" el mapa muestra una actividad de fuego ", " the map shows ") + (pos <= 3 ? t("alta", "high") : pos <= 6 ? t("media", "medium") : t("baja", "low")) + t(": NAL espera ", " fire activity: NAL expects ") + nfu(p.mes[mS]) + t(" fuegos (otros años: entre ", " fires (past years: between ") + nfu(p.bajo[mS]) + t(" y ", " and ") + nfu(p.alto[mS]) + "). " +
+          (pos === 1 ? t("Es el mes con más fuego del año.", "It is the month with the most fire of the year.") : pos <= 3 ? t("Es uno de los 3 meses con más fuego del año.", "It is one of the 3 months with the most fire of the year.") : pos >= 10 ? t("Es uno de los meses más tranquilos del año.", "It is one of the quietest months of the year.") : t("Es un mes intermedio.", "It is an in-between month."));
+        return txt;
+      }
+      var pct3 = Math.round((p.mes[top[0]] + p.mes[top[1]] + p.mes[top[2]]) / p.total * 100), bajos = ord.slice(9).map(function (x) { return x[1]; }).sort(function (a, c) { return a - c; }), nivel;
+      if (estado.sel.tipo === "region") nivel = pct3 >= 70 ? t("una temporada de fuego muy marcada", "a very marked fire season") : t("fuego repartido en varios meses", "fire spread over several months");
+      else { var reg = N.predecir(N.tierra).total / Math.max(1, N.tierra.length), aqui = p.total / Math.max(1, celdasSel().length), r = reg > 0 ? aqui / reg : 1;
+        nivel = r > 1.25 ? t("una actividad de fuego alta, más que el promedio de la región", "high fire activity, above the regional average") : r < 0.75 ? t("una actividad de fuego baja, menos que el promedio de la región", "low fire activity, below the regional average") : t("una actividad de fuego media, parecida al promedio de la región", "medium fire activity, close to the regional average"); }
+      txt = enDonde() + t(", en ", ", in ") + per + t(" el mapa muestra ", " the map shows ") + nivel + ". " + t("NAL espera ", "NAL expects ") + nfu(p.total) + t(" fuegos al año (en años pasados hubo entre ", " fires a year (past years had between ") + nfu(p.totalBajo) + t(" y ", " and ") + nfu(p.totalAlto) + "). " +
+        pct3 + t(" de cada 100 llegarán en ", " out of every 100 will come in ") + listaMeses(top) + t(", con lo más fuerte en ", ", peaking in ") + NOML[ord[0][1]] + ". " + t("Los meses más tranquilos serán ", "The quietest months will be ") + listaMeses(bajos) + ".";
+      if (a2 > a1) txt += " " + t("En los ", "Over the ") + (a2 - a1 + 1) + t(" años suman ", " years that adds up to ") + nfu(p.total * (a2 - a1 + 1)) + ".";
+      if (estado.sel.tipo === "region") { // where the strongest colour is, from the forecast map itself
+        var mp = N.mapa(), tr = N.tierra.slice().sort(function (x, y) { return mp[y] - mp[x]; }), n10 = Math.max(1, Math.round(tr.length * 0.1)), sx = 0, sy = 0, sw = 0, cx = 0, cy = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+        tr.forEach(function (c, i) { var q = centro(c); cx += q[0]; cy += q[1]; x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); if (i < n10) { sx += q[0] * mp[c]; sy += q[1] * mp[c]; sw += mp[c]; } });
+        if (sw > 0) { var dx = (sx / sw - cx / tr.length) / ((x1 - x0) || 1), dy = (sy / sw - cy / tr.length) / ((y1 - y0) || 1), U = 0.08;
+          var ns = dy > U ? "n" : dy < -U ? "s" : "", ew = dx > U ? "e" : dx < -U ? "o" : "";
+          var dir = { n: t("norte", "north"), s: t("sur", "south"), e: t("este", "east"), o: t("oeste", "west"), ne: t("noreste", "northeast"), no: t("noroeste", "northwest"), se: t("sureste", "southeast"), so: t("suroeste", "southwest") }[ns + ew] || t("centro", "centre");
+          txt += " " + t("Las zonas de color más fuerte están sobre todo hacia el ", "The areas with the strongest colour are mostly towards the ") + dir + t(" de la región.", " of the region."); }
+      }
+      return txt;
+    }
+    caja.innerHTML = '<div class="nal-fila"><label>' + t("Del año", "From") + '<select id="nbDe">' + ops(a1, Y0) + "</select></label><label>" + t("al año", "to") + '<select id="nbA">' + ops(a2, a1) + "</select></label><label>" + t("Mes", "Month") + '<select id="nbMes">' + meses + "</select></label></div>" +
+      '<button class="boton prim nal-gen" id="nbGen" type="button">' + I("chart", 16) + t("Generar resumen con NAL", "Generate summary with NAL") + "</button>" + (estado.nalRes ? '<p class="nal-res" id="nbRes" aria-live="polite"></p>' : "") +
+      '<div class="nal-pie"><span title="' + esc(t("De cada 100 fuegos, ", "Out of every 100 fires, ") + pct + t(" cayeron en los 3 meses que NAL señaló. Probado con ", " fell in the 3 months NAL pointed to. Tested on ") + v.n + t(" años que NAL no había visto.", " years NAL had not seen.")) + '"><b>' + pct + "%</b> " + t("de acierto en el cuándo", "right on timing") + '</span><button class="link" id="nbMas">' + t("Ver detalles", "See details") + "</button></div>";
+    $("nbDe").addEventListener("change", function () { estado.nalDe = +this.value; if ((estado.nalA || 0) < estado.nalDe) estado.nalA = estado.nalDe; tabNal(); });
+    $("nbA").addEventListener("change", function () { estado.nalA = +this.value; tabNal(); });
+    $("nbMes").addEventListener("change", function () { estado.nalMes = +this.value < 0 ? undefined : +this.value; tabNal(); });
+    $("nbMas").addEventListener("click", irNal);
+    $("nbGen").addEventListener("click", function () { estado.nalRes = true; NAL_TXT = null; barraNal(); });
+    // The summary is written out over about 3 seconds every time the place, the years or the month change
+    if (estado.nalRes) {
+      var txtR = resumen(), elR = $("nbRes");
+      if (QUIETO || txtR === NAL_TXT) { elR.textContent = txtR; NAL_TXT = txtR; }
+      else {
+        elR.className = "nal-res pensando"; elR.innerHTML = '<span class="nal-pens">' + t("NAL está generando el resumen", "NAL is generating the summary") + "<i></i><i></i><i></i></span>";
+        NAL_T = setTimeout(function () {
+          var n = 0, paso = Math.max(1, Math.ceil(txtR.length / 60)); elR.className = "nal-res escribiendo"; elR.textContent = "";
+          NAL_I = setInterval(function () { n += paso; elR.textContent = txtR.slice(0, n); if (n >= txtR.length) { clearInterval(NAL_I); elR.className = "nal-res"; NAL_TXT = txtR; } }, 30);
+        }, 1200);
+      }
+    }
+  }
+  // the bar redraws itself on click, so the click must never reach the map underneath
+  if ($("nalCaja")) $("nalCaja").addEventListener("click", function (ev) { ev.stopPropagation(); });
+  if ($("btnNal")) $("btnNal").addEventListener("click", function () { if (NAL_ABIERTA) abrirTab("cal"); else abrirTab("nal"); });
+  function nal() { if (NALM == null) NALM = window.NAL ? window.NAL.crear(Q) : false; return NALM; }
+  var NALV = {};
+  function nalVal(h) { var N = nal(); NALV = NALV || {}; h = Math.max(1, h); if (!NALV[h]) NALV[h] = N.validar(h); while (NALV[h].n < 5 && h > 1) { h--; if (!NALV[h]) NALV[h] = N.validar(h); } return NALV[h]; }
   function listaMeses(ms) { var n = ms.map(function (m) { return NOML[m]; }); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + t(" y ", " and ") + n[n.length - 1]; }
   function tabNal() {
     var N = nal(), el = $("tab-nal");
     if (!N || N.anios.length <= N.minEntreno) { el.innerHTML = '<div class="tarjeta"><p class="lead">' + t("Esta región todavía no tiene suficientes años de datos para predecir.", "This region does not have enough years of data to forecast yet.") + "</p></div>"; return; }
     var Y0 = ANIO[T - 1] + 1, a1 = estado.nalDe || Y0, a2 = Math.max(a1, estado.nalA || a1), nA = a2 - a1 + 1, per = nA === 1 ? "" + a1 : a1 + "–" + a2;
-    var cs = celdasSel(), p = N.predecir(cs), h = Math.max(1, a2 - N.ultimo), v = N.validar(h);
-    while (v.n < 5 && h > 1) v = N.validar(--h);
+    var cs = celdasSel(), p = N.predecir(cs), v = nalVal(a2 - N.ultimo), h = v.h;
     var mS = estado.nalMes === undefined ? null : estado.nalMes;
     var ord = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, b) { return b[0] - a[0]; });
     var top = ord.slice(0, 3).map(function (x) { return x[1]; }).sort(function (a, b) { return a - b; }), pico = ord[0][1];
@@ -1177,6 +1246,7 @@
     $("barNal").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("[data-m]") : null; if (!b) return; var m = +b.getAttribute("data-m"); estado.nalMes = estado.nalMes === m ? undefined : m; tabNal(); });
     var bt = $("nalTodo"); if (bt) bt.addEventListener("click", function () { estado.nalMes = undefined; tabNal(); });
     estado.mapa = { tipo: "nal", valores: N.mapa(undefined, mS), mes: mS, per: per }; pararReplay(); pintarMapa();
+    NAL_ABIERTA = true; barraNal();
   }
 
   // ---------- Protected areas ----------
