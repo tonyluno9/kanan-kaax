@@ -165,7 +165,7 @@ def ficha(clave, dec, val, ref, tch):
                      "y el calor de NASA POWER de la temporada anterior." if usa_c else
                      "Para la cantidad del año se queda con el promedio de los años pasados: el clima no mejoró la predicción aquí.")),
         "como_se_probo": ("Se escondió cada año de prueba y se predijo solo con lo que existía en noviembre del año anterior. "
-                          "Así se hizo con %d años. El modelo acertó %s del fuego en sus 3 meses de más fuego; el máximo posible era %s. "
+                          "Así se hizo con %d años. Los 3 meses que esperaba con más fuego tuvieron el %s del fuego; el máximo posible era %s. "
                           "El total del año falló en una mediana de %s (el modelo anterior: %s). "
                           "El rango contuvo el total real en %s de los años." % (
                               v["n"], pct(v["top3"]), pct(tch["top3"]), pct(v["errMediano"]), pct(r["errMediano"]), pct(v["dentroRango"]))),

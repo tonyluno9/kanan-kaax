@@ -28,6 +28,13 @@ def ganados(v2, v1):
     return sum(a[y] < b[y] - 1e-12 for y in comunes), sum(a[y] > b[y] + 1e-12 for y in comunes), len(comunes)
 
 
+def p_signo(a, b):
+    """One-sided sign test: chance of >= a wins out of a + b if v2 and v1 were equally good."""
+    from math import comb
+    n = a + b
+    return sum(comb(n, i) for i in range(a, n + 1)) / 2 ** n if n else 1.0
+
+
 def main():
     D = {c: json.load(open(os.path.join(RES, c + ".json"), encoding="utf-8")) for c in NOMBRE}
     ver = open(os.path.join(RES, "verificar.txt"), encoding="utf-8").read() if os.path.exists(os.path.join(RES, "verificar.txt")) else "(sin ejecutar)"
@@ -50,7 +57,8 @@ def main():
         L.append("")
         g = [(k,) + ganados(d["validacion"][k], d["referencia_v1"][k]) for k in ("1", "2", "3", "nov")]
         L.append("Total del año, años en que v2 se acercó más que v1 / menos / iguales: " +
-                 "; ".join("%s: %d / %d / %d" % (k, a, b, n - a - b) for k, a, b, n in g) + ".")
+                 "; ".join("%s: %d / %d / %d" % (k, a, b, n - a - b) + (" (prueba de signo p = %.2f)" % p_signo(a, b) if a + b else "")
+                           for k, a, b, n in g) + ".")
         L.append("Rango de un solo cuadro (P10-P90 de los escenarios, año completo): contuvo el valor real en " +
                  ", ".join("%s: %s" % (k, p0(d["validacion"][k].get("dentroRangoCuadro", float("nan")))) for k in ("1", "2", "3", "nov")) + " de los cuadros con fuego esperado.")
         L.append("")
@@ -80,9 +88,9 @@ def main():
     for c, d in D.items():
         for k in ("1", "2", "3", "nov"):
             cb = d["combinaciones"][k]
-            L.append("- %s %s: solo patrón v2 → top3 %s, donde20 %s; solo total v2 → error %s; ambos → error %s; base v1 → error %s." % (
+            L.append("- %s %s: solo patrón v2 → top3 %s, donde20 %s; solo total v2 → error %s; ambos → error %s; base (patrón v1 + línea base de v1 con rango conforme%s) → error %s." % (
                 NOMBRE[c], k, p(cb["v2_patron"]["top3"]), p(cb["v2_patron"]["donde20"]), p(cb["v2_cantidad"]["errMediano"]),
-                p(cb["v2"]["errMediano"]), p(cb["base"]["errMediano"])))
+                p(cb["v2"]["errMediano"]), "; en nov la línea base incluye el año en curso" if k == "nov" else "", p(cb["base"]["errMediano"])))
     L += ["- Intercepto libre en la regresión del total: hundía el total (muestras tempranas cortas). Se fijó en 0.",
           "- Elegir una sola familia de predictores y una penalización por pliegue: sobreajusta y a h = 1 en Yucatán subía el error. Se reemplazó por el promedio.",
           "- Elegir un solo patrón (K = 1): inestable en Portugal. Promediar todos (K = 20) tampoco ganó a v1 en Portugal.",
@@ -104,9 +112,10 @@ def main():
     L += ["**Sí se puede decir:**", "",
           "- \"NAL predice cuándo llega el fuego: probado en %d años escondidos, los 3 meses que espera con más fuego concentran el %s del fuego real en Yucatán (lo máximo posible era %s).\"" % (vy["n"], p0(vy["top3"]), p0(ty["top3"])),
           "- \"En el 20 %% del territorio que NAL marca como de más riesgo cae el %s del fuego de Yucatán.\"" % p0(vy["donde20"]),
-          "- \"Con el fuego del año anterior, El Niño y el clima de la NASA, el error del total del año en Yucatán bajó de %s a %s (mediana, %d años de prueba).\"" % (p0(ry["errMediano"]), p0(vy["errMediano"]), vy["n"]),
+          "- \"Con el fuego del año anterior, El Niño y el clima de la NASA, el error del total del año en Yucatán bajó de %s a %s (mediana de %d años de prueba; v2 se acercó más en %d de %d años).\"" % (
+              p0(ry["errMediano"]), p0(vy["errMediano"]), vy["n"], ganados(vy, ry)[0], ganados(vy, ry)[2]),
           "- \"El rango de NAL v2 contiene el total real en %s de los años (v1: %s; meta: 80 %%).\"" % (p0(vy["dentroRango"]), p0(ry["dentroRango"])),
-          "- \"Para 2027 NAL espera en Yucatán unos %s fuegos vistos, entre %s y %s.\"" % (format(round(y["pronostico"]["2027"]["total"], -3), ",.0f"),
+          "- \"Para 2027 NAL espera en Yucatán unos %s fuegos vistos por satélite, entre %s y %s.\"" % (format(round(y["pronostico"]["2027"]["total"], -3), ",.0f"),
                                                                                  format(round(y["pronostico"]["2027"]["bajo"], -3), ",.0f"), format(round(y["pronostico"]["2027"]["alto"], -3), ",.0f")),
           "", "**No se puede decir:**", "",
           "- \"NAL predice los incendios\" o \"sabe cuántos fuegos habrá\": da un rango, y el rango de un solo lugar es mucho más incierto.",

@@ -33,7 +33,7 @@ Cada año de prueba se predijo solo con lo que existía en su fecha de emisión.
 | nov | climatología | 15 | 85.1 % | 46.6 % | 71.0 % | 22.4 % | 60 % |
 | nov | techo (modelo perfecto) | | 85.9 % | 56.2 % | 80.9 % | 0 % | |
 
-Total del año, años en que v2 se acercó más que v1 / menos / iguales: 1: 12 / 3 / 0; 2: 0 / 0 / 14; 3: 0 / 0 / 13; nov: 11 / 4 / 0.
+Total del año, años en que v2 se acercó más que v1 / menos / iguales: 1: 12 / 3 / 0 (prueba de signo p = 0.02); 2: 0 / 0 / 14; 3: 0 / 0 / 13; nov: 11 / 4 / 0 (prueba de signo p = 0.06).
 Rango de un solo cuadro (P10-P90 de los escenarios, año completo): contuvo el valor real en 1: 78 %, 2: 78 %, 3: 78 %, nov: 80 % de los cuadros con fuego esperado.
 
 ### Portugal
@@ -61,7 +61,7 @@ Rango de un solo cuadro (P10-P90 de los escenarios, año completo): contuvo el v
 | nov | climatología | 15 | 56.5 % | 60.0 % | 54.9 % | 47.5 % | 53 % |
 | nov | techo (modelo perfecto) | | 71.3 % | 80.3 % | 92.0 % | 0 % | |
 
-Total del año, años en que v2 se acercó más que v1 / menos / iguales: 1: 9 / 6 / 0; 2: 0 / 0 / 14; 3: 8 / 5 / 0; nov: 12 / 3 / 0.
+Total del año, años en que v2 se acercó más que v1 / menos / iguales: 1: 9 / 6 / 0 (prueba de signo p = 0.30); 2: 0 / 0 / 14; 3: 8 / 5 / 0 (prueba de signo p = 0.29); nov: 12 / 3 / 0 (prueba de signo p = 0.02).
 Rango de un solo cuadro (P10-P90 de los escenarios, año completo): contuvo el valor real en 1: 84 %, 2: 84 %, 3: 81 %, nov: 85 % de los cuadros con fuego esperado.
 
 ## 2. El modelo que quedó
@@ -100,14 +100,14 @@ Variables y fuentes (todas disponibles en noviembre del año anterior):
 
 ## 3. Qué se probó y no funcionó
 
-- Yucatán 1: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
-- Yucatán 2: solo patrón v2 → top3 84.8 %, donde20 50.0 %; solo total v2 → error 25.6 %; ambos → error 25.6 %; base v1 → error 19.7 %.
-- Yucatán 3: solo patrón v2 → top3 84.7 %, donde20 48.0 %; solo total v2 → error 23.8 %; ambos → error 23.8 %; base v1 → error 17.1 %.
-- Yucatán nov: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
-- Portugal 1: solo patrón v2 → top3 53.2 %, donde20 58.6 %; solo total v2 → error 51.4 %; ambos → error 51.4 %; base v1 → error 54.5 %.
-- Portugal 2: solo patrón v2 → top3 55.4 %, donde20 58.9 %; solo total v2 → error 65.5 %; ambos → error 65.5 %; base v1 → error 64.1 %.
-- Portugal 3: solo patrón v2 → top3 58.2 %, donde20 58.1 %; solo total v2 → error 68.2 %; ambos → error 68.2 %; base v1 → error 69.7 %.
-- Portugal nov: solo patrón v2 → top3 53.1 %, donde20 59.7 %; solo total v2 → error 45.0 %; ambos → error 45.0 %; base v1 → error 54.5 %.
+- Yucatán 1: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base (patrón v1 + línea base de v1 con rango conforme) → error 22.2 %.
+- Yucatán 2: solo patrón v2 → top3 84.8 %, donde20 50.0 %; solo total v2 → error 25.6 %; ambos → error 25.6 %; base (patrón v1 + línea base de v1 con rango conforme) → error 19.7 %.
+- Yucatán 3: solo patrón v2 → top3 84.7 %, donde20 48.0 %; solo total v2 → error 23.8 %; ambos → error 23.8 %; base (patrón v1 + línea base de v1 con rango conforme) → error 17.1 %.
+- Yucatán nov: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base (patrón v1 + línea base de v1 con rango conforme; en nov la línea base incluye el año en curso) → error 22.2 %.
+- Portugal 1: solo patrón v2 → top3 53.2 %, donde20 58.6 %; solo total v2 → error 51.4 %; ambos → error 51.4 %; base (patrón v1 + línea base de v1 con rango conforme) → error 54.5 %.
+- Portugal 2: solo patrón v2 → top3 55.4 %, donde20 58.9 %; solo total v2 → error 65.5 %; ambos → error 65.5 %; base (patrón v1 + línea base de v1 con rango conforme) → error 64.1 %.
+- Portugal 3: solo patrón v2 → top3 58.2 %, donde20 58.1 %; solo total v2 → error 68.2 %; ambos → error 68.2 %; base (patrón v1 + línea base de v1 con rango conforme) → error 69.7 %.
+- Portugal nov: solo patrón v2 → top3 53.1 %, donde20 59.7 %; solo total v2 → error 45.0 %; ambos → error 45.0 %; base (patrón v1 + línea base de v1 con rango conforme; en nov la línea base incluye el año en curso) → error 54.5 %.
 - Intercepto libre en la regresión del total: hundía el total (muestras tempranas cortas). Se fijó en 0.
 - Elegir una sola familia de predictores y una penalización por pliegue: sobreajusta y a h = 1 en Yucatán subía el error. Se reemplazó por el promedio.
 - Elegir un solo patrón (K = 1): inestable en Portugal. Promediar todos (K = 20) tampoco ganó a v1 en Portugal.
@@ -131,9 +131,9 @@ Variables y fuentes (todas disponibles en noviembre del año anterior):
 
 - "NAL predice cuándo llega el fuego: probado en 15 años escondidos, los 3 meses que espera con más fuego concentran el 85 % del fuego real en Yucatán (lo máximo posible era 86 %)."
 - "En el 20 % del territorio que NAL marca como de más riesgo cae el 49 % del fuego de Yucatán."
-- "Con el fuego del año anterior, El Niño y el clima de la NASA, el error del total del año en Yucatán bajó de 20 % a 16 % (mediana, 15 años de prueba)."
+- "Con el fuego del año anterior, El Niño y el clima de la NASA, el error del total del año en Yucatán bajó de 20 % a 16 % (mediana de 15 años de prueba; v2 se acercó más en 11 de 15 años)."
 - "El rango de NAL v2 contiene el total real en 93 % de los años (v1: 60 %; meta: 80 %)."
-- "Para 2027 NAL espera en Yucatán unos 46,000 fuegos vistos, entre 24,000 y 68,000."
+- "Para 2027 NAL espera en Yucatán unos 46,000 fuegos vistos por satélite, entre 24,000 y 68,000."
 
 **No se puede decir:**
 

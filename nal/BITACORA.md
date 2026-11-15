@@ -39,3 +39,6 @@ Cada decisión, en orden. Fecha: 2026-11-15.
     (17 cuadros de Yucatán y 6 de Portugal no marcados como tierra). Las métricas lo siguen usando (es la definición
     de v1), pero el modelo ahora usa `Vista.mascara`: tierra marcada o fuego hasta la fecha de emisión. Efecto
     pequeño (donde20 de Yucatán a h = 3 bajó de 48.3 a 48.0 %, sigue arriba de v1).
+14. Cierre: `python nal/entrenar.py` (~40 s) y `python nal/verificar.py` (~45 s) dan PASS; dos corridas seguidas
+    producen archivos idénticos (semillas fijas). Lo que no alcanzó el tiempo: adelanto/retraso de la temporada y un
+    pronóstico "actualizado en febrero". No se tocó nada fuera de `nal/` y `web/nal/`; no se hizo push.
