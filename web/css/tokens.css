@@ -18,7 +18,7 @@
   --night-4: #222D4A;
   --paper-0: #F4F1EA;
   --paper-1: #B4BCCB;
-  --paper-2: #8A94AA;           /* 5.9:1 on --night-1 (AA for small text) */
+  --paper-2: #A3ACBE;           /* ~8:1 on --night-1: still readable in sunlight */
   --ember-0: #FFB347;
   --ember-1: #FF8A3D;
   --ember-2: #FF6B2C;

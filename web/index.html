@@ -96,6 +96,7 @@
     <section class="tab" id="tab-anios" role="tabpanel"></section>
     <section class="tab" id="tab-alertas" role="tabpanel"></section>
     <section class="tab" id="tab-reglas" role="tabpanel"></section>
+    <section class="tab" id="tab-tipo" role="tabpanel"></section>
     <section class="tab" id="tab-riesgo" role="tabpanel"></section>
     <section class="tab" id="tab-areas" role="tabpanel"></section>
     <section class="tab" id="tab-prueba" role="tabpanel"></section>
@@ -112,7 +113,9 @@
     try { var u = new URLSearchParams(location.search); q = u.get("region"); l = u.get("lang"); } catch (e) {}
     var ok = R.some(function (r) { return r.clave === q; });
     window.CLAVE_REGION = ok ? q : (R[0] ? R[0].clave : "yucatan");
-    window.IDIOMA = l === "es" ? "es" : "en";
+    // ?lang wins; otherwise the browser language (Spanish if it starts with "es", English for everything else)
+    var nav = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+    window.IDIOMA = l === "es" || l === "en" ? l : (/^es/i.test(nav) ? "es" : "en");
     document.write('<script src="data/' + window.CLAVE_REGION + '.js"><\/script>');
   })();
 </script>
