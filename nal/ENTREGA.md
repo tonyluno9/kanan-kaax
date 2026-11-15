@@ -12,7 +12,7 @@ Cada año de prueba se predijo solo con lo que existía en su fecha de emisión.
 
 | h | modelo | n | top3 | donde20 | captura10 | error mediano | dentro del rango |
 |---|---|---|---|---|---|---|---|
-| 1 | **v2** (patrón v2, total v2) | 15 | 85.1 % | 49.3 % | 72.3 % | 16.2 % | 93 % |
+| 1 | **v2** (patrón v2, total v2) | 15 | 85.1 % | 49.4 % | 72.1 % | 16.2 % | 93 % |
 | 1 | v1 | 15 | 85.1 % | 48.9 % | 71.6 % | 22.2 % | 67 % |
 | 1 | persistencia | 15 | 84.1 % | 47.7 % | 67.0 % | 49.7 % | 67 % |
 | 1 | climatología | 15 | 85.1 % | 47.1 % | 71.3 % | 24.3 % | 67 % |
@@ -22,12 +22,12 @@ Cada año de prueba se predijo solo con lo que existía en su fecha de emisión.
 | 2 | persistencia | 14 | 84.2 % | 47.9 % | 66.6 % | 29.5 % | 64 % |
 | 2 | climatología | 14 | 84.8 % | 46.9 % | 70.7 % | 22.5 % | 64 % |
 | 2 | techo (modelo perfecto) | | 85.7 % | 56.6 % | 80.7 % | 0 % | |
-| 3 | **v2** (patrón v2, total v1) | 13 | 84.7 % | 48.3 % | 70.8 % | 17.1 % | 85 % |
+| 3 | **v2** (patrón v2, total v1) | 13 | 84.7 % | 48.0 % | 70.8 % | 17.1 % | 85 % |
 | 3 | v1 | 13 | 84.7 % | 47.4 % | 70.5 % | 17.1 % | 69 % |
 | 3 | persistencia | 13 | 84.2 % | 47.8 % | 66.0 % | 48.4 % | 69 % |
 | 3 | climatología | 13 | 84.7 % | 45.8 % | 70.4 % | 20.4 % | 69 % |
 | 3 | techo (modelo perfecto) | | 85.7 % | 56.4 % | 80.7 % | 0 % | |
-| nov | **v2** (patrón v2, total v2) | 15 | 85.1 % | 49.6 % | 72.2 % | 16.2 % | 93 % |
+| nov | **v2** (patrón v2, total v2) | 15 | 85.1 % | 49.4 % | 72.1 % | 16.2 % | 93 % |
 | nov | v1 | 15 | 85.1 % | 48.3 % | 71.4 % | 19.9 % | 60 % |
 | nov | persistencia | 15 | 84.1 % | 47.6 % | 67.3 % | 49.5 % | 67 % |
 | nov | climatología | 15 | 85.1 % | 46.6 % | 71.0 % | 22.4 % | 60 % |
@@ -100,14 +100,14 @@ Variables y fuentes (todas disponibles en noviembre del año anterior):
 
 ## 3. Qué se probó y no funcionó
 
-- Yucatán 1: solo patrón v2 → top3 85.1 %, donde20 49.3 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
+- Yucatán 1: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
 - Yucatán 2: solo patrón v2 → top3 84.8 %, donde20 50.0 %; solo total v2 → error 25.6 %; ambos → error 25.6 %; base v1 → error 19.7 %.
-- Yucatán 3: solo patrón v2 → top3 84.7 %, donde20 48.3 %; solo total v2 → error 23.8 %; ambos → error 23.8 %; base v1 → error 17.1 %.
-- Yucatán nov: solo patrón v2 → top3 85.1 %, donde20 49.6 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
+- Yucatán 3: solo patrón v2 → top3 84.7 %, donde20 48.0 %; solo total v2 → error 23.8 %; ambos → error 23.8 %; base v1 → error 17.1 %.
+- Yucatán nov: solo patrón v2 → top3 85.1 %, donde20 49.4 %; solo total v2 → error 16.2 %; ambos → error 16.2 %; base v1 → error 22.2 %.
 - Portugal 1: solo patrón v2 → top3 53.2 %, donde20 58.6 %; solo total v2 → error 51.4 %; ambos → error 51.4 %; base v1 → error 54.5 %.
-- Portugal 2: solo patrón v2 → top3 55.4 %, donde20 59.1 %; solo total v2 → error 65.5 %; ambos → error 65.5 %; base v1 → error 64.1 %.
+- Portugal 2: solo patrón v2 → top3 55.4 %, donde20 58.9 %; solo total v2 → error 65.5 %; ambos → error 65.5 %; base v1 → error 64.1 %.
 - Portugal 3: solo patrón v2 → top3 58.2 %, donde20 58.1 %; solo total v2 → error 68.2 %; ambos → error 68.2 %; base v1 → error 69.7 %.
-- Portugal nov: solo patrón v2 → top3 53.1 %, donde20 59.9 %; solo total v2 → error 45.0 %; ambos → error 45.0 %; base v1 → error 54.5 %.
+- Portugal nov: solo patrón v2 → top3 53.1 %, donde20 59.7 %; solo total v2 → error 45.0 %; ambos → error 45.0 %; base v1 → error 54.5 %.
 - Intercepto libre en la regresión del total: hundía el total (muestras tempranas cortas). Se fijó en 0.
 - Elegir una sola familia de predictores y una penalización por pliegue: sobreajusta y a h = 1 en Yucatán subía el error. Se reemplazó por el promedio.
 - Elegir un solo patrón (K = 1): inestable en Portugal. Promediar todos (K = 20) tampoco ganó a v1 en Portugal.
@@ -130,7 +130,7 @@ Variables y fuentes (todas disponibles en noviembre del año anterior):
 **Sí se puede decir:**
 
 - "NAL predice cuándo llega el fuego: probado en 15 años escondidos, los 3 meses que espera con más fuego concentran el 85 % del fuego real en Yucatán (lo máximo posible era 86 %)."
-- "En el 20 % del territorio que NAL marca como de más riesgo cae el 50 % del fuego de Yucatán."
+- "En el 20 % del territorio que NAL marca como de más riesgo cae el 49 % del fuego de Yucatán."
 - "Con el fuego del año anterior, El Niño y el clima de la NASA, el error del total del año en Yucatán bajó de 20 % a 16 % (mediana, 15 años de prueba)."
 - "El rango de NAL v2 contiene el total real en 93 % de los años (v1: 60 %; meta: 80 %)."
 - "Para 2027 NAL espera en Yucatán unos 46,000 fuegos vistos, entre 24,000 y 68,000."

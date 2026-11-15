@@ -22,19 +22,19 @@
   "1": {
    "v2": {
     "top3": 0.5325,
-    "donde20": 0.5855,
-    "captura10": 0.5361,
+    "donde20": 0.5856,
+    "captura10": 0.5352,
     "errMediano": 0.5137,
     "dentroRango": 0.8,
-    "cuandoR": 0.5487
+    "cuandoR": 0.5484
    },
    "v2_patron": {
     "top3": 0.5325,
-    "donde20": 0.5855,
-    "captura10": 0.5361,
+    "donde20": 0.5856,
+    "captura10": 0.5352,
     "errMediano": 0.5454,
     "dentroRango": 0.8,
-    "cuandoR": 0.5487
+    "cuandoR": 0.5484
    },
    "v2_cantidad": {
     "top3": 0.54,
@@ -56,19 +56,19 @@
   "2": {
    "v2": {
     "top3": 0.554,
-    "donde20": 0.5906,
-    "captura10": 0.5589,
+    "donde20": 0.589,
+    "captura10": 0.5593,
     "errMediano": 0.6555,
     "dentroRango": 1.0,
-    "cuandoR": 0.5963
+    "cuandoR": 0.5975
    },
    "v2_patron": {
     "top3": 0.554,
-    "donde20": 0.5906,
-    "captura10": 0.5589,
+    "donde20": 0.589,
+    "captura10": 0.5593,
     "errMediano": 0.6407,
     "dentroRango": 0.8571,
-    "cuandoR": 0.5963
+    "cuandoR": 0.5975
    },
    "v2_cantidad": {
     "top3": 0.5551,
@@ -90,19 +90,19 @@
   "3": {
    "v2": {
     "top3": 0.5816,
-    "donde20": 0.5808,
-    "captura10": 0.5498,
+    "donde20": 0.5813,
+    "captura10": 0.5486,
     "errMediano": 0.6821,
     "dentroRango": 0.7692,
-    "cuandoR": 0.6255
+    "cuandoR": 0.6259
    },
    "v2_patron": {
     "top3": 0.5816,
-    "donde20": 0.5808,
-    "captura10": 0.5498,
+    "donde20": 0.5813,
+    "captura10": 0.5486,
     "errMediano": 0.6965,
     "dentroRango": 0.6923,
-    "cuandoR": 0.6255
+    "cuandoR": 0.6259
    },
    "v2_cantidad": {
     "top3": 0.5601,
@@ -124,19 +124,19 @@
   "nov": {
    "v2": {
     "top3": 0.5309,
-    "donde20": 0.599,
-    "captura10": 0.5411,
+    "donde20": 0.5973,
+    "captura10": 0.5405,
     "errMediano": 0.4499,
     "dentroRango": 0.8,
-    "cuandoR": 0.5473
+    "cuandoR": 0.5477
    },
    "v2_patron": {
     "top3": 0.5309,
-    "donde20": 0.599,
-    "captura10": 0.5411,
+    "donde20": 0.5973,
+    "captura10": 0.5405,
     "errMediano": 0.5446,
     "dentroRango": 0.8,
-    "cuandoR": 0.5473
+    "cuandoR": 0.5477
    },
    "v2_cantidad": {
     "top3": 0.5339,

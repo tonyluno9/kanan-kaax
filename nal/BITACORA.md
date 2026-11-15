@@ -35,3 +35,7 @@ Cada decisión, en orden. Fecha: 2026-11-15.
     cuadro solo queda dentro en ~78-85 %, y la suma regional cubre lo mismo que el rango.
 12. Rango conforme: con 10 a 20 errores internos, el método es conservador (en Yucatán cubre 85-93 %). Se deja así:
     preferimos pasarnos a quedarnos cortos, y no se ajustó mirando la prueba.
+13. Fuga menor encontrada y corregida: el conjunto `tierra` de nal.js incluye cuadros con fuego en CUALQUIER fecha
+    (17 cuadros de Yucatán y 6 de Portugal no marcados como tierra). Las métricas lo siguen usando (es la definición
+    de v1), pero el modelo ahora usa `Vista.mascara`: tierra marcada o fuego hasta la fecha de emisión. Efecto
+    pequeño (donde20 de Yucatán a h = 3 bajó de 48.3 a 48.0 %, sigue arriba de v1).

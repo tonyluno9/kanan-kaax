@@ -22,19 +22,19 @@
   "1": {
    "v2": {
     "top3": 0.8506,
-    "donde20": 0.4934,
-    "captura10": 0.723,
+    "donde20": 0.4935,
+    "captura10": 0.7213,
     "errMediano": 0.1616,
     "dentroRango": 0.9333,
-    "cuandoR": 0.9496
+    "cuandoR": 0.9493
    },
    "v2_patron": {
     "top3": 0.8506,
-    "donde20": 0.4934,
-    "captura10": 0.723,
+    "donde20": 0.4935,
+    "captura10": 0.7213,
     "errMediano": 0.2221,
     "dentroRango": 0.8667,
-    "cuandoR": 0.9496
+    "cuandoR": 0.9493
    },
    "v2_cantidad": {
     "top3": 0.8506,
@@ -56,19 +56,19 @@
   "2": {
    "v2": {
     "top3": 0.8475,
-    "donde20": 0.5005,
-    "captura10": 0.715,
+    "donde20": 0.5004,
+    "captura10": 0.7149,
     "errMediano": 0.2557,
     "dentroRango": 0.7857,
-    "cuandoR": 0.9406
+    "cuandoR": 0.9405
    },
    "v2_patron": {
     "top3": 0.8475,
-    "donde20": 0.5005,
-    "captura10": 0.715,
+    "donde20": 0.5004,
+    "captura10": 0.7149,
     "errMediano": 0.1966,
     "dentroRango": 0.8571,
-    "cuandoR": 0.9406
+    "cuandoR": 0.9405
    },
    "v2_cantidad": {
     "top3": 0.8475,
@@ -90,19 +90,19 @@
   "3": {
    "v2": {
     "top3": 0.8473,
-    "donde20": 0.4829,
-    "captura10": 0.7079,
+    "donde20": 0.4805,
+    "captura10": 0.7078,
     "errMediano": 0.2379,
     "dentroRango": 1.0,
-    "cuandoR": 0.9402
+    "cuandoR": 0.9396
    },
    "v2_patron": {
     "top3": 0.8473,
-    "donde20": 0.4829,
-    "captura10": 0.7079,
+    "donde20": 0.4805,
+    "captura10": 0.7078,
     "errMediano": 0.1708,
     "dentroRango": 0.8462,
-    "cuandoR": 0.9402
+    "cuandoR": 0.9396
    },
    "v2_cantidad": {
     "top3": 0.8473,
@@ -124,19 +124,19 @@
   "nov": {
    "v2": {
     "top3": 0.8506,
-    "donde20": 0.4956,
-    "captura10": 0.7216,
+    "donde20": 0.4941,
+    "captura10": 0.7212,
     "errMediano": 0.1625,
     "dentroRango": 0.9333,
-    "cuandoR": 0.949
+    "cuandoR": 0.9489
    },
    "v2_patron": {
     "top3": 0.8506,
-    "donde20": 0.4956,
-    "captura10": 0.7216,
+    "donde20": 0.4941,
+    "captura10": 0.7212,
     "errMediano": 0.222,
     "dentroRango": 0.9333,
-    "cuandoR": 0.949
+    "cuandoR": 0.9489
    },
    "v2_cantidad": {
     "top3": 0.8506,
@@ -2277,14 +2277,14 @@
     2025
    ],
    "top3": 0.8506,
-   "donde20": 0.4934,
-   "captura10": 0.723,
+   "donde20": 0.4935,
+   "captura10": 0.7213,
    "errMediano": 0.1616,
    "errPersistencia": 0.4966,
    "dentroRango": 0.9333,
-   "cuandoR": 0.9496,
+   "cuandoR": 0.9493,
    "errClimatologia": 0.2426,
-   "dentroRangoCuadro": 0.781,
+   "dentroRangoCuadro": 0.7803,
    "dentroEscenarios": 0.9333,
    "filas": [
     {
@@ -2295,8 +2295,8 @@
      "alto": 68450.3865,
      "dentro": true,
      "top3": 0.8944,
-     "donde20": 0.4194,
-     "captura10": 0.7675
+     "donde20": 0.4229,
+     "captura10": 0.7596
     },
     {
      "anio": 2012,
@@ -2318,7 +2318,7 @@
      "dentro": true,
      "top3": 0.918,
      "donde20": 0.4932,
-     "captura10": 0.72
+     "captura10": 0.7227
     },
     {
      "anio": 2014,
@@ -2328,8 +2328,8 @@
      "alto": 58766.7298,
      "dentro": true,
      "top3": 0.8663,
-     "donde20": 0.5144,
-     "captura10": 0.7731
+     "donde20": 0.5156,
+     "captura10": 0.7727
     },
     {
      "anio": 2015,
@@ -2340,7 +2340,7 @@
      "dentro": true,
      "top3": 0.8859,
      "donde20": 0.4608,
-     "captura10": 0.7707
+     "captura10": 0.7662
     },
     {
      "anio": 2016,
@@ -2350,8 +2350,8 @@
      "alto": 56339.2779,
      "dentro": true,
      "top3": 0.8452,
-     "donde20": 0.5186,
-     "captura10": 0.7752
+     "donde20": 0.5207,
+     "captura10": 0.7749
     },
     {
      "anio": 2017,
@@ -2362,7 +2362,7 @@
      "dentro": true,
      "top3": 0.8354,
      "donde20": 0.4963,
-     "captura10": 0.6343
+     "captura10": 0.6255
     },
     {
      "anio": 2018,
@@ -2372,8 +2372,8 @@
      "alto": 52150.3666,
      "dentro": true,
      "top3": 0.7988,
-     "donde20": 0.4846,
-     "captura10": 0.6706
+     "donde20": 0.489,
+     "captura10": 0.6693
     },
     {
      "anio": 2019,
@@ -2384,7 +2384,7 @@
      "dentro": true,
      "top3": 0.8189,
      "donde20": 0.4405,
-     "captura10": 0.6639
+     "captura10": 0.6624
     },
     {
      "anio": 2020,
@@ -2427,8 +2427,8 @@
      "alto": 52813.2397,
      "dentro": true,
      "top3": 0.7924,
-     "donde20": 0.5737,
-     "captura10": 0.7006
+     "donde20": 0.5638,
+     "captura10": 0.6978
     },
     {
      "anio": 2024,
@@ -2473,14 +2473,14 @@
     2025
    ],
    "top3": 0.8475,
-   "donde20": 0.5005,
-   "captura10": 0.715,
+   "donde20": 0.5004,
+   "captura10": 0.7149,
    "errMediano": 0.1966,
    "errPersistencia": 0.2948,
    "dentroRango": 0.8571,
-   "cuandoR": 0.9406,
+   "cuandoR": 0.9405,
    "errClimatologia": 0.2254,
-   "dentroRangoCuadro": 0.7821,
+   "dentroRangoCuadro": 0.7818,
    "dentroEscenarios": 0.8571,
    "filas": [
     {
@@ -2491,8 +2491,8 @@
      "alto": 63728.1023,
      "dentro": false,
      "top3": 0.8499,
-     "donde20": 0.545,
-     "captura10": 0.74
+     "donde20": 0.5447,
+     "captura10": 0.7406
     },
     {
      "anio": 2013,
@@ -2503,7 +2503,7 @@
      "dentro": true,
      "top3": 0.918,
      "donde20": 0.4909,
-     "captura10": 0.7229
+     "captura10": 0.7212
     },
     {
      "anio": 2014,
@@ -2514,7 +2514,7 @@
      "dentro": true,
      "top3": 0.8663,
      "donde20": 0.5232,
-     "captura10": 0.7768
+     "captura10": 0.778
     },
     {
      "anio": 2015,
@@ -2536,7 +2536,7 @@
      "dentro": true,
      "top3": 0.8452,
      "donde20": 0.5158,
-     "captura10": 0.7776
+     "captura10": 0.777
     },
     {
      "anio": 2017,
@@ -2546,8 +2546,8 @@
      "alto": 59043.796,
      "dentro": true,
      "top3": 0.8354,
-     "donde20": 0.4899,
-     "captura10": 0.6331
+     "donde20": 0.495,
+     "captura10": 0.6359
     },
     {
      "anio": 2018,
@@ -2557,8 +2557,8 @@
      "alto": 62930.7747,
      "dentro": true,
      "top3": 0.7988,
-     "donde20": 0.467,
-     "captura10": 0.6591
+     "donde20": 0.4607,
+     "captura10": 0.6555
     },
     {
      "anio": 2019,
@@ -2657,14 +2657,14 @@
     2025
    ],
    "top3": 0.8473,
-   "donde20": 0.4829,
-   "captura10": 0.7079,
+   "donde20": 0.4805,
+   "captura10": 0.7078,
    "errMediano": 0.1708,
    "errPersistencia": 0.484,
    "dentroRango": 0.8462,
-   "cuandoR": 0.9402,
+   "cuandoR": 0.9396,
    "errClimatologia": 0.2041,
-   "dentroRangoCuadro": 0.7826,
+   "dentroRangoCuadro": 0.7829,
    "dentroEscenarios": 0.8462,
    "filas": [
     {
@@ -2675,8 +2675,8 @@
      "alto": 63944.1045,
      "dentro": true,
      "top3": 0.918,
-     "donde20": 0.494,
-     "captura10": 0.717
+     "donde20": 0.491,
+     "captura10": 0.7144
     },
     {
      "anio": 2014,
@@ -2686,8 +2686,8 @@
      "alto": 75847.2632,
      "dentro": false,
      "top3": 0.8663,
-     "donde20": 0.5283,
-     "captura10": 0.7676
+     "donde20": 0.526,
+     "captura10": 0.7722
     },
     {
      "anio": 2015,
@@ -2698,7 +2698,7 @@
      "dentro": true,
      "top3": 0.8859,
      "donde20": 0.4624,
-     "captura10": 0.7665
+     "captura10": 0.7667
     },
     {
      "anio": 2016,
@@ -2708,8 +2708,8 @@
      "alto": 64725.6235,
      "dentro": true,
      "top3": 0.8452,
-     "donde20": 0.5209,
-     "captura10": 0.7752
+     "donde20": 0.5082,
+     "captura10": 0.7759
     },
     {
      "anio": 2017,
@@ -2719,8 +2719,8 @@
      "alto": 60870.719,
      "dentro": true,
      "top3": 0.8354,
-     "donde20": 0.4802,
-     "captura10": 0.6362
+     "donde20": 0.4844,
+     "captura10": 0.6357
     },
     {
      "anio": 2018,
@@ -2730,8 +2730,8 @@
      "alto": 61472.58,
      "dentro": true,
      "top3": 0.7988,
-     "donde20": 0.4539,
-     "captura10": 0.6582
+     "donde20": 0.4504,
+     "captura10": 0.6552
     },
     {
      "anio": 2019,
@@ -2741,8 +2741,8 @@
      "alto": 60097.1522,
      "dentro": true,
      "top3": 0.8189,
-     "donde20": 0.4026,
-     "captura10": 0.6492
+     "donde20": 0.4004,
+     "captura10": 0.6507
     },
     {
      "anio": 2020,
@@ -2752,8 +2752,8 @@
      "alto": 66575.5923,
      "dentro": true,
      "top3": 0.9295,
-     "donde20": 0.446,
-     "captura10": 0.7222
+     "donde20": 0.4361,
+     "captura10": 0.7226
     },
     {
      "anio": 2021,
@@ -2763,8 +2763,8 @@
      "alto": 56973.0882,
      "dentro": true,
      "top3": 0.8269,
-     "donde20": 0.4816,
-     "captura10": 0.7147
+     "donde20": 0.4798,
+     "captura10": 0.7148
     },
     {
      "anio": 2022,
@@ -2808,7 +2808,7 @@
      "dentro": true,
      "top3": 0.8069,
      "donde20": 0.5305,
-     "captura10": 0.7105
+     "captura10": 0.7079
     }
    ]
   },
@@ -2832,14 +2832,14 @@
     2025
    ],
    "top3": 0.8506,
-   "donde20": 0.4956,
-   "captura10": 0.7216,
+   "donde20": 0.4941,
+   "captura10": 0.7212,
    "errMediano": 0.1625,
    "errPersistencia": 0.4947,
    "dentroRango": 0.9333,
-   "cuandoR": 0.949,
+   "cuandoR": 0.9489,
    "errClimatologia": 0.2243,
-   "dentroRangoCuadro": 0.7955,
+   "dentroRangoCuadro": 0.7954,
    "dentroEscenarios": 0.9333,
    "filas": [
     {
@@ -2850,8 +2850,8 @@
      "alto": 79558.7595,
      "dentro": true,
      "top3": 0.8944,
-     "donde20": 0.4431,
-     "captura10": 0.7595
+     "donde20": 0.4437,
+     "captura10": 0.7581
     },
     {
      "anio": 2012,
@@ -2862,7 +2862,7 @@
      "dentro": true,
      "top3": 0.8499,
      "donde20": 0.5329,
-     "captura10": 0.7385
+     "captura10": 0.7409
     },
     {
      "anio": 2013,
@@ -2873,7 +2873,7 @@
      "dentro": true,
      "top3": 0.918,
      "donde20": 0.4894,
-     "captura10": 0.7226
+     "captura10": 0.7221
     },
     {
      "anio": 2014,
@@ -2883,8 +2883,8 @@
      "alto": 58454.604,
      "dentro": true,
      "top3": 0.8663,
-     "donde20": 0.528,
-     "captura10": 0.771
+     "donde20": 0.5156,
+     "captura10": 0.7725
     },
     {
      "anio": 2015,
@@ -2895,7 +2895,7 @@
      "dentro": true,
      "top3": 0.8859,
      "donde20": 0.4623,
-     "captura10": 0.7643
+     "captura10": 0.7638
     },
     {
      "anio": 2016,
@@ -2906,7 +2906,7 @@
      "dentro": true,
      "top3": 0.8452,
      "donde20": 0.5207,
-     "captura10": 0.775
+     "captura10": 0.7763
     },
     {
      "anio": 2017,
@@ -2917,7 +2917,7 @@
      "dentro": true,
      "top3": 0.8354,
      "donde20": 0.4963,
-     "captura10": 0.6343
+     "captura10": 0.6272
     },
     {
      "anio": 2018,
@@ -2927,8 +2927,8 @@
      "alto": 52300.9172,
      "dentro": true,
      "top3": 0.7988,
-     "donde20": 0.489,
-     "captura10": 0.6703
+     "donde20": 0.4741,
+     "captura10": 0.6673
     },
     {
      "anio": 2019,
@@ -2939,7 +2939,7 @@
      "dentro": true,
      "top3": 0.8189,
      "donde20": 0.4405,
-     "captura10": 0.6593
+     "captura10": 0.6588
     },
     {
      "anio": 2020,
@@ -2950,7 +2950,7 @@
      "dentro": true,
      "top3": 0.9295,
      "donde20": 0.4519,
-     "captura10": 0.7587
+     "captura10": 0.759
     },
     {
      "anio": 2021,
@@ -2960,8 +2960,8 @@
      "alto": 50391.1438,
      "dentro": true,
      "top3": 0.8269,
-     "donde20": 0.4885,
-     "captura10": 0.7113
+     "donde20": 0.4927,
+     "captura10": 0.7133
     },
     {
      "anio": 2022,

@@ -68,8 +68,10 @@ class Region:
         self.meses = Q["meses"]
         self.mid = np.array([mid(int(s[:4]), int(s[5:7])) for s in self.meses])
         self.parcial = np.array(Q.get("parcial") or [False] * self.T, bool)
-        tierra_flag = np.array(Q.get("tierra") or [0] * self.NC, bool)
-        self.tierra = np.where(tierra_flag | (self.serie.sum(1) > 0))[0]  # same rule as nal.js
+        self.tierra_flag = np.array(Q.get("tierra") or [0] * self.NC, bool)
+        # squares scored by the metrics: same rule as nal.js (land, or fire at ANY date). Models never use it:
+        # they use Vista.mascara, built only from the land flag and the fire up to the issue date.
+        self.tierra = np.where(self.tierra_flag | (self.serie.sum(1) > 0))[0]
         # full years (12 months, none partial) -> NC x 12 matrices
         self.anio = {}
         for y in sorted(set(int(s[:4]) for s in self.meses)):
@@ -104,10 +106,12 @@ class Vista:
 
     def __init__(self, F, corte):
         assert corte <= getattr(F, "corte", corte), "a view cannot see past its source"
-        self.clave, self.nx, self.ny, self.NC, self.tierra = F.clave, F.nx, F.ny, F.NC, F.tierra
+        self.clave, self.nx, self.ny, self.NC, self.tierra_flag = F.clave, F.nx, F.ny, F.NC, F.tierra_flag
         self.corte = corte
         keep = (F.mid <= corte) & ~F.parcial
         self.serie, self.mid, self.parcial = F.serie[:, keep], F.mid[keep], F.parcial[keep]
+        self.mascara = np.where(self.tierra_flag | (self.serie.sum(1) > 0))[0]  # land known at the issue date
+        self.tierra = self.mascara
         self.anio = {}
         for y in sorted(set(int(i) // 12 for i in self.mid)):
             ks = [np.where(self.mid == mid(y, m))[0] for m in range(1, 13)]
