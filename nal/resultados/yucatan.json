@@ -1,0 +1,3759 @@
+{
+ "region": "yucatan",
+ "decision": {
+  "1": {
+   "patron_v2": true,
+   "cantidad_v2": true
+  },
+  "2": {
+   "patron_v2": true,
+   "cantidad_v2": false
+  },
+  "3": {
+   "patron_v2": true,
+   "cantidad_v2": false
+  },
+  "nov": {
+   "patron_v2": true,
+   "cantidad_v2": true
+  }
+ },
+ "combinaciones": {
+  "1": {
+   "v2": {
+    "top3": 0.8506,
+    "donde20": 0.4934,
+    "captura10": 0.723,
+    "errMediano": 0.1616,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.9496
+   },
+   "v2_patron": {
+    "top3": 0.8506,
+    "donde20": 0.4934,
+    "captura10": 0.723,
+    "errMediano": 0.2221,
+    "dentroRango": 0.8667,
+    "cuandoR": 0.9496
+   },
+   "v2_cantidad": {
+    "top3": 0.8506,
+    "donde20": 0.4886,
+    "captura10": 0.716,
+    "errMediano": 0.1616,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.951
+   },
+   "base": {
+    "top3": 0.8506,
+    "donde20": 0.4886,
+    "captura10": 0.716,
+    "errMediano": 0.2221,
+    "dentroRango": 0.8667,
+    "cuandoR": 0.951
+   }
+  },
+  "2": {
+   "v2": {
+    "top3": 0.8475,
+    "donde20": 0.5005,
+    "captura10": 0.715,
+    "errMediano": 0.2557,
+    "dentroRango": 0.7857,
+    "cuandoR": 0.9406
+   },
+   "v2_patron": {
+    "top3": 0.8475,
+    "donde20": 0.5005,
+    "captura10": 0.715,
+    "errMediano": 0.1966,
+    "dentroRango": 0.8571,
+    "cuandoR": 0.9406
+   },
+   "v2_cantidad": {
+    "top3": 0.8475,
+    "donde20": 0.4867,
+    "captura10": 0.7104,
+    "errMediano": 0.2557,
+    "dentroRango": 0.7857,
+    "cuandoR": 0.9451
+   },
+   "base": {
+    "top3": 0.8475,
+    "donde20": 0.4867,
+    "captura10": 0.7104,
+    "errMediano": 0.1966,
+    "dentroRango": 0.8571,
+    "cuandoR": 0.9451
+   }
+  },
+  "3": {
+   "v2": {
+    "top3": 0.8473,
+    "donde20": 0.4829,
+    "captura10": 0.7079,
+    "errMediano": 0.2379,
+    "dentroRango": 1.0,
+    "cuandoR": 0.9402
+   },
+   "v2_patron": {
+    "top3": 0.8473,
+    "donde20": 0.4829,
+    "captura10": 0.7079,
+    "errMediano": 0.1708,
+    "dentroRango": 0.8462,
+    "cuandoR": 0.9402
+   },
+   "v2_cantidad": {
+    "top3": 0.8473,
+    "donde20": 0.474,
+    "captura10": 0.7048,
+    "errMediano": 0.2379,
+    "dentroRango": 1.0,
+    "cuandoR": 0.944
+   },
+   "base": {
+    "top3": 0.8473,
+    "donde20": 0.474,
+    "captura10": 0.7048,
+    "errMediano": 0.1708,
+    "dentroRango": 0.8462,
+    "cuandoR": 0.944
+   }
+  },
+  "nov": {
+   "v2": {
+    "top3": 0.8506,
+    "donde20": 0.4956,
+    "captura10": 0.7216,
+    "errMediano": 0.1625,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.949
+   },
+   "v2_patron": {
+    "top3": 0.8506,
+    "donde20": 0.4956,
+    "captura10": 0.7216,
+    "errMediano": 0.222,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.949
+   },
+   "v2_cantidad": {
+    "top3": 0.8506,
+    "donde20": 0.483,
+    "captura10": 0.7137,
+    "errMediano": 0.1625,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.9485
+   },
+   "base": {
+    "top3": 0.8506,
+    "donde20": 0.483,
+    "captura10": 0.7137,
+    "errMediano": 0.222,
+    "dentroRango": 0.9333,
+    "cuandoR": 0.9485
+   }
+  }
+ },
+ "referencias": {
+  "1": {
+   "climatologia": {
+    "n": 15,
+    "anios": [
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8506,
+    "donde20": 0.4715,
+    "captura10": 0.7132,
+    "errMediano": 0.2426,
+    "errPersistencia": 0.4966,
+    "dentroRango": 0.6667,
+    "cuandoR": 0.9518,
+    "errClimatologia": 0.2426,
+    "filas": [
+     {
+      "anio": 2011,
+      "real": 62929.4,
+      "esperado": 47004.96,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8944,
+      "donde20": 0.415,
+      "captura10": 0.7553
+     },
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 48452.6364,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.5274,
+      "captura10": 0.7384
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 46516.6833,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4809,
+      "captura10": 0.7071
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 47239.5538,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.5121,
+      "captura10": 0.7721
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 45645.5,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.464,
+      "captura10": 0.7561
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 45902.9733,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5249,
+      "captura10": 0.7765
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 45342.8125,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4874,
+      "captura10": 0.6282
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 45516.5765,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.4752,
+      "captura10": 0.6662
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 44611.1889,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.4142,
+      "captura10": 0.6494
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 44983.2316,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4235,
+      "captura10": 0.7417
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 45160.22,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4697,
+      "captura10": 0.7131
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 44224.8286,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.8618,
+      "donde20": 0.4555,
+      "captura10": 0.721
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 43469.8364,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.4857,
+      "captura10": 0.6745
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 43868.4957,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.426,
+      "captura10": 0.687
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 44470.0583,
+      "bajo": 26146.4,
+      "alto": 58236.31,
+      "dentro": true,
+      "top3": 0.8069,
+      "donde20": 0.5109,
+      "captura10": 0.7114
+     }
+    ]
+   },
+   "persistencia": {
+    "n": 15,
+    "anios": [
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8413,
+    "donde20": 0.4767,
+    "captura10": 0.6697,
+    "errMediano": 0.4966,
+    "errPersistencia": 0.4966,
+    "dentroRango": 0.6667,
+    "cuandoR": 0.9265,
+    "errClimatologia": 0.2426,
+    "filas": [
+     {
+      "anio": 2011,
+      "real": 62929.4,
+      "esperado": 30699.0,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8944,
+      "donde20": 0.4011,
+      "captura10": 0.6647
+     },
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 62929.4,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.4638,
+      "captura10": 0.6819
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 25221.2,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4587,
+      "captura10": 0.6126
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 55914.0,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.5012,
+      "captura10": 0.7368
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 24922.8,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4346,
+      "captura10": 0.6578
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 49507.6,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5118,
+      "captura10": 0.7481
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 36940.4,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.6072,
+      "donde20": 0.5173,
+      "captura10": 0.5713
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 48296.8,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.4848,
+      "captura10": 0.6173
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 29219.6,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.4698,
+      "captura10": 0.6378
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 51680.0,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4316,
+      "captura10": 0.7446
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 48523.0,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4659,
+      "captura10": 0.6511
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 25517.0,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.8618,
+      "donde20": 0.4704,
+      "captura10": 0.691
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 27615.0,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.5402,
+      "captura10": 0.6485
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 52639.0,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": false,
+      "top3": 0.888,
+      "donde20": 0.4941,
+      "captura10": 0.681
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 58306.0,
+      "bajo": 26146.4,
+      "alto": 58236.31,
+      "dentro": true,
+      "top3": 0.8359,
+      "donde20": 0.5054,
+      "captura10": 0.7014
+     }
+    ]
+   }
+  },
+  "2": {
+   "climatologia": {
+    "n": 14,
+    "anios": [
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8475,
+    "donde20": 0.469,
+    "captura10": 0.7072,
+    "errMediano": 0.2254,
+    "errPersistencia": 0.2948,
+    "dentroRango": 0.6429,
+    "cuandoR": 0.9473,
+    "errClimatologia": 0.2254,
+    "filas": [
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 47004.96,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.5403,
+      "captura10": 0.7386
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 48452.6364,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4782,
+      "captura10": 0.7065
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 46516.6833,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.5084,
+      "captura10": 0.7722
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 47239.5538,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4585,
+      "captura10": 0.7557
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 45645.5,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5249,
+      "captura10": 0.777
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 45902.9733,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4813,
+      "captura10": 0.625
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 45342.8125,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.462,
+      "captura10": 0.6565
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 45516.5765,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.418,
+      "captura10": 0.6516
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 44611.1889,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4009,
+      "captura10": 0.7214
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 44983.2316,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4639,
+      "captura10": 0.7096
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 45160.22,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8618,
+      "donde20": 0.4482,
+      "captura10": 0.721
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 44224.8286,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.4699,
+      "captura10": 0.6722
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 43469.8364,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.4154,
+      "captura10": 0.6869
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 43868.4957,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": true,
+      "top3": 0.8069,
+      "donde20": 0.4967,
+      "captura10": 0.706
+     }
+    ]
+   },
+   "persistencia": {
+    "n": 14,
+    "anios": [
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8424,
+    "donde20": 0.4787,
+    "captura10": 0.6658,
+    "errMediano": 0.2948,
+    "errPersistencia": 0.2948,
+    "dentroRango": 0.6429,
+    "cuandoR": 0.8984,
+    "errClimatologia": 0.2254,
+    "filas": [
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 30699.0,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.487,
+      "captura10": 0.7046
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 62929.4,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4561,
+      "captura10": 0.6929
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 25221.2,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.4654,
+      "captura10": 0.6071
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 55914.0,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4711,
+      "captura10": 0.7075
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 24922.8,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.4828,
+      "captura10": 0.6611
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 49507.6,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4837,
+      "captura10": 0.598
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 36940.4,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.6985,
+      "donde20": 0.4857,
+      "captura10": 0.6183
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 48296.8,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.4763,
+      "captura10": 0.633
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 29219.6,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4321,
+      "captura10": 0.7077
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 51680.0,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4377,
+      "captura10": 0.6829
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 48523.0,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8618,
+      "donde20": 0.4603,
+      "captura10": 0.6732
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 25517.0,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.5375,
+      "captura10": 0.6676
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 27615.0,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.4472,
+      "captura10": 0.6583
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 52639.0,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": true,
+      "top3": 0.8359,
+      "donde20": 0.5792,
+      "captura10": 0.709
+     }
+    ]
+   }
+  },
+  "3": {
+   "climatologia": {
+    "n": 13,
+    "anios": [
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8473,
+    "donde20": 0.4577,
+    "captura10": 0.7039,
+    "errMediano": 0.2041,
+    "errPersistencia": 0.484,
+    "dentroRango": 0.6923,
+    "cuandoR": 0.9465,
+    "errClimatologia": 0.2041,
+    "filas": [
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 47004.96,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4779,
+      "captura10": 0.7045
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 48452.6364,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.504,
+      "captura10": 0.7686
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 46516.6833,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4552,
+      "captura10": 0.7625
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 47239.5538,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5259,
+      "captura10": 0.7779
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 45645.5,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4813,
+      "captura10": 0.6335
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 45902.9733,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.4522,
+      "captura10": 0.6562
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 45342.8125,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.4056,
+      "captura10": 0.6483
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 45516.5765,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4238,
+      "captura10": 0.7186
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 44611.1889,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4564,
+      "captura10": 0.7066
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 44983.2316,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": false,
+      "top3": 0.8618,
+      "donde20": 0.4436,
+      "captura10": 0.717
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 45160.22,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.4522,
+      "captura10": 0.6722
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 44224.8286,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.4002,
+      "captura10": 0.684
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 43469.8364,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": true,
+      "top3": 0.8069,
+      "donde20": 0.4723,
+      "captura10": 0.7003
+     }
+    ]
+   },
+   "persistencia": {
+    "n": 13,
+    "anios": [
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8419,
+    "donde20": 0.4779,
+    "captura10": 0.6599,
+    "errMediano": 0.484,
+    "errPersistencia": 0.484,
+    "dentroRango": 0.6923,
+    "cuandoR": 0.9062,
+    "errClimatologia": 0.2041,
+    "filas": [
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 30699.0,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4544,
+      "captura10": 0.6449
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 62929.4,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.4761,
+      "captura10": 0.7484
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 25221.2,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4195,
+      "captura10": 0.585
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 55914.0,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5015,
+      "captura10": 0.6914
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 24922.8,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4552,
+      "captura10": 0.5802
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 49507.6,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.4562,
+      "captura10": 0.6209
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 36940.4,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.7485,
+      "donde20": 0.4845,
+      "captura10": 0.6223
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 48296.8,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4833,
+      "captura10": 0.701
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 29219.6,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4933,
+      "captura10": 0.686
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 51680.0,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": false,
+      "top3": 0.8618,
+      "donde20": 0.4774,
+      "captura10": 0.6995
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 48523.0,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.5625,
+      "captura10": 0.6557
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 25517.0,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.4387,
+      "captura10": 0.6585
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 27615.0,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": true,
+      "top3": 0.8069,
+      "donde20": 0.5105,
+      "captura10": 0.6851
+     }
+    ]
+   }
+  },
+  "nov": {
+   "climatologia": {
+    "n": 15,
+    "anios": [
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8506,
+    "donde20": 0.4662,
+    "captura10": 0.7103,
+    "errMediano": 0.2243,
+    "errPersistencia": 0.2642,
+    "dentroRango": 0.6,
+    "cuandoR": 0.9505,
+    "errClimatologia": 0.2243,
+    "filas": [
+     {
+      "anio": 2011,
+      "real": 62929.4,
+      "esperado": 48816.7333,
+      "bajo": 36878.14,
+      "alto": 61386.3,
+      "dentro": false,
+      "top3": 0.8944,
+      "donde20": 0.4265,
+      "captura10": 0.7539
+     },
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 47004.96,
+      "bajo": 30539.09,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.5403,
+      "captura10": 0.7386
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 48452.6364,
+      "bajo": 30699.0,
+      "alto": 62929.4,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4782,
+      "captura10": 0.7065
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 46516.6833,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.5084,
+      "captura10": 0.7722
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 47239.5538,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4585,
+      "captura10": 0.7557
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 45645.5,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.5249,
+      "captura10": 0.777
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 45902.9733,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8354,
+      "donde20": 0.4813,
+      "captura10": 0.625
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 45342.8125,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.462,
+      "captura10": 0.6565
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 45516.5765,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.418,
+      "captura10": 0.6516
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 44611.1889,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4009,
+      "captura10": 0.7214
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 44983.2316,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4639,
+      "captura10": 0.7096
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 45160.22,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8618,
+      "donde20": 0.4482,
+      "captura10": 0.721
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 44224.8286,
+      "bajo": 25517.0,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.4699,
+      "captura10": 0.6722
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 43469.8364,
+      "bajo": 25726.8,
+      "alto": 57857.73,
+      "dentro": false,
+      "top3": 0.8291,
+      "donde20": 0.4154,
+      "captura10": 0.6869
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 43868.4957,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": true,
+      "top3": 0.8069,
+      "donde20": 0.4967,
+      "captura10": 0.706
+     }
+    ]
+   },
+   "persistencia": {
+    "n": 15,
+    "anios": [
+     2011,
+     2012,
+     2013,
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025
+    ],
+    "top3": 0.8413,
+    "donde20": 0.4765,
+    "captura10": 0.6731,
+    "errMediano": 0.4947,
+    "errPersistencia": 0.4947,
+    "dentroRango": 0.6667,
+    "cuandoR": 0.927,
+    "errClimatologia": 0.2243,
+    "filas": [
+     {
+      "anio": 2011,
+      "real": 62929.4,
+      "esperado": 30159.6283,
+      "bajo": 30053.6554,
+      "alto": 59730.0,
+      "dentro": false,
+      "top3": 0.8944,
+      "donde20": 0.4011,
+      "captura10": 0.6686
+     },
+     {
+      "anio": 2012,
+      "real": 25221.2,
+      "esperado": 63140.3702,
+      "bajo": 30699.0,
+      "alto": 63140.3702,
+      "dentro": false,
+      "top3": 0.8499,
+      "donde20": 0.4638,
+      "captura10": 0.6819
+     },
+     {
+      "anio": 2013,
+      "real": 55914.0,
+      "esperado": 24267.6735,
+      "bajo": 29259.81,
+      "alto": 62443.83,
+      "dentro": true,
+      "top3": 0.918,
+      "donde20": 0.4626,
+      "captura10": 0.6495
+     },
+     {
+      "anio": 2014,
+      "real": 24922.8,
+      "esperado": 56476.8948,
+      "bajo": 29419.72,
+      "alto": 61958.26,
+      "dentro": false,
+      "top3": 0.8663,
+      "donde20": 0.5012,
+      "captura10": 0.7368
+     },
+     {
+      "anio": 2015,
+      "real": 49507.6,
+      "esperado": 25016.6639,
+      "bajo": 26384.81,
+      "alto": 61472.69,
+      "dentro": true,
+      "top3": 0.8859,
+      "donde20": 0.4329,
+      "captura10": 0.664
+     },
+     {
+      "anio": 2016,
+      "real": 36940.4,
+      "esperado": 49937.1776,
+      "bajo": 26772.68,
+      "alto": 60987.12,
+      "dentro": true,
+      "top3": 0.8452,
+      "donde20": 0.508,
+      "captura10": 0.7481
+     },
+     {
+      "anio": 2017,
+      "real": 48296.8,
+      "esperado": 36690.3612,
+      "bajo": 27160.55,
+      "alto": 60501.55,
+      "dentro": true,
+      "top3": 0.6072,
+      "donde20": 0.5173,
+      "captura10": 0.571
+     },
+     {
+      "anio": 2018,
+      "real": 29219.6,
+      "esperado": 48438.6308,
+      "bajo": 27548.42,
+      "alto": 60015.98,
+      "dentro": true,
+      "top3": 0.7988,
+      "donde20": 0.4856,
+      "captura10": 0.6173
+     },
+     {
+      "anio": 2019,
+      "real": 51680.0,
+      "esperado": 29149.8582,
+      "bajo": 27936.29,
+      "alto": 59530.41,
+      "dentro": true,
+      "top3": 0.8189,
+      "donde20": 0.4654,
+      "captura10": 0.6378
+     },
+     {
+      "anio": 2020,
+      "real": 48523.0,
+      "esperado": 51872.5872,
+      "bajo": 28324.16,
+      "alto": 59044.84,
+      "dentro": true,
+      "top3": 0.9295,
+      "donde20": 0.4316,
+      "captura10": 0.7446
+     },
+     {
+      "anio": 2021,
+      "real": 25517.0,
+      "esperado": 48844.786,
+      "bajo": 28712.03,
+      "alto": 58559.27,
+      "dentro": false,
+      "top3": 0.8269,
+      "donde20": 0.4659,
+      "captura10": 0.6511
+     },
+     {
+      "anio": 2022,
+      "real": 27615.0,
+      "esperado": 25228.3441,
+      "bajo": 25228.3441,
+      "alto": 58073.7,
+      "dentro": true,
+      "top3": 0.8618,
+      "donde20": 0.4718,
+      "captura10": 0.6923
+     },
+     {
+      "anio": 2023,
+      "real": 52639.0,
+      "esperado": 27685.9363,
+      "bajo": 25733.8936,
+      "alto": 57857.73,
+      "dentro": true,
+      "top3": 0.7924,
+      "donde20": 0.5402,
+      "captura10": 0.6506
+     },
+     {
+      "anio": 2024,
+      "real": 58306.0,
+      "esperado": 52944.0209,
+      "bajo": 25936.6,
+      "alto": 57641.76,
+      "dentro": false,
+      "top3": 0.888,
+      "donde20": 0.4941,
+      "captura10": 0.681
+     },
+     {
+      "anio": 2025,
+      "real": 36101.0,
+      "esperado": 58464.7099,
+      "bajo": 26146.4,
+      "alto": 58347.407,
+      "dentro": true,
+      "top3": 0.8359,
+      "donde20": 0.5054,
+      "captura10": 0.7014
+     }
+    ]
+   }
+  }
+ },
+ "techo": {
+  "1": {
+   "top3": 0.859,
+   "donde20": 0.5621,
+   "captura10": 0.809
+  },
+  "2": {
+   "top3": 0.8565,
+   "donde20": 0.5664,
+   "captura10": 0.8072
+  },
+  "3": {
+   "top3": 0.857,
+   "donde20": 0.5639,
+   "captura10": 0.8069
+  },
+  "nov": {
+   "top3": 0.859,
+   "donde20": 0.5621,
+   "captura10": 0.809
+  }
+ },
+ "auditoria": {
+  "1": [
+   {
+    "anio": 2011,
+    "corte": "2010-12",
+    "ultimo_dato_max": "2010-12",
+    "vistas": 21,
+    "corte_vistas_max": "2010-12",
+    "oni_usado": "2010-10",
+    "clima_hasta": "2010-12"
+   },
+   {
+    "anio": 2012,
+    "corte": "2011-12",
+    "ultimo_dato_max": "2011-12",
+    "vistas": 23,
+    "corte_vistas_max": "2011-12",
+    "oni_usado": "2011-10",
+    "clima_hasta": "2011-12"
+   },
+   {
+    "anio": 2013,
+    "corte": "2012-12",
+    "ultimo_dato_max": "2012-12",
+    "vistas": 25,
+    "corte_vistas_max": "2012-12",
+    "oni_usado": "2012-10",
+    "clima_hasta": "2012-12"
+   },
+   {
+    "anio": 2014,
+    "corte": "2013-12",
+    "ultimo_dato_max": "2013-12",
+    "vistas": 27,
+    "corte_vistas_max": "2013-12",
+    "oni_usado": "2013-10",
+    "clima_hasta": "2013-12"
+   },
+   {
+    "anio": 2015,
+    "corte": "2014-12",
+    "ultimo_dato_max": "2014-12",
+    "vistas": 29,
+    "corte_vistas_max": "2014-12",
+    "oni_usado": "2014-10",
+    "clima_hasta": "2014-12"
+   },
+   {
+    "anio": 2016,
+    "corte": "2015-12",
+    "ultimo_dato_max": "2015-12",
+    "vistas": 31,
+    "corte_vistas_max": "2015-12",
+    "oni_usado": "2015-10",
+    "clima_hasta": "2015-12"
+   },
+   {
+    "anio": 2017,
+    "corte": "2016-12",
+    "ultimo_dato_max": "2016-12",
+    "vistas": 33,
+    "corte_vistas_max": "2016-12",
+    "oni_usado": "2016-10",
+    "clima_hasta": "2016-12"
+   },
+   {
+    "anio": 2018,
+    "corte": "2017-12",
+    "ultimo_dato_max": "2017-12",
+    "vistas": 35,
+    "corte_vistas_max": "2017-12",
+    "oni_usado": "2017-10",
+    "clima_hasta": "2017-12"
+   },
+   {
+    "anio": 2019,
+    "corte": "2018-12",
+    "ultimo_dato_max": "2018-12",
+    "vistas": 37,
+    "corte_vistas_max": "2018-12",
+    "oni_usado": "2018-10",
+    "clima_hasta": "2018-12"
+   },
+   {
+    "anio": 2020,
+    "corte": "2019-12",
+    "ultimo_dato_max": "2019-12",
+    "vistas": 39,
+    "corte_vistas_max": "2019-12",
+    "oni_usado": "2019-10",
+    "clima_hasta": "2019-12"
+   },
+   {
+    "anio": 2021,
+    "corte": "2020-12",
+    "ultimo_dato_max": "2020-12",
+    "vistas": 41,
+    "corte_vistas_max": "2020-12",
+    "oni_usado": "2020-10",
+    "clima_hasta": "2020-12"
+   },
+   {
+    "anio": 2022,
+    "corte": "2021-12",
+    "ultimo_dato_max": "2021-12",
+    "vistas": 43,
+    "corte_vistas_max": "2021-12",
+    "oni_usado": "2021-10",
+    "clima_hasta": "2021-12"
+   },
+   {
+    "anio": 2023,
+    "corte": "2022-12",
+    "ultimo_dato_max": "2022-12",
+    "vistas": 45,
+    "corte_vistas_max": "2022-12",
+    "oni_usado": "2022-10",
+    "clima_hasta": "2022-12"
+   },
+   {
+    "anio": 2024,
+    "corte": "2023-12",
+    "ultimo_dato_max": "2023-12",
+    "vistas": 47,
+    "corte_vistas_max": "2023-12",
+    "oni_usado": "2023-10",
+    "clima_hasta": "2023-12"
+   },
+   {
+    "anio": 2025,
+    "corte": "2024-12",
+    "ultimo_dato_max": "2024-12",
+    "vistas": 49,
+    "corte_vistas_max": "2024-12",
+    "oni_usado": "2024-10",
+    "clima_hasta": "2024-12"
+   }
+  ],
+  "2": [
+   {
+    "anio": 2012,
+    "corte": "2010-12",
+    "ultimo_dato_max": "2010-12",
+    "vistas": 21,
+    "corte_vistas_max": "2010-12",
+    "oni_usado": "2010-10",
+    "clima_hasta": "2010-12"
+   },
+   {
+    "anio": 2013,
+    "corte": "2011-12",
+    "ultimo_dato_max": "2011-12",
+    "vistas": 23,
+    "corte_vistas_max": "2011-12",
+    "oni_usado": "2011-10",
+    "clima_hasta": "2011-12"
+   },
+   {
+    "anio": 2014,
+    "corte": "2012-12",
+    "ultimo_dato_max": "2012-12",
+    "vistas": 25,
+    "corte_vistas_max": "2012-12",
+    "oni_usado": "2012-10",
+    "clima_hasta": "2012-12"
+   },
+   {
+    "anio": 2015,
+    "corte": "2013-12",
+    "ultimo_dato_max": "2013-12",
+    "vistas": 27,
+    "corte_vistas_max": "2013-12",
+    "oni_usado": "2013-10",
+    "clima_hasta": "2013-12"
+   },
+   {
+    "anio": 2016,
+    "corte": "2014-12",
+    "ultimo_dato_max": "2014-12",
+    "vistas": 29,
+    "corte_vistas_max": "2014-12",
+    "oni_usado": "2014-10",
+    "clima_hasta": "2014-12"
+   },
+   {
+    "anio": 2017,
+    "corte": "2015-12",
+    "ultimo_dato_max": "2015-12",
+    "vistas": 31,
+    "corte_vistas_max": "2015-12",
+    "oni_usado": "2015-10",
+    "clima_hasta": "2015-12"
+   },
+   {
+    "anio": 2018,
+    "corte": "2016-12",
+    "ultimo_dato_max": "2016-12",
+    "vistas": 33,
+    "corte_vistas_max": "2016-12",
+    "oni_usado": "2016-10",
+    "clima_hasta": "2016-12"
+   },
+   {
+    "anio": 2019,
+    "corte": "2017-12",
+    "ultimo_dato_max": "2017-12",
+    "vistas": 35,
+    "corte_vistas_max": "2017-12",
+    "oni_usado": "2017-10",
+    "clima_hasta": "2017-12"
+   },
+   {
+    "anio": 2020,
+    "corte": "2018-12",
+    "ultimo_dato_max": "2018-12",
+    "vistas": 37,
+    "corte_vistas_max": "2018-12",
+    "oni_usado": "2018-10",
+    "clima_hasta": "2018-12"
+   },
+   {
+    "anio": 2021,
+    "corte": "2019-12",
+    "ultimo_dato_max": "2019-12",
+    "vistas": 39,
+    "corte_vistas_max": "2019-12",
+    "oni_usado": "2019-10",
+    "clima_hasta": "2019-12"
+   },
+   {
+    "anio": 2022,
+    "corte": "2020-12",
+    "ultimo_dato_max": "2020-12",
+    "vistas": 41,
+    "corte_vistas_max": "2020-12",
+    "oni_usado": "2020-10",
+    "clima_hasta": "2020-12"
+   },
+   {
+    "anio": 2023,
+    "corte": "2021-12",
+    "ultimo_dato_max": "2021-12",
+    "vistas": 43,
+    "corte_vistas_max": "2021-12",
+    "oni_usado": "2021-10",
+    "clima_hasta": "2021-12"
+   },
+   {
+    "anio": 2024,
+    "corte": "2022-12",
+    "ultimo_dato_max": "2022-12",
+    "vistas": 45,
+    "corte_vistas_max": "2022-12",
+    "oni_usado": "2022-10",
+    "clima_hasta": "2022-12"
+   },
+   {
+    "anio": 2025,
+    "corte": "2023-12",
+    "ultimo_dato_max": "2023-12",
+    "vistas": 47,
+    "corte_vistas_max": "2023-12",
+    "oni_usado": "2023-10",
+    "clima_hasta": "2023-12"
+   }
+  ],
+  "3": [
+   {
+    "anio": 2013,
+    "corte": "2010-12",
+    "ultimo_dato_max": "2010-12",
+    "vistas": 21,
+    "corte_vistas_max": "2010-12",
+    "oni_usado": "2010-10",
+    "clima_hasta": "2010-12"
+   },
+   {
+    "anio": 2014,
+    "corte": "2011-12",
+    "ultimo_dato_max": "2011-12",
+    "vistas": 23,
+    "corte_vistas_max": "2011-12",
+    "oni_usado": "2011-10",
+    "clima_hasta": "2011-12"
+   },
+   {
+    "anio": 2015,
+    "corte": "2012-12",
+    "ultimo_dato_max": "2012-12",
+    "vistas": 25,
+    "corte_vistas_max": "2012-12",
+    "oni_usado": "2012-10",
+    "clima_hasta": "2012-12"
+   },
+   {
+    "anio": 2016,
+    "corte": "2013-12",
+    "ultimo_dato_max": "2013-12",
+    "vistas": 27,
+    "corte_vistas_max": "2013-12",
+    "oni_usado": "2013-10",
+    "clima_hasta": "2013-12"
+   },
+   {
+    "anio": 2017,
+    "corte": "2014-12",
+    "ultimo_dato_max": "2014-12",
+    "vistas": 29,
+    "corte_vistas_max": "2014-12",
+    "oni_usado": "2014-10",
+    "clima_hasta": "2014-12"
+   },
+   {
+    "anio": 2018,
+    "corte": "2015-12",
+    "ultimo_dato_max": "2015-12",
+    "vistas": 31,
+    "corte_vistas_max": "2015-12",
+    "oni_usado": "2015-10",
+    "clima_hasta": "2015-12"
+   },
+   {
+    "anio": 2019,
+    "corte": "2016-12",
+    "ultimo_dato_max": "2016-12",
+    "vistas": 33,
+    "corte_vistas_max": "2016-12",
+    "oni_usado": "2016-10",
+    "clima_hasta": "2016-12"
+   },
+   {
+    "anio": 2020,
+    "corte": "2017-12",
+    "ultimo_dato_max": "2017-12",
+    "vistas": 35,
+    "corte_vistas_max": "2017-12",
+    "oni_usado": "2017-10",
+    "clima_hasta": "2017-12"
+   },
+   {
+    "anio": 2021,
+    "corte": "2018-12",
+    "ultimo_dato_max": "2018-12",
+    "vistas": 37,
+    "corte_vistas_max": "2018-12",
+    "oni_usado": "2018-10",
+    "clima_hasta": "2018-12"
+   },
+   {
+    "anio": 2022,
+    "corte": "2019-12",
+    "ultimo_dato_max": "2019-12",
+    "vistas": 39,
+    "corte_vistas_max": "2019-12",
+    "oni_usado": "2019-10",
+    "clima_hasta": "2019-12"
+   },
+   {
+    "anio": 2023,
+    "corte": "2020-12",
+    "ultimo_dato_max": "2020-12",
+    "vistas": 41,
+    "corte_vistas_max": "2020-12",
+    "oni_usado": "2020-10",
+    "clima_hasta": "2020-12"
+   },
+   {
+    "anio": 2024,
+    "corte": "2021-12",
+    "ultimo_dato_max": "2021-12",
+    "vistas": 43,
+    "corte_vistas_max": "2021-12",
+    "oni_usado": "2021-10",
+    "clima_hasta": "2021-12"
+   },
+   {
+    "anio": 2025,
+    "corte": "2022-12",
+    "ultimo_dato_max": "2022-12",
+    "vistas": 45,
+    "corte_vistas_max": "2022-12",
+    "oni_usado": "2022-10",
+    "clima_hasta": "2022-12"
+   }
+  ],
+  "nov": [
+   {
+    "anio": 2011,
+    "corte": "2010-10",
+    "ultimo_dato_max": "2010-10",
+    "vistas": 19,
+    "corte_vistas_max": "2010-10",
+    "oni_usado": "2010-10",
+    "clima_hasta": "2010-10"
+   },
+   {
+    "anio": 2012,
+    "corte": "2011-10",
+    "ultimo_dato_max": "2011-10",
+    "vistas": 21,
+    "corte_vistas_max": "2011-10",
+    "oni_usado": "2011-10",
+    "clima_hasta": "2011-10"
+   },
+   {
+    "anio": 2013,
+    "corte": "2012-10",
+    "ultimo_dato_max": "2012-10",
+    "vistas": 23,
+    "corte_vistas_max": "2012-10",
+    "oni_usado": "2012-10",
+    "clima_hasta": "2012-10"
+   },
+   {
+    "anio": 2014,
+    "corte": "2013-10",
+    "ultimo_dato_max": "2013-10",
+    "vistas": 25,
+    "corte_vistas_max": "2013-10",
+    "oni_usado": "2013-10",
+    "clima_hasta": "2013-10"
+   },
+   {
+    "anio": 2015,
+    "corte": "2014-10",
+    "ultimo_dato_max": "2014-10",
+    "vistas": 27,
+    "corte_vistas_max": "2014-10",
+    "oni_usado": "2014-10",
+    "clima_hasta": "2014-10"
+   },
+   {
+    "anio": 2016,
+    "corte": "2015-10",
+    "ultimo_dato_max": "2015-10",
+    "vistas": 29,
+    "corte_vistas_max": "2015-10",
+    "oni_usado": "2015-10",
+    "clima_hasta": "2015-10"
+   },
+   {
+    "anio": 2017,
+    "corte": "2016-10",
+    "ultimo_dato_max": "2016-10",
+    "vistas": 31,
+    "corte_vistas_max": "2016-10",
+    "oni_usado": "2016-10",
+    "clima_hasta": "2016-10"
+   },
+   {
+    "anio": 2018,
+    "corte": "2017-10",
+    "ultimo_dato_max": "2017-10",
+    "vistas": 33,
+    "corte_vistas_max": "2017-10",
+    "oni_usado": "2017-10",
+    "clima_hasta": "2017-10"
+   },
+   {
+    "anio": 2019,
+    "corte": "2018-10",
+    "ultimo_dato_max": "2018-10",
+    "vistas": 35,
+    "corte_vistas_max": "2018-10",
+    "oni_usado": "2018-10",
+    "clima_hasta": "2018-10"
+   },
+   {
+    "anio": 2020,
+    "corte": "2019-10",
+    "ultimo_dato_max": "2019-10",
+    "vistas": 37,
+    "corte_vistas_max": "2019-10",
+    "oni_usado": "2019-10",
+    "clima_hasta": "2019-10"
+   },
+   {
+    "anio": 2021,
+    "corte": "2020-10",
+    "ultimo_dato_max": "2020-10",
+    "vistas": 39,
+    "corte_vistas_max": "2020-10",
+    "oni_usado": "2020-10",
+    "clima_hasta": "2020-10"
+   },
+   {
+    "anio": 2022,
+    "corte": "2021-10",
+    "ultimo_dato_max": "2021-10",
+    "vistas": 41,
+    "corte_vistas_max": "2021-10",
+    "oni_usado": "2021-10",
+    "clima_hasta": "2021-10"
+   },
+   {
+    "anio": 2023,
+    "corte": "2022-10",
+    "ultimo_dato_max": "2022-10",
+    "vistas": 43,
+    "corte_vistas_max": "2022-10",
+    "oni_usado": "2022-10",
+    "clima_hasta": "2022-10"
+   },
+   {
+    "anio": 2024,
+    "corte": "2023-10",
+    "ultimo_dato_max": "2023-10",
+    "vistas": 45,
+    "corte_vistas_max": "2023-10",
+    "oni_usado": "2023-10",
+    "clima_hasta": "2023-10"
+   },
+   {
+    "anio": 2025,
+    "corte": "2024-10",
+    "ultimo_dato_max": "2024-10",
+    "vistas": 47,
+    "corte_vistas_max": "2024-10",
+    "oni_usado": "2024-10",
+    "clima_hasta": "2024-10"
+   }
+  ],
+  "salida": {
+   "corte": "2026-10",
+   "ultimo_dato_max": "2026-10"
+  }
+ },
+ "pronostico": {
+  "2027": {
+   "total": 46458.5156,
+   "bajo": 24326.8001,
+   "alto": 67694.6856,
+   "lead": "nov",
+   "patron_v2": true,
+   "cantidad_v2": true,
+   "predictores": {
+    "oni": 2.46,
+    "lluvia_hum": 6.643,
+    "suelo": 0.616,
+    "tmax": 32.2751,
+    "fuego_prev": -0.2582
+   },
+   "base": 41932.0699,
+   "zhat": 0.1025
+  },
+  "2028": {
+   "total": 41932.0699,
+   "bajo": 22810.3292,
+   "alto": 59707.0532,
+   "lead": "2",
+   "patron_v2": true,
+   "cantidad_v2": false,
+   "predictores": {
+    "oni": 2.46,
+    "lluvia_hum": 6.643,
+    "suelo": 0.616,
+    "tmax": 32.2751,
+    "fuego_prev": -0.2582
+   },
+   "base": 41932.0699,
+   "zhat": 0.0167
+  },
+  "2029": {
+   "total": 41932.0699,
+   "bajo": 21502.714,
+   "alto": 57678.4038,
+   "lead": "3",
+   "patron_v2": true,
+   "cantidad_v2": false,
+   "predictores": {
+    "oni": 2.46,
+    "lluvia_hum": 6.643,
+    "suelo": 0.616,
+    "tmax": 32.2751,
+    "fuego_prev": -0.2582
+   },
+   "base": 41932.0699,
+   "zhat": -0.1096
+  }
+ },
+ "validacion": {
+  "1": {
+   "n": 15,
+   "anios": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8506,
+   "donde20": 0.4934,
+   "captura10": 0.723,
+   "errMediano": 0.1616,
+   "errPersistencia": 0.4966,
+   "dentroRango": 0.9333,
+   "cuandoR": 0.9496,
+   "errClimatologia": 0.2426,
+   "dentroRangoCuadro": 0.4782,
+   "dentroEscenarios": 0.6667,
+   "filas": [
+    {
+     "anio": 2011,
+     "real": 62929.4,
+     "esperado": 52759.0438,
+     "bajo": 20289.9153,
+     "alto": 68450.3865,
+     "dentro": true,
+     "top3": 0.8944,
+     "donde20": 0.4194,
+     "captura10": 0.7675
+    },
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 48114.2223,
+     "bajo": 21393.1584,
+     "alto": 62190.5707,
+     "dentro": true,
+     "top3": 0.8499,
+     "donde20": 0.5332,
+     "captura10": 0.7408
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 51663.3242,
+     "bajo": 22376.9253,
+     "alto": 66248.8846,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.4932,
+     "captura10": 0.72
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 45334.5539,
+     "bajo": 20550.6796,
+     "alto": 58766.7298,
+     "dentro": true,
+     "top3": 0.8663,
+     "donde20": 0.5144,
+     "captura10": 0.7731
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 49835.9367,
+     "bajo": 23726.0531,
+     "alto": 63928.0406,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4608,
+     "captura10": 0.7707
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 41280.9444,
+     "bajo": 19456.6257,
+     "alto": 56339.2779,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5186,
+     "captura10": 0.7752
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 45169.1799,
+     "bajo": 21542.2267,
+     "alto": 55428.0349,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4963,
+     "captura10": 0.6343
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 42498.1562,
+     "bajo": 22277.2903,
+     "alto": 52150.3666,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.4846,
+     "captura10": 0.6706
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 45995.4101,
+     "bajo": 24110.5308,
+     "alto": 56441.9192,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4405,
+     "captura10": 0.6639
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 41487.1512,
+     "bajo": 21747.3272,
+     "alto": 50909.7413,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4607,
+     "captura10": 0.7598
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 41141.5103,
+     "bajo": 21566.1443,
+     "alto": 50485.5983,
+     "dentro": true,
+     "top3": 0.8269,
+     "donde20": 0.4885,
+     "captura10": 0.7096
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 48510.8901,
+     "bajo": 25429.131,
+     "alto": 59528.7167,
+     "dentro": true,
+     "top3": 0.8618,
+     "donde20": 0.4905,
+     "captura10": 0.7283
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 43038.342,
+     "bajo": 22560.4526,
+     "alto": 52813.2397,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5737,
+     "captura10": 0.7006
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 39986.1894,
+     "bajo": 20960.5317,
+     "alto": 49067.8802,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4776,
+     "captura10": 0.7009
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 38811.0614,
+     "bajo": 20344.5363,
+     "alto": 56592.4831,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.549,
+     "captura10": 0.7297
+    }
+   ]
+  },
+  "2": {
+   "n": 14,
+   "anios": [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8475,
+   "donde20": 0.5005,
+   "captura10": 0.715,
+   "errMediano": 0.1966,
+   "errPersistencia": 0.2948,
+   "dentroRango": 0.8571,
+   "cuandoR": 0.9406,
+   "errClimatologia": 0.2254,
+   "dentroRangoCuadro": 0.4718,
+   "dentroEscenarios": 0.7143,
+   "filas": [
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 46363.957,
+     "bajo": 25326.4639,
+     "alto": 63728.1023,
+     "dentro": false,
+     "top3": 0.8499,
+     "donde20": 0.545,
+     "captura10": 0.74
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 48601.5205,
+     "bajo": 29476.9487,
+     "alto": 64908.0326,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.4909,
+     "captura10": 0.7229
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 45599.769,
+     "bajo": 22863.594,
+     "alto": 60582.4884,
+     "dentro": true,
+     "top3": 0.8663,
+     "donde20": 0.5232,
+     "captura10": 0.7768
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 46866.4929,
+     "bajo": 23726.724,
+     "alto": 62018.4887,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4638,
+     "captura10": 0.7701
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 44274.7149,
+     "bajo": 22585.7371,
+     "alto": 58405.6872,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5158,
+     "captura10": 0.7776
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 44871.8064,
+     "bajo": 23031.4727,
+     "alto": 59043.796,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4899,
+     "captura10": 0.6331
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 43994.1069,
+     "bajo": 21494.436,
+     "alto": 62930.7747,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.467,
+     "captura10": 0.6591
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 44457.4304,
+     "bajo": 21981.6177,
+     "alto": 57116.1897,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4505,
+     "captura10": 0.6604
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 42856.1175,
+     "bajo": 23312.9953,
+     "alto": 55058.9208,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4597,
+     "captura10": 0.7435
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 43763.3587,
+     "bajo": 23806.519,
+     "alto": 56224.4889,
+     "dentro": true,
+     "top3": 0.8269,
+     "donde20": 0.4939,
+     "captura10": 0.7103
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 44243.2176,
+     "bajo": 24067.554,
+     "alto": 56840.9822,
+     "dentro": true,
+     "top3": 0.8618,
+     "donde20": 0.5045,
+     "captura10": 0.7237
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 42388.3309,
+     "bajo": 23058.5274,
+     "alto": 54457.9372,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5697,
+     "captura10": 0.6932
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 40948.1148,
+     "bajo": 22275.0744,
+     "alto": 52607.6355,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4721,
+     "captura10": 0.6773
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 42071.5504,
+     "bajo": 22886.2042,
+     "alto": 54050.9569,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.5612,
+     "captura10": 0.7219
+    }
+   ]
+  },
+  "3": {
+   "n": 13,
+   "anios": [
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8473,
+   "donde20": 0.4829,
+   "captura10": 0.7079,
+   "errMediano": 0.1708,
+   "errPersistencia": 0.484,
+   "dentroRango": 0.8462,
+   "cuandoR": 0.9402,
+   "errClimatologia": 0.2041,
+   "dentroRangoCuadro": 0.4618,
+   "dentroEscenarios": 0.7692,
+   "filas": [
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 46363.957,
+     "bajo": 23699.4182,
+     "alto": 63944.1045,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.494,
+     "captura10": 0.717
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 48601.5205,
+     "bajo": 25713.8991,
+     "alto": 75847.2632,
+     "dentro": false,
+     "top3": 0.8663,
+     "donde20": 0.5283,
+     "captura10": 0.7676
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 45599.769,
+     "bajo": 21188.1814,
+     "alto": 63350.4018,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4624,
+     "captura10": 0.7665
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 46866.4929,
+     "bajo": 22079.6216,
+     "alto": 64725.6235,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5209,
+     "captura10": 0.7752
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 44274.7149,
+     "bajo": 20982.9543,
+     "alto": 60870.719,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4802,
+     "captura10": 0.6362
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 44871.8064,
+     "bajo": 21444.1023,
+     "alto": 61472.58,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.4539,
+     "captura10": 0.6582
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 43994.1069,
+     "bajo": 21166.9039,
+     "alto": 60097.1522,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4026,
+     "captura10": 0.6492
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 44457.4304,
+     "bajo": 20238.4659,
+     "alto": 66575.5923,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.446,
+     "captura10": 0.7222
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 42856.1175,
+     "bajo": 19769.3335,
+     "alto": 56973.0882,
+     "dentro": true,
+     "top3": 0.8269,
+     "donde20": 0.4816,
+     "captura10": 0.7147
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 43763.3587,
+     "bajo": 22441.7966,
+     "alto": 58179.1782,
+     "dentro": true,
+     "top3": 0.8618,
+     "donde20": 0.4813,
+     "captura10": 0.7225
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 44243.2176,
+     "bajo": 22687.8676,
+     "alto": 58817.1044,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5508,
+     "captura10": 0.6849
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 42388.3309,
+     "bajo": 21736.684,
+     "alto": 56351.2109,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4452,
+     "captura10": 0.6774
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 40948.1148,
+     "bajo": 20998.143,
+     "alto": 54436.582,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.5305,
+     "captura10": 0.7105
+    }
+   ]
+  },
+  "nov": {
+   "n": 15,
+   "anios": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8506,
+   "donde20": 0.4956,
+   "captura10": 0.7216,
+   "errMediano": 0.1625,
+   "errPersistencia": 0.4947,
+   "dentroRango": 0.9333,
+   "cuandoR": 0.949,
+   "errClimatologia": 0.2243,
+   "dentroRangoCuadro": 0.4805,
+   "dentroEscenarios": 0.6667,
+   "filas": [
+    {
+     "anio": 2011,
+     "real": 62929.4,
+     "esperado": 49857.3843,
+     "bajo": 15840.9214,
+     "alto": 79558.7595,
+     "dentro": true,
+     "top3": 0.8944,
+     "donde20": 0.4431,
+     "captura10": 0.7595
+    },
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 48479.0024,
+     "bajo": 18550.1709,
+     "alto": 62918.9495,
+     "dentro": true,
+     "top3": 0.8499,
+     "donde20": 0.5329,
+     "captura10": 0.7385
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 50015.4249,
+     "bajo": 22136.9648,
+     "alto": 64688.0539,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.4894,
+     "captura10": 0.7226
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 45554.9262,
+     "bajo": 19700.9855,
+     "alto": 58454.604,
+     "dentro": true,
+     "top3": 0.8663,
+     "donde20": 0.528,
+     "captura10": 0.771
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 48345.3021,
+     "bajo": 21867.4893,
+     "alto": 62805.3905,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4623,
+     "captura10": 0.7643
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 41303.0659,
+     "bajo": 19617.0919,
+     "alto": 53041.5361,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5207,
+     "captura10": 0.775
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 45021.2271,
+     "bajo": 21192.2927,
+     "alto": 61484.8833,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4963,
+     "captura10": 0.6343
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 42600.7574,
+     "bajo": 20291.6718,
+     "alto": 52300.9172,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.489,
+     "captura10": 0.6703
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 45494.4975,
+     "bajo": 23822.0169,
+     "alto": 55853.5596,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4405,
+     "captura10": 0.6593
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 41728.8332,
+     "bajo": 21850.2243,
+     "alto": 51230.4565,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4519,
+     "captura10": 0.7587
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 41045.1864,
+     "bajo": 21492.2503,
+     "alto": 50391.1438,
+     "dentro": true,
+     "top3": 0.8269,
+     "donde20": 0.4885,
+     "captura10": 0.7113
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 48106.8078,
+     "bajo": 25189.8857,
+     "alto": 59060.6909,
+     "dentro": true,
+     "top3": 0.8618,
+     "donde20": 0.4905,
+     "captura10": 0.7283
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 44086.3994,
+     "bajo": 23084.7028,
+     "alto": 54124.8387,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5737,
+     "captura10": 0.7006
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 40880.4069,
+     "bajo": 21405.9677,
+     "alto": 50188.8441,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4776,
+     "captura10": 0.7009
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 38418.7603,
+     "bajo": 20116.9902,
+     "alto": 47166.6825,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.549,
+     "captura10": 0.7297
+    }
+   ]
+  }
+ },
+ "referencia_v1": {
+  "1": {
+   "n": 15,
+   "anios": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8506,
+   "donde20": 0.4886,
+   "captura10": 0.716,
+   "errMediano": 0.2221,
+   "errPersistencia": 0.4966,
+   "dentroRango": 0.6667,
+   "cuandoR": 0.951,
+   "errClimatologia": 0.2426,
+   "filas": [
+    {
+     "anio": 2011,
+     "real": 62929.4,
+     "esperado": 46363.957,
+     "bajo": 30539.09,
+     "alto": 59730.0,
+     "dentro": false,
+     "top3": 0.8944,
+     "donde20": 0.4401,
+     "captura10": 0.7606
+    },
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 48601.5205,
+     "bajo": 30699.0,
+     "alto": 62929.4,
+     "dentro": false,
+     "top3": 0.8499,
+     "donde20": 0.5303,
+     "captura10": 0.7344
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 45599.769,
+     "bajo": 29259.81,
+     "alto": 62443.83,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.487,
+     "captura10": 0.7215
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 46866.4929,
+     "bajo": 29419.72,
+     "alto": 61958.26,
+     "dentro": false,
+     "top3": 0.8663,
+     "donde20": 0.5144,
+     "captura10": 0.7718
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 44274.7149,
+     "bajo": 26384.81,
+     "alto": 61472.69,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4625,
+     "captura10": 0.76
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 44871.8064,
+     "bajo": 26772.68,
+     "alto": 60987.12,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5195,
+     "captura10": 0.7748
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 43994.1069,
+     "bajo": 27160.55,
+     "alto": 60501.55,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4911,
+     "captura10": 0.6252
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 44457.4304,
+     "bajo": 27548.42,
+     "alto": 60015.98,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.4705,
+     "captura10": 0.6665
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 42856.1175,
+     "bajo": 27936.29,
+     "alto": 59530.41,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4265,
+     "captura10": 0.6518
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 43763.3587,
+     "bajo": 28324.16,
+     "alto": 59044.84,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4471,
+     "captura10": 0.7438
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 44243.2176,
+     "bajo": 28712.03,
+     "alto": 58559.27,
+     "dentro": false,
+     "top3": 0.8269,
+     "donde20": 0.4867,
+     "captura10": 0.7094
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 42388.3309,
+     "bajo": 25517.0,
+     "alto": 58073.7,
+     "dentro": true,
+     "top3": 0.8618,
+     "donde20": 0.5032,
+     "captura10": 0.7261
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 40948.1148,
+     "bajo": 25726.8,
+     "alto": 57857.73,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5468,
+     "captura10": 0.6774
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 42071.5504,
+     "bajo": 25936.6,
+     "alto": 57641.76,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4682,
+     "captura10": 0.697
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 43611.4289,
+     "bajo": 26146.4,
+     "alto": 58236.31,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.535,
+     "captura10": 0.7199
+    }
+   ]
+  },
+  "2": {
+   "n": 14,
+   "anios": [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8475,
+   "donde20": 0.4867,
+   "captura10": 0.7104,
+   "errMediano": 0.1966,
+   "errPersistencia": 0.2948,
+   "dentroRango": 0.6429,
+   "cuandoR": 0.9451,
+   "errClimatologia": 0.2254,
+   "filas": [
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 46363.957,
+     "bajo": 30539.09,
+     "alto": 59730.0,
+     "dentro": false,
+     "top3": 0.8499,
+     "donde20": 0.5408,
+     "captura10": 0.7365
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 48601.5205,
+     "bajo": 30699.0,
+     "alto": 62929.4,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.482,
+     "captura10": 0.7295
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 45599.769,
+     "bajo": 29259.81,
+     "alto": 62443.83,
+     "dentro": false,
+     "top3": 0.8663,
+     "donde20": 0.5095,
+     "captura10": 0.7742
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 46866.4929,
+     "bajo": 29419.72,
+     "alto": 61958.26,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4709,
+     "captura10": 0.7579
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 44274.7149,
+     "bajo": 26384.81,
+     "alto": 61472.69,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5226,
+     "captura10": 0.776
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 44871.8064,
+     "bajo": 26772.68,
+     "alto": 60987.12,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4844,
+     "captura10": 0.6267
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 43994.1069,
+     "bajo": 27160.55,
+     "alto": 60501.55,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.4584,
+     "captura10": 0.6513
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 44457.4304,
+     "bajo": 27548.42,
+     "alto": 60015.98,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4336,
+     "captura10": 0.6519
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 42856.1175,
+     "bajo": 27936.29,
+     "alto": 59530.41,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4458,
+     "captura10": 0.7243
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 43763.3587,
+     "bajo": 28324.16,
+     "alto": 59044.84,
+     "dentro": false,
+     "top3": 0.8269,
+     "donde20": 0.4709,
+     "captura10": 0.7083
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 44243.2176,
+     "bajo": 28712.03,
+     "alto": 58559.27,
+     "dentro": false,
+     "top3": 0.8618,
+     "donde20": 0.4969,
+     "captura10": 0.7269
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 42388.3309,
+     "bajo": 25517.0,
+     "alto": 58073.7,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5315,
+     "captura10": 0.6771
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 40948.1148,
+     "bajo": 25726.8,
+     "alto": 57857.73,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4483,
+     "captura10": 0.6858
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 42071.5504,
+     "bajo": 25936.6,
+     "alto": 57641.76,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.5179,
+     "captura10": 0.7187
+    }
+   ]
+  },
+  "3": {
+   "n": 13,
+   "anios": [
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8473,
+   "donde20": 0.474,
+   "captura10": 0.7048,
+   "errMediano": 0.1708,
+   "errPersistencia": 0.484,
+   "dentroRango": 0.6923,
+   "cuandoR": 0.944,
+   "errClimatologia": 0.2041,
+   "filas": [
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 46363.957,
+     "bajo": 30539.09,
+     "alto": 59730.0,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.4791,
+     "captura10": 0.7125
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 48601.5205,
+     "bajo": 30699.0,
+     "alto": 62929.4,
+     "dentro": false,
+     "top3": 0.8663,
+     "donde20": 0.5035,
+     "captura10": 0.7704
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 45599.769,
+     "bajo": 29259.81,
+     "alto": 62443.83,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4557,
+     "captura10": 0.7594
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 46866.4929,
+     "bajo": 29419.72,
+     "alto": 61958.26,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5281,
+     "captura10": 0.7764
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 44274.7149,
+     "bajo": 26384.81,
+     "alto": 61472.69,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.477,
+     "captura10": 0.6273
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 44871.8064,
+     "bajo": 26772.68,
+     "alto": 60987.12,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.451,
+     "captura10": 0.6544
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 43994.1069,
+     "bajo": 27160.55,
+     "alto": 60501.55,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4099,
+     "captura10": 0.6439
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 44457.4304,
+     "bajo": 27548.42,
+     "alto": 60015.98,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4231,
+     "captura10": 0.7279
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 42856.1175,
+     "bajo": 27936.29,
+     "alto": 59530.41,
+     "dentro": false,
+     "top3": 0.8269,
+     "donde20": 0.4778,
+     "captura10": 0.7064
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 43763.3587,
+     "bajo": 28324.16,
+     "alto": 59044.84,
+     "dentro": false,
+     "top3": 0.8618,
+     "donde20": 0.4787,
+     "captura10": 0.7195
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 44243.2176,
+     "bajo": 28712.03,
+     "alto": 58559.27,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5201,
+     "captura10": 0.6757
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 42388.3309,
+     "bajo": 25517.0,
+     "alto": 58073.7,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.446,
+     "captura10": 0.6829
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 40948.1148,
+     "bajo": 25726.8,
+     "alto": 57857.73,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.5118,
+     "captura10": 0.7058
+    }
+   ]
+  },
+  "nov": {
+   "n": 15,
+   "anios": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "top3": 0.8506,
+   "donde20": 0.483,
+   "captura10": 0.7137,
+   "errMediano": 0.1985,
+   "errPersistencia": 0.2642,
+   "dentroRango": 0.6,
+   "cuandoR": 0.9485,
+   "errClimatologia": 0.2243,
+   "filas": [
+    {
+     "anio": 2011,
+     "real": 62929.4,
+     "esperado": 48982.2489,
+     "bajo": 36878.14,
+     "alto": 61386.3,
+     "dentro": false,
+     "top3": 0.8944,
+     "donde20": 0.4314,
+     "captura10": 0.7606
+    },
+    {
+     "anio": 2012,
+     "real": 25221.2,
+     "esperado": 46363.957,
+     "bajo": 30539.09,
+     "alto": 59730.0,
+     "dentro": false,
+     "top3": 0.8499,
+     "donde20": 0.5408,
+     "captura10": 0.7365
+    },
+    {
+     "anio": 2013,
+     "real": 55914.0,
+     "esperado": 48601.5205,
+     "bajo": 30699.0,
+     "alto": 62929.4,
+     "dentro": true,
+     "top3": 0.918,
+     "donde20": 0.482,
+     "captura10": 0.7295
+    },
+    {
+     "anio": 2014,
+     "real": 24922.8,
+     "esperado": 45599.769,
+     "bajo": 29259.81,
+     "alto": 62443.83,
+     "dentro": false,
+     "top3": 0.8663,
+     "donde20": 0.5095,
+     "captura10": 0.7742
+    },
+    {
+     "anio": 2015,
+     "real": 49507.6,
+     "esperado": 46866.4929,
+     "bajo": 29419.72,
+     "alto": 61958.26,
+     "dentro": true,
+     "top3": 0.8859,
+     "donde20": 0.4709,
+     "captura10": 0.7579
+    },
+    {
+     "anio": 2016,
+     "real": 36940.4,
+     "esperado": 44274.7149,
+     "bajo": 26384.81,
+     "alto": 61472.69,
+     "dentro": true,
+     "top3": 0.8452,
+     "donde20": 0.5226,
+     "captura10": 0.776
+    },
+    {
+     "anio": 2017,
+     "real": 48296.8,
+     "esperado": 44871.8064,
+     "bajo": 26772.68,
+     "alto": 60987.12,
+     "dentro": true,
+     "top3": 0.8354,
+     "donde20": 0.4844,
+     "captura10": 0.6267
+    },
+    {
+     "anio": 2018,
+     "real": 29219.6,
+     "esperado": 43994.1069,
+     "bajo": 27160.55,
+     "alto": 60501.55,
+     "dentro": true,
+     "top3": 0.7988,
+     "donde20": 0.4584,
+     "captura10": 0.6513
+    },
+    {
+     "anio": 2019,
+     "real": 51680.0,
+     "esperado": 44457.4304,
+     "bajo": 27548.42,
+     "alto": 60015.98,
+     "dentro": true,
+     "top3": 0.8189,
+     "donde20": 0.4336,
+     "captura10": 0.6519
+    },
+    {
+     "anio": 2020,
+     "real": 48523.0,
+     "esperado": 42856.1175,
+     "bajo": 27936.29,
+     "alto": 59530.41,
+     "dentro": true,
+     "top3": 0.9295,
+     "donde20": 0.4458,
+     "captura10": 0.7243
+    },
+    {
+     "anio": 2021,
+     "real": 25517.0,
+     "esperado": 43763.3587,
+     "bajo": 28324.16,
+     "alto": 59044.84,
+     "dentro": false,
+     "top3": 0.8269,
+     "donde20": 0.4709,
+     "captura10": 0.7083
+    },
+    {
+     "anio": 2022,
+     "real": 27615.0,
+     "esperado": 44243.2176,
+     "bajo": 28712.03,
+     "alto": 58559.27,
+     "dentro": false,
+     "top3": 0.8618,
+     "donde20": 0.4969,
+     "captura10": 0.7269
+    },
+    {
+     "anio": 2023,
+     "real": 52639.0,
+     "esperado": 42388.3309,
+     "bajo": 25517.0,
+     "alto": 58073.7,
+     "dentro": true,
+     "top3": 0.7924,
+     "donde20": 0.5315,
+     "captura10": 0.6771
+    },
+    {
+     "anio": 2024,
+     "real": 58306.0,
+     "esperado": 40948.1148,
+     "bajo": 25726.8,
+     "alto": 57857.73,
+     "dentro": false,
+     "top3": 0.8291,
+     "donde20": 0.4483,
+     "captura10": 0.6858
+    },
+    {
+     "anio": 2025,
+     "real": 36101.0,
+     "esperado": 42071.5504,
+     "bajo": 25936.6,
+     "alto": 57641.76,
+     "dentro": true,
+     "top3": 0.8069,
+     "donde20": 0.5179,
+     "captura10": 0.7187
+    }
+   ]
+  }
+ }
+}

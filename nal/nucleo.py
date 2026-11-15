@@ -95,25 +95,42 @@ class Region:
         return self.anio[y]
 
 
-class Vista:
-    """What existed at the end of month `corte`. Fire months flagged partial are dropped too."""
+REGISTRO_VISTAS = None  # when a list, every view created appends (corte, ultimo_dato): used by the leak audit
 
-    def __init__(self, R, corte):
-        self.clave, self.nx, self.ny, self.NC, self.tierra = R.clave, R.nx, R.ny, R.NC, R.tierra
+
+class Vista:
+    """What existed at the end of month `corte`. Built from a Region or from a later Vista (a view can only be
+    narrowed, never widened). Fire months flagged partial are dropped."""
+
+    def __init__(self, F, corte):
+        assert corte <= getattr(F, "corte", corte), "a view cannot see past its source"
+        self.clave, self.nx, self.ny, self.NC, self.tierra = F.clave, F.nx, F.ny, F.NC, F.tierra
         self.corte = corte
-        self.anio = {y: m for y, m in R.anio.items() if mid(y, 12) <= corte}   # full years
+        keep = (F.mid <= corte) & ~F.parcial
+        self.serie, self.mid, self.parcial = F.serie[:, keep], F.mid[keep], F.parcial[keep]
+        self.anio = {}
+        for y in sorted(set(int(i) // 12 for i in self.mid)):
+            ks = [np.where(self.mid == mid(y, m))[0] for m in range(1, 13)]
+            if all(len(k) == 1 for k in ks):
+                self.anio[y] = self.serie[:, [k[0] for k in ks]]
         self.anios = sorted(self.anio)
         y0 = corte // 12
-        ks = [np.where((R.mid == mid(y0, m)) & ~R.parcial)[0] for m in range(1, 13)]
-        # months of the running (not yet complete) year that already exist at the issue date
         self.parcial_anio = y0 if (corte % 12) != 11 else None
-        self.parcial_meses = {m: R.serie[:, k[0]] for m, k in zip(range(1, 13), ks)
-                              if len(k) == 1 and mid(y0, m) <= corte} if self.parcial_anio else {}
-        self.clima = R.clima[R.clima.index <= corte]
-        self.oni = R.oni[R.oni.index <= corte]
-        usados = [mid(y, 12) for y in self.anios] + [mid(y0, m) for m in self.parcial_meses] + \
-                 list(self.clima.index) + list(self.oni.index)
-        self.ultimo_dato = max(usados)  # checked by verificar.py: never after `corte`
+        self.parcial_meses = {}
+        if self.parcial_anio is not None:
+            for m in range(1, 13):
+                k = np.where(self.mid == mid(y0, m))[0]
+                if len(k) == 1:
+                    self.parcial_meses[m] = self.serie[:, k[0]]
+        self.clima = F.clima[F.clima.index <= corte]
+        self.oni = F.oni[F.oni.index <= corte]
+        usados = list(self.mid) + list(self.clima.index) + list(self.oni.index)
+        self.ultimo_dato = int(max(usados))  # checked by verificar.py: never after `corte`
+        if REGISTRO_VISTAS is not None:
+            REGISTRO_VISTAS.append((self.corte, self.ultimo_dato))
+
+    def sub(self, corte):
+        return Vista(self, corte)
 
 
 # ----------------------------------------------------------------------------------------------- metrics
@@ -123,14 +140,14 @@ def puntuar(E, bajo, alto, real, tierra, ant_total):
     Et, Rt = E[tierra], real[tierra]
     pmes, r = Et.sum(0), Rt.sum(0)
     tot = r.sum()
-    orden = sorted(range(12), key=lambda m: -pmes[m])[:3]  # stable, like Array.sort in V8
+    orden = np.argsort(-pmes, kind="stable")[:3]  # stable, like Array.sort in V8
     top3 = r[orden].sum() / tot
     esp, act = Et.sum(1), Rt.sum(1)
-    ord_c = sorted(range(len(tierra)), key=lambda i: -esp[i])
+    ord_c = np.argsort(-esp, kind="stable")
     n20 = max(1, js_round(len(tierra) * 0.2))
     d20 = act[ord_c[:n20]].sum() / tot
     e_cm, a_cm = Et.reshape(-1), Rt.reshape(-1)
-    ord_cm = sorted(range(len(e_cm)), key=lambda i: -e_cm[i])
+    ord_cm = np.argsort(-e_cm, kind="stable")
     n10 = js_round(len(e_cm) * 0.1)
     d10 = a_cm[ord_cm[:n10]].sum() / tot
     total = float(pmes.sum())

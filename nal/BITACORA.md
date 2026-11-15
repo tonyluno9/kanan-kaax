@@ -14,3 +14,17 @@ Cada decisión, en orden. Fecha: 2026-11-15.
    La estación ONI se fecha por su último mes (ASO = octubre) y solo entra si ese mes es anterior o igual al corte.
 4. Fase 0: el arnés en Python reproduce v1 de Yucatán y Portugal con diferencia 0.00 puntos en las 7 métricas y h = 1, 2, 3.
    Redondeos de JavaScript (`Math.round`) y orden estable de `sort` replicados.
+5. Modelo v2, primer intento (`TOP_K = 1`, elegir una sola familia de predictores por pliegue, intercepto libre):
+   el patrón mejoró un poco en Yucatán; el total empeoró a h = 2 y el intercepto libre hundía el total
+   (estimado con muestras tempranas muy cortas). Decisión: intercepto fijo en 0, así "sin predictores" = total de v1.
+6. Elegir UNA familia y UNA penalización dentro de cada pliegue sobreajusta (con 6 a 20 muestras elige α chico).
+   Se probó además α en {30, 100, 300}. Decisión: promediar con peso igual todas las familias y α en {3, 10, 30, 100}
+   (fue la primera variante de promedio probada; no se siguió buscando para no ajustar a los años de prueba).
+7. Patrón: elegir la mejor configuración interna (K = 1) era inestable en Portugal. Probé K = 5 (promedio de las 5
+   mejores) y K = 20 (todas, sin elegir). Me quedo con K = 5. Total de variantes probadas mirando la validación
+   externa: unas 12 (anotadas aquí); por eso las mejoras pequeñas se reportan como "no distinguibles de cero".
+8. Regla final por región y horizonte (la del prompt): el patrón v2 solo si top3 y donde20 no empeoran frente al
+   patrón de v1; el total v2 solo si baja el error mediano. Si no, se usa la parte de v1. El rango siempre es el
+   conforme (cubre más cerca del 80 % que v1).
+9. Pronóstico público: emitido con datos hasta 2026-10. 2027 usa la validación "nov"; 2028 la de h = 2; 2029 la de
+   h = 3; 2030 y 2031 apuntan a 2029.
