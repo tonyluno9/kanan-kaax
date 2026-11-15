@@ -413,6 +413,8 @@
       },
       marcar: function (lat, lon) { if (marca) map.removeLayer(marca); marca = null; if (lat === null) return;
         marca = L.marker([lat, lon], { pane: "contornos", interactive: false, keyboard: false, icon: L.divIcon({ className: "pulso", html: "<i></i>", iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map); },
+      // "you are here": an animated dot at the person's own position
+      yo: function (lat, lon) { if (this._yo) map.removeLayer(this._yo); this._yo = L.marker([lat, lon], { pane: "contornos", interactive: false, keyboard: false, zIndexOffset: 1000, icon: L.divIcon({ className: "yo", html: "<i></i>", iconSize: [20, 20], iconAnchor: [10, 10] }) }).addTo(map); },
       irA: function (lat, lon, z) { z = z || Math.max(map.getZoom(), 8); map.flyTo(desplazado(lat, lon, z), z, { duration: QUIETO ? 0 : 1.1, easeLinearity: 0.2, animate: !QUIETO }); },
       encuadrar: function (b) { var o = relleno(); o.duration = QUIETO ? 0 : 1; o.animate = !QUIETO; map.flyToBounds([[b[1], b[0]], [b[3], b[2]]], o); },
       zona: function (anillos) { if (zonaCapa) map.removeLayer(zonaCapa); zonaCapa = null;
@@ -468,7 +470,7 @@
         else if (cs && cs.length) { var b = cajaDe(cs); capas.sel = '<rect x="' + px(b[0]) + '" y="' + py(b[3]) + '" width="' + (px(b[2]) - px(b[0])) + '" height="' + (py(b[1]) - py(b[3])) + '" fill="none" stroke="#FF6B2C" stroke-width="3" stroke-dasharray="6 4"/>'; }
         dibujar(); },
       marcar: function (lat, lon) { capas.marca = lat === null ? "" : '<circle cx="' + px(lon) + '" cy="' + py(lat) + '" r="7" fill="#FF6B2C" stroke="#fff" stroke-width="3"/>'; dibujar(); },
-      irA: function () {}, encuadrar: function () {},
+      yo: function () {}, irA: function () {}, encuadrar: function () {},
       zona: function (an) { capas.zona = an ? an.map(function (r) { return '<path d="' + anillo(r) + '" fill="none" stroke="#5AA9FF" stroke-width="2.5" stroke-dasharray="8 6"/>'; }).join("") : ""; dibujar(); },
       areas: function (lista, marcada) { capas.areas = lista ? lista.map(function (a) { return a.anillos.map(function (r) { return '<path d="' + anillo(r) + '" fill="none" stroke="' + (a.id === marcada ? "#FF6B2C" : "#8A94AA") + '" stroke-width="' + (a.id === marcada ? 3 : 1.2) + '" stroke-dasharray="' + (a.id === marcada ? "" : "4 3") + '"/>'; }).join(""); }).join("") : ""; dibujar(); },
       imagen: function (src, b) { capas.img = src ? '<image href="' + src + '" x="' + px(b[0]) + '" y="' + py(b[3]) + '" width="' + (px(b[2]) - px(b[0])) + '" height="' + (py(b[1]) - py(b[3])) + '" preserveAspectRatio="none"/>' : ""; dibujar(); },
@@ -703,6 +705,27 @@
     else if (ev.key === "ArrowUp") { ev.preventDefault(); if (i <= 0) $("q").focus(); else bs[i - 1].focus(); }
     else if (ev.key === "Escape") { mostrarResultados(""); $("q").blur(); }
   });
+  // ---------- "My location": an animated dot where the person is ----------
+  // The position is asked only when the button is pressed, stays in the browser and is not sent anywhere (no reverse geocoding).
+  (function () {
+    var b = $("btnUbic"); if (!b) return;
+    if (!navigator.geolocation) { b.style.display = "none"; return; }
+    function pintar(c) { b.innerHTML = I("target", 16) + "<span>" + (c ? t("Buscando…", "Locating…") : t("Mi ubicación", "My location")) + "</span>"; b.classList.toggle("cargando", !!c); b.disabled = !!c; }
+    pintar(false); b.title = t("Ver dónde estás en el mapa. Tu ubicación no sale de tu navegador.", "See where you are on the map. Your location never leaves your browser.");
+    b.addEventListener("click", function () {
+      pintar(true);
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        pintar(false); var lat = pos.coords.latitude, lon = pos.coords.longitude;
+        if (MAPA) MAPA.yo(lat, lon);
+        if (celdaEn(lat, lon) >= 0) { seleccionarPunto(lat, lon, t("Tu ubicación", "Your location"), true); if (MAPA) MAPA.irA(lat, lon); }
+        else { if (MAPA) MAPA.irA(lat, lon, 6); avisoFuera(lat, lon); }
+      }, function () {
+        pintar(false);
+        mostrarResultados('<div class="nota">' + t("No pudimos ver tu ubicación. Revisa que el navegador tenga permiso, o busca tu pueblo aquí arriba.", "We could not see your location. Check that the browser has permission, or search your town above.") + "</div>");
+      }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+    });
+  })();
+
   function avisoFuera(lat, lon) { setTimeout(function () { avisoFuera2(lat, lon); }, 0); }
   function avisoFuera2(lat, lon) {
     var otra = (window.REGIONES || []).filter(function (r) { return r.clave !== M.clave; });
@@ -1138,7 +1161,7 @@
     clearTimeout(NAL_T); clearInterval(NAL_I);
     if (!NAL_ABIERTA) { caja.innerHTML = ""; estado.nalRes = false; NAL_TXT = null; return; }
     var Y0 = ANIO[T - 1] + 1, a1 = estado.nalDe || Y0, a2 = Math.max(a1, estado.nalA || a1), per = a1 === a2 ? "" + a1 : a1 + "–" + a2, mS = estado.nalMes === undefined ? -1 : estado.nalMes;
-    var p = N.predecir(celdasSel()), v = nalVal(a2 - N.ultimo), pct = Math.round(v.top3 * 100);
+    var p = NM.predecir(celdasSel(), a1, a2), v = NM.val(a2), pct = Math.round(v.top3 * 100);
     var top = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, c) { return c[0] - a[0]; }).slice(0, 3).map(function (x) { return x[1]; }).sort(function (a, c) { return a - c; });
     function ops(sel, min) { var o = ""; for (var y = Math.max(Y0, min); y <= Y0 + 4; y++) o += '<option value="' + y + '"' + (y === sel ? " selected" : "") + ">" + y + "</option>"; return o; }
     function nfu(x) { return x >= 100 ? aprox(x) : x >= 10 ? "" + Math.round(x) : fmt(x); }
@@ -1149,19 +1172,20 @@
       var ord = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, c) { return c[0] - a[0]; }), txt;
       if (mS >= 0) {
         var pos = ord.map(function (x) { return x[1]; }).indexOf(mS) + 1;
-        txt = enDonde() + t(", en ", ", in ") + NOML[mS] + t(" de ", " ") + per + t(" el mapa muestra una actividad de fuego ", " the map shows ") + (pos <= 3 ? t("alta", "high") : pos <= 6 ? t("media", "medium") : t("baja", "low")) + t(": NAL espera ", " fire activity: NAL expects ") + nfu(p.mes[mS]) + t(" fuegos (otros años: entre ", " fires (past years: between ") + nfu(p.bajo[mS]) + t(" y ", " and ") + nfu(p.alto[mS]) + "). " +
+        txt = enDonde() + t(", en ", ", in ") + NOML[mS] + t(" de ", " ") + per + t(" el mapa muestra una actividad de fuego ", " the map shows ") + (pos <= 3 ? t("alta", "high") : pos <= 6 ? t("media", "medium") : t("baja", "low")) + t(": NAL espera ", " fire activity: NAL expects ") + nfu(p.mes[mS]) + (NM.v2 ? t(" fuegos (lo más probable: entre ", " fires (most likely between ") : t(" fuegos (otros años: entre ", " fires (past years: between ")) + nfu(p.bajo[mS]) + t(" y ", " and ") + nfu(p.alto[mS]) + "). " +
           (pos === 1 ? t("Es el mes con más fuego del año.", "It is the month with the most fire of the year.") : pos <= 3 ? t("Es uno de los 3 meses con más fuego del año.", "It is one of the 3 months with the most fire of the year.") : pos >= 10 ? t("Es uno de los meses más tranquilos del año.", "It is one of the quietest months of the year.") : t("Es un mes intermedio.", "It is an in-between month."));
         return txt;
       }
       var pct3 = Math.round((p.mes[top[0]] + p.mes[top[1]] + p.mes[top[2]]) / p.total * 100), bajos = ord.slice(9).map(function (x) { return x[1]; }).sort(function (a, c) { return a - c; }), nivel;
       if (estado.sel.tipo === "region") nivel = pct3 >= 70 ? t("una temporada de fuego muy marcada", "a very marked fire season") : t("fuego repartido en varios meses", "fire spread over several months");
-      else { var reg = N.predecir(N.tierra).total / Math.max(1, N.tierra.length), aqui = p.total / Math.max(1, celdasSel().length), r = reg > 0 ? aqui / reg : 1;
+      else { var reg = NM.predecir(N.tierra, a1, a2).total / Math.max(1, N.tierra.length), aqui = p.total / Math.max(1, celdasSel().length), r = reg > 0 ? aqui / reg : 1;
         nivel = r > 1.25 ? t("una actividad de fuego alta, más que el promedio de la región", "high fire activity, above the regional average") : r < 0.75 ? t("una actividad de fuego baja, menos que el promedio de la región", "low fire activity, below the regional average") : t("una actividad de fuego media, parecida al promedio de la región", "medium fire activity, close to the regional average"); }
-      txt = enDonde() + t(", en ", ", in ") + per + t(" el mapa muestra ", " the map shows ") + nivel + ". " + t("NAL espera ", "NAL expects ") + nfu(p.total) + t(" fuegos al año (en años pasados hubo entre ", " fires a year (past years had between ") + nfu(p.totalBajo) + t(" y ", " and ") + nfu(p.totalAlto) + "). " +
+      txt = enDonde() + t(", en ", ", in ") + per + t(" el mapa muestra ", " the map shows ") + nivel + ". " + t("NAL espera ", "NAL expects ") + nfu(p.total) + (NM.v2 ? t(" fuegos al año (lo más probable: entre ", " fires a year (most likely between ") : t(" fuegos al año (en años pasados hubo entre ", " fires a year (past years had between ")) + nfu(p.totalBajo) + t(" y ", " and ") + nfu(p.totalAlto) + "). " +
         pct3 + t(" de cada 100 llegarán en ", " out of every 100 will come in ") + listaMeses(top) + t(", con lo más fuerte en ", ", peaking in ") + NOML[ord[0][1]] + ". " + t("Los meses más tranquilos serán ", "The quietest months will be ") + listaMeses(bajos) + ".";
+      if (NM.v2 && V2.resumen_pronostico && V2.resumen_pronostico[String(a1)] && V2.resumen_pronostico[String(a1)].cantidad_v2) txt += " " + t("Para la cantidad de ", "For the amount in ") + a1 + t(", NAL tomó en cuenta el fuego del año anterior, El Niño y el clima de NASA POWER.", ", NAL took into account last year's fire, El Niño and NASA POWER climate.");
       if (a2 > a1) txt += " " + t("En los ", "Over the ") + (a2 - a1 + 1) + t(" años suman ", " years that adds up to ") + nfu(p.total * (a2 - a1 + 1)) + ".";
       if (estado.sel.tipo === "region") { // where the strongest colour is, from the forecast map itself
-        var mp = N.mapa(), tr = N.tierra.slice().sort(function (x, y) { return mp[y] - mp[x]; }), n10 = Math.max(1, Math.round(tr.length * 0.1)), sx = 0, sy = 0, sw = 0, cx = 0, cy = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+        var mp = NM.mapa(a1, a2, null), tr = N.tierra.slice().sort(function (x, y) { return mp[y] - mp[x]; }), n10 = Math.max(1, Math.round(tr.length * 0.1)), sx = 0, sy = 0, sw = 0, cx = 0, cy = 0, x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
         tr.forEach(function (c, i) { var q = centro(c); cx += q[0]; cy += q[1]; x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); if (i < n10) { sx += q[0] * mp[c]; sy += q[1] * mp[c]; sw += mp[c]; } });
         if (sw > 0) { var dx = (sx / sw - cx / tr.length) / ((x1 - x0) || 1), dy = (sy / sw - cy / tr.length) / ((y1 - y0) || 1), U = 0.08;
           var ns = dy > U ? "n" : dy < -U ? "s" : "", ew = dx > U ? "e" : dx < -U ? "o" : "";
@@ -1195,6 +1219,39 @@
   if ($("nalCaja")) $("nalCaja").addEventListener("click", function (ev) { ev.stopPropagation(); });
   if ($("btnNal")) $("btnNal").addEventListener("click", function () { if (NAL_ABIERTA) abrirTab("cal"); else abrirTab("nal"); });
   function nal() { if (NALM == null) NALM = window.NAL ? window.NAL.crear(Q) : false; return NALM; }
+  // NAL v2 (web/nal/<region>.js, trained offline with nal/entrenar.py) when its file is present; otherwise the v1 engine in js/nal.js.
+  // NM gives both the same interface: predecir(cells, y1, y2) = a typical year of the period, mapa(y1, y2, month), val(y2) = walk-forward scores.
+  var V2 = (window.NAL_V2 || {})[M.clave] || null;
+  (function () { var y = String(ANIO[T - 1] + 1); if (V2 && !(V2.esperado && V2.escenarios && V2.validacion && V2.esperado[y] && V2.esperado[y].length === NC && V2.escenarios[y])) V2 = null; })();
+  function cuantilN(v, q) { v = v.slice().sort(function (a, b) { return a - b; }); if (!v.length) return 0; var p = (v.length - 1) * q, a = Math.floor(p), b = Math.ceil(p); return v[a] + (v[b] - v[a]) * (p - a); }
+  function nalAnios(a1, a2) { var ys = []; for (var y = a1; y <= a2; y++) if (V2.esperado[String(y)] && V2.escenarios[String(y)]) ys.push(String(y)); return ys.length ? ys : [String(ANIO[T - 1] + 1)]; }
+  var NM = {
+    v2: !!V2,
+    predecir: function (cs, a1, a2) {
+      var N = nal(); if (!V2) return N.predecir(cs);
+      var ys = nalAnios(a1, a2), mes = new Array(12).fill(0), porMes = [], tot = [], m, i; for (m = 0; m < 12; m++) porMes.push([]);
+      ys.forEach(function (y) {
+        var E = V2.esperado[y];
+        for (i = 0; i < cs.length; i++) { var e = E[cs[i]]; for (m = 0; m < 12; m++) mes[m] += e[m] / ys.length; }
+        V2.escenarios[y].forEach(function (sc) { var v = new Array(12).fill(0), su = 0; for (i = 0; i < cs.length; i++) { var r = sc[cs[i]]; for (m = 0; m < 12; m++) v[m] += r[m]; } for (m = 0; m < 12; m++) { porMes[m].push(v[m]); su += v[m]; } tot.push(su); });
+      });
+      var total = mes.reduce(function (a, b) { return a + b; }, 0), bajo = cuantilN(tot, 0.1), alto = cuantilN(tot, 0.9);
+      if (cs.length === NC && V2.resumen_pronostico) { // whole region: the calibrated range published with the forecast
+        var b = 0, a = 0, ok = true; ys.forEach(function (y) { var r = V2.resumen_pronostico[y]; if (!r || !(r.alto > 0)) ok = false; else { b += r.bajo / ys.length; a += r.alto / ys.length; } }); if (ok) { bajo = b; alto = a; } }
+      return { mes: mes, bajo: porMes.map(function (v) { return cuantilN(v, 0.1); }), alto: porMes.map(function (v) { return cuantilN(v, 0.9); }), total: total, totalBajo: Math.min(bajo, total), totalAlto: Math.max(alto, total) };
+    },
+    mapa: function (a1, a2, mes) {
+      var N = nal(); if (!V2) return N.mapa(undefined, mes);
+      var ys = nalAnios(a1, a2), out = new Array(NC).fill(0);
+      ys.forEach(function (y) { var E = V2.esperado[y]; for (var c = 0; c < NC; c++) { var e = E[c], su = 0; if (mes === null || mes === undefined) { for (var m = 0; m < 12; m++) su += e[m]; } else su = e[mes]; out[c] += su / ys.length; } });
+      return out;
+    },
+    val: function (a2) {
+      var N = nal(); if (!V2) return nalVal(a2 - N.ultimo);
+      var r = V2.resumen_pronostico && V2.resumen_pronostico[String(a2)], k = r && V2.validacion[r.lead] ? String(r.lead) : String(Math.min(3, Math.max(1, a2 - N.ultimo)));
+      var v = V2.validacion[k] || V2.validacion["1"], o = {}; for (var x in v) o[x] = v[x]; o.lead = k; o.h = k === "nov" ? 1 : +k; return o;
+    }
+  };
   var NALV = {};
   function nalVal(h) { var N = nal(); NALV = NALV || {}; h = Math.max(1, h); if (!NALV[h]) NALV[h] = N.validar(h); while (NALV[h].n < 5 && h > 1) { h--; if (!NALV[h]) NALV[h] = N.validar(h); } return NALV[h]; }
   function listaMeses(ms) { var n = ms.map(function (m) { return NOML[m]; }); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + t(" y ", " and ") + n[n.length - 1]; }
@@ -1202,7 +1259,7 @@
     var N = nal(), el = $("tab-nal");
     if (!N || N.anios.length <= N.minEntreno) { el.innerHTML = '<div class="tarjeta"><p class="lead">' + t("Esta región todavía no tiene suficientes años de datos para predecir.", "This region does not have enough years of data to forecast yet.") + "</p></div>"; return; }
     var Y0 = ANIO[T - 1] + 1, a1 = estado.nalDe || Y0, a2 = Math.max(a1, estado.nalA || a1), nA = a2 - a1 + 1, per = nA === 1 ? "" + a1 : a1 + "–" + a2;
-    var cs = celdasSel(), p = N.predecir(cs), v = nalVal(a2 - N.ultimo), h = v.h;
+    var cs = celdasSel(), p = NM.predecir(cs, a1, a2), v = NM.val(a2), h = v.h, FN = V2 && V2.ficha ? V2.ficha[EN ? "en" : "es"] : null;
     var mS = estado.nalMes === undefined ? null : estado.nalMes;
     var ord = p.mes.map(function (x, m) { return [x, m]; }).sort(function (a, b) { return b[0] - a[0]; });
     var top = ord.slice(0, 3).map(function (x) { return x[1]; }).sort(function (a, b) { return a - b; }), pico = ord[0][1];
@@ -1215,7 +1272,7 @@
     for (i = 0; i < 12; i++) {
       var cx = L + i * bw + bw / 2, esTop = top.indexOf(i) >= 0 && p.total >= 1;
       g.push('<rect class="ch-bar" style="--i:' + i + '" data-m="' + i + '" x="' + (L + i * bw + 2) + '" y="' + Y(p.mes[i]) + '" width="' + Math.max(1, bw - 4) + '" height="' + (H - B - Y(p.mes[i])) + '" rx="2" fill="' + (esTop ? "#FF6B2C" : "#31688e") + '"' + (mS === i ? ' stroke="#F4F1EA" stroke-width="1.5"' : "") + ' data-tip="' +
-        esc("<b>" + NOML[i] + "</b><br>" + t("NAL espera ", "NAL expects ") + fmt(p.mes[i]) + t(" fuegos", " fires") + "<br>" + t("En años pasados: entre ", "In past years: between ") + fmt(p.bajo[i]) + t(" y ", " and ") + fmt(p.alto[i])) + '"/>');
+        esc("<b>" + NOML[i] + "</b><br>" + t("NAL espera ", "NAL expects ") + fmt(p.mes[i]) + t(" fuegos", " fires") + "<br>" + (NM.v2 ? t("Lo más probable: entre ", "Most likely between ") : t("En años pasados: entre ", "In past years: between ")) + fmt(p.bajo[i]) + t(" y ", " and ") + fmt(p.alto[i])) + '"/>');
       g.push('<path d="M' + cx + " " + Y(p.alto[i]) + "V" + Y(p.bajo[i]) + "M" + (cx - 3) + " " + Y(p.alto[i]) + "h6M" + (cx - 3) + " " + Y(p.bajo[i]) + 'h6" stroke="#F4F1EA" stroke-width="1" opacity=".75" fill="none" pointer-events="none"/>');
       g.push('<text x="' + cx + '" y="' + (H - 9) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + NOM[i] + "</text>");
     }
@@ -1230,22 +1287,22 @@
       g.join("") +
       '<p class="lead nal-mapa">' + (mS === null ? t("El mapa muestra dónde espera NAL el fuego en un año. ", "The map shows where NAL expects fire in a year. ") + (TACTIL ? t("Toca", "Tap") : t("Haz clic en", "Click")) + t(" un mes de la gráfica para ver solo ese mes.", " a month in the chart to see only that month.")
         : t("El mapa muestra solo ", "The map shows only ") + NOML[mS] + '. <button class="link" id="nalTodo">' + t("Ver todo el año", "See the whole year") + "</button>") + "</p>" +
-      comoLeer(t("Cada barra es un mes: mientras más alta, más fuego espera NAL. Las 3 naranjas son los meses de más fuego. La rayita blanca marca entre cuánto y cuánto fuego hubo ese mes en años pasados.", "Each bar is a month: the taller, the more fire NAL expects. The 3 orange ones are the months with the most fire. The white line marks the range of fire seen that month in past years.")) +
-      '<div class="stats"><div class="stat"><div class="n">' + aproxT(p.total) + '</div><div class="l">' + t("fuegos espera NAL aquí en un año. En años pasados hubo entre ", "fires NAL expects here in a year. Past years had between ") + aprox(p.totalBajo) + t(" y ", " and ") + aprox(p.totalAlto) + "." + (nA > 1 ? t(" En los ", " Over the ") + nA + t(" años: ", " years: ") + aprox(p.total * nA) + "." : "") + "</div></div>" +
+      comoLeer(t("Cada barra es un mes: mientras más alta, más fuego espera NAL. Las 3 naranjas son los meses de más fuego. La rayita blanca marca el rango: entre cuánto y cuánto fuego puede haber ese mes.", "Each bar is a month: the taller, the more fire NAL expects. The 3 orange ones are the months with the most fire. The white line marks the range: how little or how much fire that month may have.")) +
+      '<div class="stats"><div class="stat"><div class="n">' + aproxT(p.total) + '</div><div class="l">' + (NM.v2 ? t("fuegos espera NAL aquí en un año. Lo más probable: entre ", "fires NAL expects here in a year. Most likely between ") : t("fuegos espera NAL aquí en un año. En años pasados hubo entre ", "fires NAL expects here in a year. Past years had between ")) + aprox(p.totalBajo) + t(" y ", " and ") + aprox(p.totalAlto) + "." + (nA > 1 ? t(" En los ", " Over the ") + nA + t(" años: ", " years: ") + aprox(p.total * nA) + "." : "") + "</div></div>" +
       '<div class="stat"><div class="n">' + Math.round(v.donde20 * 100) + '</div><div class="l">' + t("de cada 100 fuegos cayeron en la quinta parte de las zonas que NAL marcó con el color más fuerte", "out of every 100 fires fell in the fifth of the areas NAL marked with the strongest colour") + "</div></div></div>" +
       "<details><summary>" + t("Cómo funciona NAL y qué no puede decir", "How NAL works and what it cannot say") + "</summary><ul>" +
-      "<li>" + t("NAL aprende de ", "NAL learns from ") + N.anios.length + t(" años de datos ya corregidos (", " years of corrected data (") + N.anios[0] + t(" a ", " to ") + N.ultimo + t("). Para cada zona de 27 km y cada mes mira cuánto fuego hubo. Los años recientes pesan más.", "). For each 27 km area and each month it looks at how much fire there was. Recent years weigh more.") + "</li>" +
-      "<li>" + t("Para probarlo le escondimos un año, le pedimos predecirlo solo con los años anteriores y comparamos con lo que pasó. Así con ", "To test it we hid a year, asked NAL to forecast it using only the years before, and compared with what happened. We did this for ") + v.n + t(" años en toda la región", " years across the whole region") + (h > 1 ? t(", prediciendo con ", ", forecasting ") + h + t(" años de anticipación.", " years ahead.") : ".") + "</li>" +
+      (FN ? "<li>" + esc(FN.que_usa) + "</li><li>" + esc(FN.como_se_probo) + "</li>" : "<li>" + t("NAL aprende de ", "NAL learns from ") + N.anios.length + t(" años de datos ya corregidos (", " years of corrected data (") + N.anios[0] + t(" a ", " to ") + N.ultimo + t("). Para cada zona de 27 km y cada mes mira cuánto fuego hubo. Los años recientes pesan más.", "). For each 27 km area and each month it looks at how much fire there was. Recent years weigh more.") + "</li>" +
+      "<li>" + t("Para probarlo le escondimos un año, le pedimos predecirlo solo con los años anteriores y comparamos con lo que pasó. Así con ", "To test it we hid a year, asked NAL to forecast it using only the years before, and compared with what happened. We did this for ") + v.n + t(" años en toda la región", " years across the whole region") + (h > 1 ? t(", prediciendo con ", ", forecasting ") + h + t(" años de anticipación.", " years ahead.") : ".") + "</li>") +
       "<li>" + (mejor ? t("En la cantidad de fuego del año se equivoca cerca de ", "On the amount of fire in a year it is off by about ") + Math.round(v.errMediano * 100) + t("%. Decir «será igual que el año pasado» se equivoca ", "%. Saying \"it will be like last year\" is off by ") + Math.round(v.errPersistencia * 100) + "%."
         : t("En la cantidad de fuego del año, aquí NAL todavía no es mejor que decir «será igual que el año pasado» (", "On the amount of fire in a year, here NAL is not yet better than saying \"it will be like last year\" (") + Math.round(v.errMediano * 100) + t("% contra ", "% versus ") + Math.round(v.errPersistencia * 100) + t("%). Aquí sirve para el cuándo y el dónde, no para el cuánto.", "%). Here it is useful for when and where, not for how much.")) + "</li>" +
       "<li>" + t("En ", "In ") + Math.round(v.dentroRango * 100) + t(" de cada 100 años probados, el fuego real quedó dentro del rango que NAL dio.", " out of every 100 tested years, the real fire fell inside the range NAL gave.") + "</li>" +
-      "<li>" + t("NAL no puede decir el fuego exacto de un año: la mayoría de los fuegos los enciende la gente y el clima de ese año también cuenta. Todavía no usa el pronóstico del clima, así que espera lo mismo para cada año que elijas.", "NAL cannot tell the exact fire of a year: people start most fires and that year's weather matters too. It does not use the weather forecast yet, so it expects the same for every year you pick.") + "</li></ul></details></div>";
+      "<li>" + (FN ? esc(FN.limites) : t("NAL no puede decir el fuego exacto de un año: la mayoría de los fuegos los enciende la gente y el clima de ese año también cuenta. Todavía no usa el pronóstico del clima, así que espera lo mismo para cada año que elijas.", "NAL cannot tell the exact fire of a year: people start most fires and that year's weather matters too. It does not use the weather forecast yet, so it expects the same for every year you pick.")) + "</li></ul></details></div>";
     el.innerHTML = hh; conTip($("barNal"));
     $("nalDe").addEventListener("change", function () { estado.nalDe = +this.value; if ((estado.nalA || 0) < estado.nalDe) estado.nalA = estado.nalDe; tabNal(); });
     $("nalA").addEventListener("change", function () { estado.nalA = +this.value; tabNal(); });
     $("barNal").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("[data-m]") : null; if (!b) return; var m = +b.getAttribute("data-m"); estado.nalMes = estado.nalMes === m ? undefined : m; tabNal(); });
     var bt = $("nalTodo"); if (bt) bt.addEventListener("click", function () { estado.nalMes = undefined; tabNal(); });
-    estado.mapa = { tipo: "nal", valores: N.mapa(undefined, mS), mes: mS, per: per }; pararReplay(); pintarMapa();
+    estado.mapa = { tipo: "nal", valores: NM.mapa(a1, a2, mS), mes: mS, per: per }; pararReplay(); pintarMapa();
     NAL_ABIERTA = true; barraNal();
   }
 

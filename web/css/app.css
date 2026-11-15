@@ -734,7 +734,7 @@ body.panel-oculto .leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--ga
 .respuesta.nal-heroe .boton { margin-top: 12px; }
 
 /* NAL bar on the map, under the base-map switch */
-.nal-caja { top: calc(var(--bar-h) + var(--gap) * 2 + 48px); left: var(--gap); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: min(400px, calc(100% - var(--gap) * 2)); pointer-events: none; }
+.nal-caja { top: calc(var(--bar-h) + var(--gap) * 2 + 48px); left: var(--gap); display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: min(480px, calc(100% - var(--gap) * 2)); pointer-events: none; }
 .nal-caja > * { pointer-events: auto; }
 #fechaBox[style*="block"] ~ .nal-caja { top: calc(var(--bar-h) + var(--gap) * 2 + 104px); }
 .nal-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 0; border-radius: var(--r-pill); background: var(--accent-grad); color: var(--accent-ink); font: 700 13px var(--font-ui); letter-spacing: .01em; cursor: pointer; box-shadow: 0 0 22px rgba(255, 107, 44, .38), var(--shadow-1); }
@@ -745,7 +745,7 @@ body.panel-oculto .leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--ga
 .nal-fila { display: flex; gap: 10px; flex-wrap: wrap; }
 .nal-fila label { display: flex; flex-direction: column; gap: 4px; font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); }
 .nal-fila select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--line-2); background: rgba(5, 7, 13, .55); color: var(--text); font: 500 13px var(--font-ui); text-transform: none; letter-spacing: 0; }
-.nal-res { margin: 12px 0 10px; font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--text); }
+.nal-res { margin: 12px 0 10px; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--text); max-height: 34vh; overflow: auto; }
 .nal-pie { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; color: var(--text-2); }
 .nal-pie b { font: 700 16px var(--font-mono); color: var(--accent-hi); margin-right: 2px; }
 .nal-gen { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; }
@@ -761,3 +761,15 @@ body.panel-oculto .leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--ga
 @keyframes nalBrillo { to { background-position: -200% 0; } }
 @keyframes nalPunto { 0%, 100% { opacity: .25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
 @keyframes nalCursor { 50% { opacity: 0; } }
+
+/* ======================= 32. "My location" dot ======================= */
+#btnUbic { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+#btnUbic.cargando .ico { animation: yo-gira 1s linear infinite; }
+.yo { position: relative; }
+.yo i { position: absolute; inset: 0; border-radius: 50%; background: #38BDF8; border: 3px solid #fff; box-shadow: 0 0 18px rgba(56, 189, 248, .85); animation: yo-late 1.6s ease-in-out infinite; }
+.yo::before, .yo::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: rgba(56, 189, 248, .38); animation: yo-onda 2.4s cubic-bezier(.2, .6, .3, 1) infinite; }
+.yo::after { animation-delay: 1.2s; }
+@keyframes yo-onda { from { transform: scale(1); opacity: .75; } to { transform: scale(5); opacity: 0; } }
+@keyframes yo-late { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+@keyframes yo-gira { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .yo i, .yo::before, .yo::after, #btnUbic.cargando .ico { animation: none; } }
