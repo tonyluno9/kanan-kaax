@@ -27,7 +27,7 @@ EMISION = N.mid(2026, 10)                       # last month of data of the publ
 ANIOS_SALIDA = [2027, 2028, 2029, 2030, 2031]
 LEAD = {2027: "nov", 2028: 2, 2029: 3}          # horizon whose validation backs each forecast year
 S = 20                                          # scenarios per year
-MEZCLA = 0.5                                    # scenario = expected pattern blended with a past year's pattern
+MEZCLA = 1.0                                    # scenario pattern = a past year's own pattern (0.5 under-covered single squares, see BITACORA)
 SALIDA_WEB = os.path.join(N.RAIZ, "web", "nal")
 SALIDA_RES = os.path.join(N.AQUI, "resultados")
 
@@ -41,6 +41,10 @@ def escenarios(F, tierra, rng):
     """S plausible years: total from the spread of past forecast errors, pattern half expected, half a past year."""
     res = np.sort(F["res"])
     q = np.quantile(res, (np.arange(S) + 0.5) / S)
+    # stretch in log space so the P10 / P90 of the S regional totals equal the conformal range exactly
+    a, b = np.quantile(q, 0.1), np.quantile(q, 0.9)
+    lo, hi = math.log(F["bajo"] / F["total"]), math.log(F["alto"] / F["total"])
+    q = lo + (q - a) * (hi - lo) / (b - a) if b > a else np.linspace(lo, hi, S)
     rng.shuffle(q)
     H = F["H"]
     ys = sorted(H)
@@ -106,6 +110,16 @@ def decidir(c):
     patron = a["top3"] >= b["top3"] - 1e-9 and a["donde20"] >= b["donde20"] - 1e-9
     cantidad = c["v2_cantidad"]["errMediano"] < b["errMediano"] - 1e-9
     return patron, cantidad
+
+
+def combinaciones(R, folds, h):
+    return {"v2": resumen(R, folds, h, True, True), "v2_patron": resumen(R, folds, h, True, False),
+            "v2_cantidad": resumen(R, folds, h, False, True), "base": resumen(R, folds, h, False, False)}
+
+
+def decidir_desde(out, k):
+    d = out["decision"][k]
+    return d["patron_v2"], d["cantidad_v2"]
 
 
 def r4(x):
@@ -189,8 +203,7 @@ def main():
             k = str(h)
             folds = correr(R, h)
             aud[k] = [f["audit"] for f in folds]
-            c = {"v2": resumen(R, folds, h, True, True), "v2_patron": resumen(R, folds, h, True, False),
-                 "v2_cantidad": resumen(R, folds, h, False, True), "base": resumen(R, folds, h, False, False)}
+            c = combinaciones(R, folds, h)
             dec[k] = decidir(c)
             val_h = resumen(R, folds, h, dec[k][0], dec[k][1], con_escenarios=True)
             clim = N.validar(R, N.climatologia, h)
@@ -230,6 +243,7 @@ def main():
             "emitido_con_datos_hasta": N.txt_mid(EMISION),
             "anios": ANIOS_SALIDA,
             "validacion": val, "referencia_v1": ref, "techo": tch["nov"],
+            "decision": {k: {"patron_v2": a, "cantidad_v2": b} for k, (a, b) in dec.items()},
             "variables": Mo.VARIABLES,
             "ficha": ficha(clave, dec, val, ref, tch["nov"]),
             "resumen_pronostico": r4(info),

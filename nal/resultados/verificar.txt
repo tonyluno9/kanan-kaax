@@ -1,0 +1,74 @@
+
+== 1. NAL v1 reproduced (Node running web/js/nal.js vs the Python harness) ==
+[OK  ] yucatan h=1 n=15: max difference 0.0000 points (top3 85.06, donde20 48.86, captura10 71.60, err 22.21, range 67%)
+[OK  ] yucatan h=2 n=14: max difference 0.0000 points (top3 84.75, donde20 48.67, captura10 71.04, err 19.66, range 64%)
+[OK  ] yucatan h=3 n=13: max difference 0.0000 points (top3 84.73, donde20 47.40, captura10 70.48, err 17.08, range 69%)
+[OK  ] portugal h=1 n=15: max difference 0.0000 points (top3 54.00, donde20 59.48, captura10 55.03, err 54.54, range 53%)
+[OK  ] portugal h=2 n=14: max difference 0.0000 points (top3 55.51, donde20 59.01, captura10 55.70, err 64.07, range 50%)
+[OK  ] portugal h=3 n=13: max difference 0.0000 points (top3 56.01, donde20 59.33, captura10 56.23, err 69.65, range 46%)
+
+== 2. No leak ==
+[OK  ] yucatan h=1: 15 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] yucatan h=1: choice of parts recomputed = file (pattern v2, amount v2)
+[OK  ] yucatan h=1 canary: data after the issue date replaced by garbage in years [2011, 2018, 2025] -> forecasts identical (max diff 0)
+[OK  ] yucatan h=2: 14 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] yucatan h=2: choice of parts recomputed = file (pattern v2, amount v1)
+[OK  ] yucatan h=2 canary: data after the issue date replaced by garbage in years [2012, 2019, 2025] -> forecasts identical (max diff 0)
+[OK  ] yucatan h=3: 13 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] yucatan h=3: choice of parts recomputed = file (pattern v2, amount v1)
+[OK  ] yucatan h=3 canary: data after the issue date replaced by garbage in years [2013, 2019, 2025] -> forecasts identical (max diff 0)
+[OK  ] yucatan h=nov: 15 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] yucatan h=nov: choice of parts recomputed = file (pattern v2, amount v2)
+[OK  ] yucatan h=nov canary: data after the issue date replaced by garbage in years [2011, 2018, 2025] -> forecasts identical (max diff 0)
+[OK  ] yucatan public forecast issued with data up to 2026-10 (last month used is the issue month)
+[OK  ] portugal h=1: 15 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] portugal h=1: choice of parts recomputed = file (pattern v1, amount v2)
+[OK  ] portugal h=1 canary: data after the issue date replaced by garbage in years [2011, 2018, 2025] -> forecasts identical (max diff 0)
+[OK  ] portugal h=2: 14 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] portugal h=2: choice of parts recomputed = file (pattern v1, amount v1)
+[OK  ] portugal h=2 canary: data after the issue date replaced by garbage in years [2012, 2019, 2025] -> forecasts identical (max diff 0)
+[OK  ] portugal h=3: 13 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] portugal h=3: choice of parts recomputed = file (pattern v1, amount v2)
+[OK  ] portugal h=3 canary: data after the issue date replaced by garbage in years [2013, 2019, 2025] -> forecasts identical (max diff 0)
+[OK  ] portugal h=nov: 15 folds, every view, fire month and predictor date <= issue date (Y-h, or Oct of Y-1) 
+[OK  ] portugal h=nov: choice of parts recomputed = file (pattern v1, amount v2)
+[OK  ] portugal h=nov canary: data after the issue date replaced by garbage in years [2011, 2018, 2025] -> forecasts identical (max diff 0)
+[OK  ] portugal public forecast issued with data up to 2026-10 (last month used is the issue month)
+
+== 3. Stored validation recomputed from scratch ==
+[OK  ] yucatan h=1 v2: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=1 v1: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=2 v2: 14 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=2 v1: 14 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=3 v2: 13 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=3 v1: 13 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=nov v2: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] yucatan h=nov v1: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=1 v2: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=1 v1: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=2 v2: 14 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=2 v1: 14 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=3 v2: 13 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=3 v1: 13 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=nov v2: 15 years, metrics and rows match the file (max diff 0)
+[OK  ] portugal h=nov v1: 15 years, metrics and rows match the file (max diff 0)
+
+== 4. Output contract ==
+[OK  ] yucatan file size 0.83 MB (< 3 MB)
+[OK  ] yucatan loads in Node with global.window = {} and has all keys
+[OK  ] yucatan esperado 5 x 384 cells x 12 and escenarios 5 x 20 x 384 cells x 12
+[OK  ] yucatan no NaN, no negatives (483840 numbers)
+[OK  ] yucatan validacion / referencia_v1 (h = 1, 2, 3, nov), techo and ficha (es, en) complete
+[OK  ] yucatan 2030 and 2031 point to the 2029 arrays (no duplicated data)
+[OK  ] portugal file size 0.67 MB (< 3 MB)
+[OK  ] portugal loads in Node with global.window = {} and has all keys
+[OK  ] portugal esperado 5 x 330 cells x 12 and escenarios 5 x 20 x 330 cells x 12
+[OK  ] portugal no NaN, no negatives (415800 numbers)
+[OK  ] portugal validacion / referencia_v1 (h = 1, 2, 3, nov), techo and ficha (es, en) complete
+[OK  ] portugal 2030 and 2031 point to the 2029 arrays (no duplicated data)
+
+== 5. Web review ==
+[OK  ] herramientas/revisar_web.py: PASS: 0 failure(s), 0 warning(s)
+[OK  ] no change against main in web/data, pipeline, resultados, web/js, web/index.html, web/css
+
+PASS: 0 failure(s)

@@ -28,3 +28,10 @@ Cada decisión, en orden. Fecha: 2026-11-15.
    conforme (cubre más cerca del 80 % que v1).
 9. Pronóstico público: emitido con datos hasta 2026-10. 2027 usa la validación "nov"; 2028 la de h = 2; 2029 la de
    h = 3; 2030 y 2031 apuntan a 2029.
+10. scikit-learn y LightGBM no hacen falta: la ridge (8 líneas de numpy) basta y evita dependencias.
+11. Escenarios: con el patrón mezclado 50 % esperado + 50 % un año pasado, el P10-P90 de un solo cuadro contenía el
+    valor real solo en ~45 % de los cuadros. Decisión: cada escenario usa el patrón propio de un año pasado (mezcla = 1),
+    y sus totales se estiran en log para que el P10/P90 regional sea exactamente el rango conforme. Resultado: un
+    cuadro solo queda dentro en ~78-85 %, y la suma regional cubre lo mismo que el rango.
+12. Rango conforme: con 10 a 20 errores internos, el método es conservador (en Yucatán cubre 85-93 %). Se deja así:
+    preferimos pasarnos a quedarnos cortos, y no se ajustó mirando la prueba.

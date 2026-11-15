@@ -2284,8 +2284,8 @@
    "dentroRango": 0.9333,
    "cuandoR": 0.9496,
    "errClimatologia": 0.2426,
-   "dentroRangoCuadro": 0.4782,
-   "dentroEscenarios": 0.6667,
+   "dentroRangoCuadro": 0.781,
+   "dentroEscenarios": 0.9333,
    "filas": [
     {
      "anio": 2011,
@@ -2480,8 +2480,8 @@
    "dentroRango": 0.8571,
    "cuandoR": 0.9406,
    "errClimatologia": 0.2254,
-   "dentroRangoCuadro": 0.4718,
-   "dentroEscenarios": 0.7143,
+   "dentroRangoCuadro": 0.7821,
+   "dentroEscenarios": 0.8571,
    "filas": [
     {
      "anio": 2012,
@@ -2664,8 +2664,8 @@
    "dentroRango": 0.8462,
    "cuandoR": 0.9402,
    "errClimatologia": 0.2041,
-   "dentroRangoCuadro": 0.4618,
-   "dentroEscenarios": 0.7692,
+   "dentroRangoCuadro": 0.7826,
+   "dentroEscenarios": 0.8462,
    "filas": [
     {
      "anio": 2013,
@@ -2839,8 +2839,8 @@
    "dentroRango": 0.9333,
    "cuandoR": 0.949,
    "errClimatologia": 0.2243,
-   "dentroRangoCuadro": 0.4805,
-   "dentroEscenarios": 0.6667,
+   "dentroRangoCuadro": 0.7955,
+   "dentroEscenarios": 0.9333,
    "filas": [
     {
      "anio": 2011,

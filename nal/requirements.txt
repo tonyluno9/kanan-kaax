@@ -1,0 +1,4 @@
+# NAL v2 (AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic) and reviewed by the team.)
+# Tested with Python 3.10, numpy 2.2, pandas 2.3. Node.js is needed only by verificar.py (to run web/js/nal.js).
+numpy>=1.24
+pandas>=2.0
