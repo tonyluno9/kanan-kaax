@@ -135,7 +135,7 @@
   $("titulo").textContent = "Kanan Ka'ax";
   $("titulo").setAttribute("title", t("Kanan Ka'ax: «guardián del monte» en maya", "Kanan Ka'ax: “guardian of the forest” in Yucatec Maya"));
   $("subtitulo").textContent = t("Calendario de quemas desde el espacio", "Burn calendar from space");
-  $("logo").innerHTML = I("logo", 30);
+  $("logo").innerHTML = '<img src="img/kanan-kaax-icono.svg?v=1" alt="" width="38" height="38">'; // team logo (vector), on its ivory tile
   $("lupa").innerHTML = I("search", 18);
   $("btnIr").innerHTML = I("arrow", 18);
   $("kbdK").textContent = /Mac|iPhone|iPad/.test(navigator.platform || "") ? "⌘ K" : "Ctrl K";
@@ -150,7 +150,7 @@
   $("cerrarBienv").innerHTML = I("x", 18);
   $("play").innerHTML = I("play", 20);
   $("repKick").textContent = t("Reproducir", "Play");
-  $("pie").innerHTML = '<div class="pie-marca">' + I("logo", 16) + "Kanan Ka'ax · La Com · NASA Space Apps 2026</div>" + t("Datos: NASA FIRMS (MODIS y VIIRS NOAA-20), NASA POWER y NASA GIBS. Mapas: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, etiquetas © Esri. Búsqueda: OpenStreetMap Nominatim. ",
+  $("pie").innerHTML = '<div class="pie-marca"><img src="img/kanan-kaax-icono.svg?v=1" alt="" width="20" height="20">' + "Kanan Ka'ax · La Com · NASA Space Apps 2026</div>" + t("Datos: NASA FIRMS (MODIS y VIIRS NOAA-20), NASA POWER y NASA GIBS. Mapas: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, etiquetas © Esri. Búsqueda: OpenStreetMap Nominatim. ",
     "Data: NASA FIRMS (MODIS and VIIRS NOAA-20), NASA POWER and NASA GIBS. Maps: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, labels © Esri. Search: OpenStreetMap Nominatim. ") +
     t("Áreas protegidas: WDPA (Protected Planet). Imágenes de la prueba: NASA HLS y OPERA. ", "Protected areas: WDPA (Protected Planet). Evidence imagery: NASA HLS and OPERA. ") +
     t("Equipo La Com (Mérida): Angel Antonio Perez Reyes, Gabriel Chi Vidal, Alan Flores Denegri, Alessandro Novelo Diaz y Daniel Esquivel Gomez. ", "Team La Com (Mérida): Angel Antonio Perez Reyes, Gabriel Chi Vidal, Alan Flores Denegri, Alessandro Novelo Diaz and Daniel Esquivel Gomez. ") +
@@ -218,11 +218,15 @@
       rects[c].addTo(map);
     }
     if (!QUIETO) map.getPane("celdas").classList.add("celdas-ocultas");
+    // Land rings used to draw: the study-area outline (Q.costa) plus, when present, the extra outlines around it
+    // (js/contornos.js), so the map does not end in a straight cut where the data outline was clipped.
+    var TIERRA = []; (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { TIERRA.push(r); }); });
+    ((window.CONTORNOS_EXTRA || {})[M.clave] || []).forEach(function (r) { TIERRA.push(r); });
     // Coastline clip: the squares follow the shape of the land exactly (Natural Earth 1:10m outline in Q.costa),
     // so coastal squares are cut by the shoreline instead of spilling into the sea. Pure presentation: values are unchanged.
     // Runs when the map is ready: before the first setView Leaflet has not created the cells' SVG container yet.
     map.whenReady(function () {
-      var anillos = []; (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { anillos.push(r); }); });
+      var anillos = TIERRA;
       if (!anillos.length || !renCeldas._container) return;
       var NS = "http://www.w3.org/2000/svg", defs = document.createElementNS(NS, "defs"), cp = document.createElementNS(NS, "clipPath"), cpath = document.createElementNS(NS, "path");
       cp.setAttribute("id", "clipTierra"); cp.setAttribute("clipPathUnits", "userSpaceOnUse"); cpath.setAttribute("clip-rule", "nonzero");
@@ -258,8 +262,15 @@
     // The heat image covers the whole land on screen (Yucatán Peninsula and its neighbours), not only the study box.
     // Inside the box the colours are the data; outside it they only continue the nearest edge, muted (illustrative).
     var EXT = [LON0, LAT0, LON1, LAT1];
-    (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { r.forEach(function (q) {
-      if (q[0] < EXT[0]) EXT[0] = q[0]; if (q[1] < EXT[1]) EXT[1] = q[1]; if (q[0] > EXT[2]) EXT[2] = q[0]; if (q[1] > EXT[3]) EXT[3] = q[1]; }); }); });
+    TIERRA.forEach(function (r) { r.forEach(function (q) {
+      if (q[0] < EXT[0]) EXT[0] = q[0]; if (q[1] < EXT[1]) EXT[1] = q[1]; if (q[0] > EXT[2]) EXT[2] = q[0]; if (q[1] > EXT[3]) EXT[3] = q[1]; }); });
+    // Which sides of that box are a straight cut of the outline (two or more points exactly on it) and which are natural
+    // coast: only the cut sides get the soft fade. Order: west, south, east, north.
+    var CORTE = [0, 0, 0, 0];
+    TIERRA.forEach(function (r) { r.forEach(function (q) {
+      if (Math.abs(q[0] - EXT[0]) < 1e-4) CORTE[0]++; if (Math.abs(q[1] - EXT[1]) < 1e-4) CORTE[1]++; if (Math.abs(q[0] - EXT[2]) < 1e-4) CORTE[2]++; if (Math.abs(q[1] - EXT[3]) < 1e-4) CORTE[3]++; }); });
+    CORTE = CORTE.map(function (n) { return n >= 2; });
+    TW = Math.max(820, Math.min(1200, Math.round((EXT[2] - EXT[0]) / G * 20))); // keep ~20 px per square on wider regions
     function mercY(lat) { var r = lat * Math.PI / 180; return Math.log(Math.tan(Math.PI / 4 + r / 2)); }
     var MY0 = mercY(EXT[1]), MY1 = mercY(EXT[3]), TH = Math.max(40, Math.round(TW * (MY1 - MY0) / ((EXT[2] - EXT[0]) * Math.PI / 180)));
     var filaF = new Float32Array(TH), colF = new Float32Array(TW), fuera = new Float32Array(TW * TH), yy, xx;
@@ -272,16 +283,16 @@
       fuera[yy * TW + xx] = Math.min(1, Math.sqrt(dx * dx + dy * dy) / (10 * G)); }
     var mascara = document.createElement("canvas"); mascara.width = TW; mascara.height = TH;
     (function () { var mx = mascara.getContext("2d"); mx.fillStyle = "#000"; mx.beginPath();
-      (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { r.forEach(function (q, i) {
-        var x = (q[0] - EXT[0]) / (EXT[2] - EXT[0]) * TW, y = (MY1 - mercY(q[1])) / (MY1 - MY0) * TH; if (i) mx.lineTo(x, y); else mx.moveTo(x, y); }); mx.closePath(); }); });
+      TIERRA.forEach(function (r) { r.forEach(function (q, i) {
+        var x = (q[0] - EXT[0]) / (EXT[2] - EXT[0]) * TW, y = (MY1 - mercY(q[1])) / (MY1 - MY0) * TH; if (i) mx.lineTo(x, y); else mx.moveTo(x, y); }); mx.closePath(); });
       mx.fill("nonzero");
       // soft fade at the outer edges of the image (where the land outline is cut), never a hard straight line
       var fd = document.createElement("canvas"); fd.width = TW; fd.height = TH; var fx = fd.getContext("2d"), fi = fx.createImageData(TW, TH), F = Math.round(TW * 0.07);
-      for (var y = 0; y < TH; y++) for (var x = 0; x < TW; x++) { var a = Math.min(1, (x + 0.5) / F, (TW - x - 0.5) / F, (y + 0.5) / F, (TH - y - 0.5) / F); fi.data[(y * TW + x) * 4 + 3] = Math.round(255 * a * a * (3 - 2 * a)); }
+      for (var y = 0; y < TH; y++) for (var x = 0; x < TW; x++) { var a = Math.min(1, CORTE[0] ? (x + 0.5) / F : 1, CORTE[2] ? (TW - x - 0.5) / F : 1, CORTE[3] ? (y + 0.5) / F : 1, CORTE[1] ? (TH - y - 0.5) / F : 1); fi.data[(y * TW + x) * 4 + 3] = Math.round(255 * a * a * (3 - 2 * a)); }
       fx.putImageData(fi, 0, 0); mx.globalCompositeOperation = "destination-in"; mx.drawImage(fd, 0, 0); mx.globalCompositeOperation = "source-over"; })();
     var LUT = []; for (var li = 0; li < 256; li++) { var hx = color(MORADO_MIN + (1 - MORADO_MIN) * li / 255); LUT.push([parseInt(hx.substr(1, 2), 16), parseInt(hx.substr(3, 2), 16), parseInt(hx.substr(5, 2), 16)]); }
     var lienzoA = document.createElement("canvas"), lienzoB = document.createElement("canvas"); lienzoA.width = lienzoB.width = TW; lienzoA.height = lienzoB.height = TH;
-    var TERMICO_OK = !!(Q.costa && Q.costa.length && lienzoA.getContext);
+    var TERMICO_OK = !!(TIERRA.length && lienzoA.getContext);
     function pintarTermico(valores, normDe) {
       var f = new Float32Array(NC), ok = new Uint8Array(NC), c2, it;
       for (c2 = 0; c2 < NC; c2++) if (rects[c2]) { var nv = normDe(valores[c2]); f[c2] = nv > 1 ? 1 : (nv > 0 ? nv : 0); ok[c2] = 1; }
@@ -334,7 +345,7 @@
     // no tooltip, no click (a click there still says the place is outside the study area).
     var fantasmas = [], fantasmasCapa = L.layerGroup();
     (function () {
-      var an = []; (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { an.push(r); }); });
+      var an = TIERRA;
       if (!an.length) return;
       var i0 = Math.floor((EXT[0] - LON0) / G), i1 = Math.ceil((EXT[2] - LON0) / G), j0 = Math.floor((EXT[1] - LAT0) / G), j1 = Math.ceil((EXT[3] - LAT0) / G);
       for (var jj = j0; jj < j1; jj++) for (var ii = i0; ii < i1; ii++) {
@@ -345,7 +356,7 @@
         var dx = Math.max(0, -ii - 0.5, ii + 0.5 - NX), dy = Math.max(0, -jj - 0.5, jj + 0.5 - NY);
         // m: how far from the study grid (blends to the regional average within ~4 squares: no stripes);
         // e: fade towards the outer edge of the drawn area (no hard straight end)
-        var e = Math.min(1, Math.min(x0 + h - EXT[0], EXT[2] - x0 - h, y0 + h - EXT[1], EXT[3] - y0 - h) / (3 * G));
+        var e = Math.min(1, Math.min(CORTE[0] ? x0 + h - EXT[0] : 99, CORTE[2] ? EXT[2] - x0 - h : 99, CORTE[1] ? y0 + h - EXT[1] : 99, CORTE[3] ? EXT[3] - y0 - h : 99) / (3 * G));
         fantasmas.push({ j: jj, i: ii, m: Math.min(1, Math.sqrt(dx * dx + dy * dy) / 4), e: Math.max(0, e),
           r: new Celda([[y0, x0], [y0 + G, x0 + G]], { pane: "celdas", renderer: renCeldas, stroke: false, fillOpacity: 0, interactive: false, className: "celda celda-fantasma" }).addTo(fantasmasCapa) });
       }

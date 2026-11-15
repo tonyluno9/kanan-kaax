@@ -710,3 +710,8 @@ body.panel-oculto .panel-mostrar { display: inline-flex; }
 @media (max-width: 699px) { .panel-ocultar, .panel-mostrar { display: none !important; } }
 /* with the panel hidden, the zoom buttons sit under the "Show the panel" pill instead of behind it */
 body.panel-oculto .leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--gap) * 2 + 44px); }
+
+/* ======================= 30. Team logo ======================= */
+.logo { width: 38px; height: 38px; filter: none; }
+.logo img { display: block; width: 38px; height: 38px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, .35); }
+.pie .pie-marca img { display: block; width: 20px; height: 20px; border-radius: 5px; }
