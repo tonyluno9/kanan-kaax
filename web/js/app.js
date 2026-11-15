@@ -62,6 +62,18 @@
     });
     return "#" + r.join("");
   }
+  // Cells read as data tiles: opacity follows the value (low ≈ 0.15, nearly see-through; high ≈ 0.75), so the satellite
+  // stays clean and only the places with fire stand out. x is the value as a share of the map's maximum (0–1).
+  function opacidad(x) { return 0.15 + 0.6 * Math.min(1, Math.max(0, x || 0)); }
+  // One cell as a tile: inset ~0.8 px per side (a 1–2 px gap between neighbours) with slightly rounded corners.
+  function tesela(x, y, w, h) {
+    var g = Math.min(0.8, w * 0.08, h * 0.08); x += g; y += g; w -= 2 * g; h -= 2 * g;
+    var r = Math.max(0, Math.min(3, w * 0.14, h * 0.14)), f = function (n) { return n.toFixed(1); };
+    if (w <= 0 || h <= 0) return "M0 0";
+    return "M" + f(x + r) + " " + f(y) + "H" + f(x + w - r) + "A" + f(r) + " " + f(r) + " 0 0 1 " + f(x + w) + " " + f(y + r) + "V" + f(y + h - r) +
+      "A" + f(r) + " " + f(r) + " 0 0 1 " + f(x + w - r) + " " + f(y + h) + "H" + f(x + r) + "A" + f(r) + " " + f(r) + " 0 0 1 " + f(x) + " " + f(y + h - r) +
+      "V" + f(y + r) + "A" + f(r) + " " + f(r) + " 0 0 1 " + f(x + r) + " " + f(y) + "Z";
+  }
   function colorPng(f) { return f > 0 ? color(f) : "#eceff3"; } // the PNG download keeps its white background
   function textoSobre(f) { return f > 0.55 ? "#14213D" : "#ffffff"; }
   function centro(c) { var j = Math.floor(c / NX), i = c % NX; return [LON0 + (i + 0.5) * G, LAT0 + (j + 0.5) * G]; }
@@ -181,11 +193,19 @@
     // Cells use the SVG renderer (a few hundred rectangles), so hover, colour changes and the entrance wave are CSS transitions.
     // Hot-spot points (up to 20,000) stay on canvas.
     var rects = {}, ren = L.canvas({ padding: 0.3 }), renCeldas = L.svg({ padding: 0.3, pane: "celdas" });
+    // A rectangle drawn as a tile (see tesela): same geometry and events as L.rectangle, only the outline differs.
+    var Celda = L.Rectangle.extend({ _updatePath: function () {
+      var pr = this._parts && this._parts[0], rr = this._renderer;
+      if (!pr || pr.length < 3 || !rr._setPath) return L.Rectangle.prototype._updatePath.call(this);
+      var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      pr.forEach(function (q) { if (q.x < x0) x0 = q.x; if (q.x > x1) x1 = q.x; if (q.y < y0) y0 = q.y; if (q.y > y1) y1 = q.y; });
+      rr._setPath(this, tesela(x0, y0, x1 - x0, y1 - y0));
+    } });
     for (var c = 0; c < NC; c++) {
       if (!conDatos(c)) continue;
       var j = Math.floor(c / NX), i = c % NX;
-      rects[c] = L.rectangle([[LAT0 + j * G, LON0 + i * G], [LAT0 + (j + 1) * G, LON0 + (i + 1) * G]],
-        { pane: "celdas", renderer: renCeldas, weight: 0.5, color: "#ffffff", opacity: 0.16, fillOpacity: 0, interactive: true, className: "celda" });
+      rects[c] = new Celda([[LAT0 + j * G, LON0 + i * G], [LAT0 + (j + 1) * G, LON0 + (i + 1) * G]],
+        { pane: "celdas", renderer: renCeldas, stroke: false, fillOpacity: 0, interactive: true, className: "celda" });
       (function (cc) {
         rects[cc].bindTooltip(function () { return textoCelda(cc); }, { sticky: true, className: "celda", direction: "top", opacity: 1, offset: [0, -8] });
         rects[cc].on("mouseover", function () { rects[cc].bringToFront(); });
@@ -207,8 +227,8 @@
     }
     var api = {
       tipo: "leaflet",
-      pintar: function (valores, colorDe, opac) {
-        for (var cc in rects) { var v = valores[cc]; var f = colorDe(v); rects[cc].setStyle({ fillColor: f || "#000", fillOpacity: f ? (opac || 0.66) : 0 }); }
+      pintar: function (valores, colorDe, opacDe) {
+        for (var cc in rects) { var v = valores[cc]; var f = colorDe(v); rects[cc].setStyle({ fillColor: f || "#000", fillOpacity: f ? opacDe(v) : 0 }); }
       },
       seleccion: function (cs, anillos) {
         if (selCapa) map.removeLayer(selCapa); selCapa = null;
@@ -291,10 +311,11 @@
     function anillo(r) { return "M" + r.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + "Z"; }
     var api = {
       tipo: "svg",
-      pintar: function (valores, colorDe) {
+      pintar: function (valores, colorDe, opacDe) {
         var h = [];
-        for (var c = 0; c < NC; c++) { if (!conDatos(c)) continue; var f = colorDe(valores[c]); var j = Math.floor(c / NX), i = c % NX;
-          h.push('<rect data-c="' + c + '" x="' + px(LON0 + i * G).toFixed(1) + '" y="' + py(LAT0 + (j + 1) * G).toFixed(1) + '" width="' + (G * KX * S).toFixed(1) + '" height="' + (G * S).toFixed(1) + '" fill="' + (f || "transparent") + '" fill-opacity="0.85" stroke="#0A0F1C" stroke-width="0.6"/>'); }
+        for (var c = 0; c < NC; c++) { if (!conDatos(c)) continue; var v = valores[c], f = colorDe(v); var j = Math.floor(c / NX), i = c % NX;
+          // no fire: a see-through tile (still hoverable for the tooltip), the coast shows through
+          h.push('<path data-c="' + c + '" d="' + tesela(px(LON0 + i * G), py(LAT0 + (j + 1) * G), G * KX * S, G * S) + '" fill="' + (f || "transparent") + '" fill-opacity="' + (f ? opacDe(v).toFixed(2) : 0) + '"/>'); }
         capas.celdas = h.join(""); dibujar();
       },
       seleccion: function (cs, anillos) { capas.sel = "";
@@ -342,8 +363,8 @@
     else if (m.tipo === "riesgo") { VALORES = m.valores; }
     else { var n = Math.max(1, aniosComp.length); for (c = 0; c < NC; c++) { var s = 0; for (k = 0; k < T; k++) if (completo[ANIO[k]]) s += F[c][k]; VALORES[c] = s / n; } }
     MAXV = 1; for (c = 0; c < NC; c++) if (VALORES[c] > MAXV) MAXV = VALORES[c];
-    if (m.tipo === "riesgo") MAPA.pintar(VALORES, function (v) { return v > 0 ? color(Math.max(0.03, v / 100)) : null; }, 0.7);
-    else MAPA.pintar(VALORES, function (v) { return v > 0 ? color(0.08 + 0.92 * Math.sqrt(v / MAXV)) : null; });
+    if (m.tipo === "riesgo") MAPA.pintar(VALORES, function (v) { return v > 0 ? color(Math.max(0.03, v / 100)) : null; }, function (v) { return opacidad(v / 100); });
+    else MAPA.pintar(VALORES, function (v) { return v > 0 ? color(0.08 + 0.92 * Math.sqrt(v / MAXV)) : null; }, function (v) { return opacidad(v / MAXV); }); // linear: only the hot zones turn solid
     leyenda();
     var mt = $("modo");
     if (m.tipo === "promedio") mt.style.display = "none";
@@ -355,7 +376,7 @@
     var max = m.tipo === "riesgo" ? "100%" : fmt(MAXV);
     $("leyenda").innerHTML = "<b>" + tit + "</b>" + (estado.crudo ? ' <span class="semaforo" style="--c:var(--warn)">' + t("sin armonizar", "unharmonized") + "</span>" : "") +
       '<div class="rampa" style="background:linear-gradient(90deg,' + VIR.join(",") + ')"></div><div class="ext"><span>' + t("poco", "low") + "</span><span>" + max + "</span></div>" +
-      '<div class="nota-ley">' + t("Cada cuadro mide 0.25° (unos 27 km). Haz clic para explorar.", "Each square is 0.25° (about 27 km). Click to explore.") + "</div>";
+      '<div class="nota-ley">' + (m.tipo === "promedio" ? t("Cada cuadro ≈ 27 km · fuego promedio por año", "Each square ≈ 27 km · average fire per year") : t("Cada cuadro ≈ 27 km (0.25°). Más sólido = más fuego.", "Each square ≈ 27 km (0.25°). More solid = more fire.")) + "</div>";
   }
   $("modoX").addEventListener("click", function () { pararReplay(); estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
 
@@ -951,6 +972,8 @@
   // Hero: every figure is computed from window.QUEMAS (nothing typed by hand).
   var NANIOS = aniosComp.length, TOTDET = 0; TOTAL.forEach(function (v) { TOTDET += v; });
   $("bKick").textContent = "NASA Space Apps 2026 · La Com";
+  // Short map key inside the hero, so the squares read as data even while the hero is open (it never overlaps it).
+  if (!$("bLey")) $("bKick").insertAdjacentHTML("beforebegin", '<div class="b-ley" id="bLey"><i class="rampa-op"></i><span>' + t("Cada cuadro ≈ 27 km · fuego promedio por año", "Each square ≈ 27 km · average fire per year") + "</span></div>");
   $("bTit").innerHTML = t(NANIOS + " años de fuego, <em>vistos desde el espacio</em>", NANIOS + " years of fire, <em>seen from space</em>");
   $("bTxt").textContent = t("¿Cuándo y cuánto se quema aquí? " + NANIOS + " años de fuego visto por satélites de la NASA, en una sola escala. Busca un lugar arriba, haz clic en el mapa o prueba un ejemplo:",
     "When and how much does it burn here? " + NANIOS + " years of fire seen by NASA satellites, on one consistent scale. Search a place above, click the map, or try an example:");
