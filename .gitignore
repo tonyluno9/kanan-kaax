@@ -1,0 +1,14 @@
+datos/prueba/
+datos/firms/**/*.csv
+datos/clima/**/*.csv
+datos/evidencia/
+salida/
+__pycache__/
+.venv/
+no_publicar/
+_to_delete/
+.DS_Store
+
+# Claude Code
+.claude/worktrees/
+.claude/settings.local.json

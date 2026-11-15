@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<!--
+  Burn Calendar / Calendario de quemas. NASA Space Apps Challenge 2026.
+  Challenge: Harmonization of MODIS and VIIRS Hot Spots.
+  AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
+  and reviewed by the team. Data: NASA FIRMS and NASA POWER.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Harmonized MODIS + VIIRS burning activity calendar. Code generated with AI assistance (Claude).">
+<meta property="og:title" content="Burn Calendar: 25 years of satellite fire in one consistent record">
+<meta property="og:description" content="Harmonized MODIS + VIIRS burning activity calendar for any area, with critical periods, anomalies, weekly risk and an alert verified from space. NASA Space Apps Challenge 2026.">
+<meta property="og:image" content="data/evidencia/yb_despues.jpg">
+<title>Burn Calendar · technical view</title>
+<style>
+  :root { --tinta:#1c2430; --suave:#5b6675; --linea:#d9dee5; --fondo:#f5f6f8; --panel:#ffffff; --acento:#b3401a; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--tinta); background:var(--fondo); }
+  header { padding:18px 24px 10px; }
+  h1 { margin:0; font-size:24px; }
+  h2 { margin:0 0 10px; font-size:16px; }
+  .sub { color:var(--suave); margin-top:2px; }
+  #aviso { display:none; margin:10px 24px 0; padding:10px 14px; background:#fff3cd; border:1px solid #e0c060; border-radius:8px; font-weight:600; }
+  main { display:grid; grid-template-columns:minmax(320px, 5fr) 7fr; gap:16px; padding:14px 24px 10px; }
+  @media (max-width: 980px) { main { grid-template-columns:1fr; } }
+  .panel { background:var(--panel); border:1px solid var(--linea); border-radius:10px; padding:14px; }
+  .ancho { grid-column:1 / -1; }
+  .fila { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button, select, input { font:inherit; padding:5px 9px; border:1px solid #b9c0ca; border-radius:6px; background:#fff; color:var(--tinta); }
+  button { cursor:pointer; }
+  button:hover { background:#eef1f5; }
+  input[type=number] { width:86px; }
+  label { color:var(--suave); font-size:13px; }
+  #mapa { width:100%; height:auto; display:block; touch-action:none; cursor:crosshair; border-radius:6px; background:#dfe9f2; margin-top:10px; }
+  .leyenda { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--suave); margin-top:8px; }
+  .rampa { height:10px; flex:1; max-width:220px; border-radius:3px; }
+  table.cal { border-collapse:collapse; width:100%; font-size:12px; font-variant-numeric:tabular-nums; }
+  table.cal th { font-weight:600; color:var(--suave); padding:2px 3px; text-align:center; }
+  table.cal td { text-align:center; padding:3px 2px; border:1px solid #fff; min-width:34px; }
+  table.cal td.anio, table.cal td.total { background:none; font-weight:600; color:var(--tinta); }
+  table.cal td.conv { font-style:italic; }
+  table.cal td.parcial { outline:2px dashed var(--suave); outline-offset:-3px; }
+  .tarjetas { display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px; }
+  .tarjeta { border:1px solid var(--linea); border-radius:8px; padding:10px 12px; }
+  .tarjeta .t { font-size:12px; color:var(--suave); }
+  .tarjeta .v { font-size:22px; font-weight:700; }
+  .tarjeta .d { font-size:13px; }
+  .alerta { border-left:4px solid var(--acento); padding:6px 10px; margin:6px 0; background:#fbf4f1; border-radius:0 6px 6px 0; cursor:pointer; }
+  .alerta:hover { background:#f6e6df; }
+  .alerta .cab { font-weight:600; font-size:13px; }
+  .alerta .txt { font-size:13px; }
+  .etq { display:inline-block; font-size:11px; padding:1px 7px; border-radius:10px; background:var(--tinta); color:#fff; margin-right:6px; }
+  .nota { font-size:12px; color:var(--suave); margin-top:8px; }
+  svg text { font:11px system-ui, sans-serif; fill:var(--suave); }
+  #lista { max-height:420px; overflow:auto; }
+  .trio { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:10px; }
+  @media (max-width: 980px) { .trio { grid-template-columns:1fr; } }
+  .trio h3 { margin:0 0 4px; font-size:13px; font-weight:600; }
+  .trio svg { width:100%; height:auto; display:block; background:#dfe9f2; border-radius:6px; }
+  .hallazgos li { margin-bottom:5px; }
+  input[type=range] { flex:1; min-width:200px; padding:0; }
+  .dos { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+  @media (max-width: 980px) { .dos { grid-template-columns:1fr; } }
+  footer { padding:6px 24px 26px; font-size:12px; color:var(--suave); }
+  #claves { margin:12px 24px 0; }
+  #claves h2 { font-size:14px; color:var(--suave); font-weight:600; margin:0 0 8px; }
+  #claves .tarjeta { background:var(--panel); cursor:pointer; border-top:4px solid #31688e; }
+  #claves .tarjeta:hover { background:#eef1f5; }
+  #claves .tarjeta .v { color:#1c2430; }
+  #claves .tarjeta .ir { font-size:12px; color:#31688e; margin-top:4px; }
+  #empieza { margin:10px 24px 0; font-size:14px; color:var(--tinta); }
+  #empieza b { color:var(--acento); }
+  #briefing, .briefing { font-size:15px; background:#eef4f8; border-left:4px solid #31688e; padding:10px 14px; border-radius:0 8px 8px 0; margin-bottom:12px; }
+  table.cal th.critico { color:#fff; background:#b3401a; border-radius:4px; }
+  .etq.verif { background:#1f7a4d; cursor:pointer; }
+  .solo-imp { display:none; }
+  table.cal td.suena { outline:3px solid #b3401a; outline-offset:-2px; }
+  #sonTxt { font-weight:600; color:var(--acento); }
+  .evento { padding:6px 10px; margin:4px 0; border-left:4px solid #440154; background:#f3f0f7; border-radius:0 6px 6px 0; cursor:pointer; font-size:13px; }
+  .evento:hover { background:#e9e3f1; }
+  @media print {
+    body { background:#fff; font-size:12px; }
+    header, #guia, #empieza, #claves, #aviso, button, select, input, label, #ayudaMapa, #briefing, #nAlertas, #sonTxt, .noimp, #secRiesgo, #secAreas, #secEvid, #secReplay, #secVal, #secOficial, #secTipo, #mapa + .leyenda + .fila { display:none !important; }
+    #lista .alerta:nth-child(n+13) { display:none; }
+    #mapa { max-width:60%; margin:0 auto; }
+    .solo-imp { display:block; }
+    main { display:block; padding:0 12px; }
+    .panel { border:none; padding:6px 0; page-break-inside:avoid; }
+    #lista { max-height:none; }
+    table.cal td { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    table.cal th.critico, .tarjeta, #briefing, rect { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    footer { padding:6px 12px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="fila" style="justify-content:space-between">
+    <h1><span id="titulo"></span> · <span id="region"></span></h1>
+    <div class="fila">
+      <label><span id="lblRegion"></span> <select id="selRegion"></select></label>
+      <button id="btnIdioma"></button>
+      <a id="lnkSimple" href="index.html" style="padding:5px 10px;border:1px solid #b9c0ca;border-radius:6px;background:#14213D;color:#fff;text-decoration:none;font-size:14px">← Burn Calendar app</a>
+    </div>
+  </div>
+  <div class="sub" id="sub"></div>
+</header>
+<div id="aviso"></div>
+<div id="empieza"></div>
+<section id="claves"><h2 id="clavesT"></h2><div class="tarjetas" id="clavesTj"></div></section>
+<div class="solo-imp" id="impCab" style="padding:0 12px"></div>
+<details id="guia" style="margin:8px 24px 0"><summary id="guiaT" style="cursor:pointer;color:var(--suave)"></summary><div id="guiaTxt" class="panel" style="margin-top:8px"></div></details>
+
+<main>
+  <section class="panel" id="sec1">
+    <h2 id="h1"></h2>
+    <div class="fila">
+      <button id="btnTodo"></button>
+      <button id="btnPoli"></button>
+      <button id="btnPoliFin" style="display:none"></button>
+      <span class="nota" style="margin:0" id="ayudaMapa"></span>
+    </div>
+    <svg id="mapa" role="img"></svg>
+    <div class="leyenda"><span id="menos"></span><div class="rampa" id="rampa"></div><span id="mas"></span><span id="leyMapa"></span></div>
+    <div class="fila" style="margin-top:10px">
+      <label><span id="lLa0"></span> <input type="number" id="la0" step="0.25"></label>
+      <label><span id="lLa1"></span> <input type="number" id="la1" step="0.25"></label>
+      <label><span id="lLo0"></span> <input type="number" id="lo0" step="0.25"></label>
+      <label><span id="lLo1"></span> <input type="number" id="lo1" step="0.25"></label>
+      <button id="btnCoord"></button>
+    </div>
+    <div class="nota" id="selTxt"></div>
+    <label style="display:block;margin-top:8px;color:var(--tinta);font-size:14px"><input type="checkbox" id="chkAreas"> <span id="lAreas"></span></label>
+  </section>
+
+  <section class="panel" id="sec2">
+    <h2 id="h2"></h2>
+    <div class="fila" style="margin-bottom:8px">
+      <label><span id="lDesde"></span> <select id="a0"></select></label>
+      <label><span id="lHasta"></span> <select id="a1"></select></label>
+      <button id="btnCsv"></button>
+      <button id="btnCsvCeldas"></button>
+      <button id="btnPuntos"></button>
+      <button id="btnPng"></button>
+      <button id="btnReporte"></button>
+      <button id="btnSon"></button>
+      <span id="sonTxt"></span>
+      <span class="nota" id="puntosTxt" style="margin:0"></span>
+    </div>
+    <div class="fila" style="margin-bottom:8px">
+      <label style="color:var(--tinta);font-size:14px"><input type="checkbox" id="chkCrudo"> <span id="lCrudo"></span></label>
+    </div>
+    <div id="crudoNota" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fff3cd;border:1px solid #e0c060;border-radius:8px;font-size:13px"></div>
+    <div style="overflow:auto"><table class="cal" id="cal"></table></div>
+    <div class="nota" id="notaCal"></div>
+  </section>
+
+  <section class="panel ancho" id="sec3">
+    <h2 id="h3"></h2>
+    <div id="briefing"></div>
+    <div class="tarjetas" id="tarjetas"></div>
+    <svg id="clima" viewBox="0 0 900 220" style="width:100%;height:auto;margin-top:12px" role="img"></svg>
+    <div class="fila" style="margin-top:14px">
+      <label><span id="lCmp"></span> <select id="anioCmp"></select></label>
+      <b id="acumTxt"></b>
+    </div>
+    <svg id="acum" viewBox="0 0 900 260" style="width:100%;height:auto;margin-top:6px" role="img"></svg>
+  </section>
+
+  <section class="panel" id="sec4">
+    <h2 id="h4"></h2>
+    <div class="fila" style="margin-bottom:6px">
+      <label><span id="lTipo"></span> <select id="tipo"></select></label>
+      <span class="nota" id="nAlertas" style="margin:0"></span>
+    </div>
+    <div id="lista"></div>
+  </section>
+
+  <section class="panel" id="secVal">
+    <h2 id="h5"></h2>
+    <div id="valTxt"></div>
+    <svg id="val" viewBox="0 0 700 260" style="width:100%;height:auto;margin-top:8px" role="img"></svg>
+    <div class="nota" id="valNota"></div>
+  </section>
+
+  <section class="panel ancho" id="secRiesgo" style="display:none">
+    <h2 id="h6"></h2>
+    <div id="riesgoTxt"></div>
+    <div class="fila" style="margin-top:10px">
+      <label for="semana" id="lSemana"></label>
+      <input type="range" id="semana" min="0" max="0" step="1" value="0">
+      <b id="semanaTxt"></b>
+      <button id="btnSemMax"></button>
+    </div>
+    <div class="trio">
+      <div><h3 id="tCalor"></h3><svg id="mCalor"></svg></div>
+      <div><h3 id="tRiesgo"></h3><svg id="mRiesgo"></svg></div>
+      <div><h3 id="tFuego"></h3><svg id="mFuego"></svg></div>
+    </div>
+    <div class="nota" id="semanaNota"></div>
+    <div class="dos">
+      <div><svg id="disp" viewBox="0 0 640 330" style="width:100%;height:auto" role="img"></svg></div>
+      <div id="tempTxt"></div>
+    </div>
+  </section>
+  <section class="panel ancho" id="secAreas" style="display:none">
+    <h2 id="h7"></h2>
+    <div id="areasTxt"></div>
+    <div class="dos" style="margin-top:10px">
+      <div style="max-height:560px;overflow:auto"><table class="cal" id="tablaAreas" style="font-size:13px"></table></div>
+      <div>
+        <div class="fila"><b id="areaNombre"></b></div>
+        <div class="nota" id="areaDesc" style="margin-top:2px"></div>
+        <svg id="areaMapa" style="width:100%;height:auto;background:#dfe9f2;border-radius:6px;margin-top:8px"></svg>
+        <div style="overflow:auto;margin-top:8px;max-height:300px"><table class="cal" id="areaCal"></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel ancho" id="secEvid" style="display:none">
+    <h2 id="h8"></h2>
+    <div id="evidTxt"></div>
+    <div class="trio" id="evidImgs"></div>
+    <div class="fila" style="margin-top:8px"><label style="color:var(--tinta);font-size:14px"><input type="checkbox" id="chkPuntos" checked> <span id="lPuntos"></span></label></div>
+    <div id="evidPrueba" style="margin-top:10px"></div>
+    <div class="nota" id="evidFuente"></div>
+  </section>
+
+  <section class="panel ancho" id="secReplay">
+    <h2 id="h9"></h2>
+    <div class="fila">
+      <label><span id="lRepAnio"></span> <select id="repAnio"></select></label>
+      <button id="repPlay"></button>
+      <label><span id="lRepVel"></span> <select id="repVel"><option value="600">0.5×</option><option value="300" selected>1×</option><option value="150">2×</option></select></label>
+      <input type="range" id="repSem" min="0" max="51" step="1" value="0">
+      <b id="repTxt" style="min-width:260px"></b>
+    </div>
+    <div class="dos" style="grid-template-columns:3fr 2fr">
+      <svg id="repMapa" style="width:100%;height:auto;background:#dfe9f2;border-radius:6px;margin-top:8px" role="img"></svg>
+      <div>
+        <svg id="repCurva" viewBox="0 0 520 300" style="width:100%;height:auto;margin-top:8px" role="img"></svg>
+        <div class="nota" id="repNota"></div>
+      </div>
+    </div>
+  </section>
+  <section class="panel ancho" id="secOficial" style="display:none">
+    <h2 id="h10"></h2>
+    <div id="oficialTxt"></div>
+    <div class="dos">
+      <svg id="oficialSem" viewBox="0 0 640 300" style="width:100%;height:auto" role="img"></svg>
+      <svg id="oficialAnios" viewBox="0 0 640 300" style="width:100%;height:auto" role="img"></svg>
+    </div>
+    <div class="tarjetas" id="oficialTj" style="margin-top:12px"></div>
+    <div class="nota" id="oficialFuente"></div>
+  </section>
+
+  <section class="panel ancho" id="secTipo" style="display:none">
+    <h2 id="h11"></h2>
+    <div id="tipoTxt"></div>
+    <div class="dos">
+      <svg id="tipoMes" viewBox="0 0 640 300" style="width:100%;height:auto" role="img"></svg>
+      <div><b id="tipoListaT"></b><div id="tipoLista" style="max-height:300px;overflow:auto;margin-top:6px"></div></div>
+    </div>
+    <div class="nota" id="tipoNota"></div>
+  </section>
+</main>
+<footer id="pie"></footer>
+
+<script src="data/regiones.js"></script>
+<script>
+  // Loads the data file of the requested region (?region=key) or the first one available.
+  (function () {
+    var R = window.REGIONES || [], q = null, l = null;
+    try { var u = new URLSearchParams(location.search); q = u.get("region"); l = u.get("lang"); } catch (e) {}
+    var ok = R.some(function (r) { return r.clave === q; });
+    window.CLAVE_REGION = ok ? q : (R[0] ? R[0].clave : "yucatan");
+    window.IDIOMA = l === "es" ? "es" : "en";
+    document.write('<script src="data/' + window.CLAVE_REGION + '.js"><\/script>');
+  })();
+</script>
+<script>
+(function () {
+  "use strict";
+  var EN = window.IDIOMA !== "es";
+  function t(es, en) { return EN ? en : es; }
+  var Q = window.QUEMAS;
+  if (!Q) { document.body.insertAdjacentHTML("beforeend", "<p style='padding:24px'>" + t("Faltan los datos en web/data/. Corran", "Data files are missing in web/data/. Run") + " <code>python ejecutar.py</code>.</p>"); return; }
+  var COSTA = Q.costa || [];
+  var M = Q.meta, NX = M.nx, NY = M.ny, G = M.malla, NC = NX * NY, T = Q.meses.length;
+  var LON0 = M.bbox[0], LAT0 = M.bbox[1], LON1 = M.bbox[2], LAT1 = M.bbox[3];
+  var ANIO = Q.meses.map(function (s) { return +s.slice(0, 4); });
+  var MES = Q.meses.map(function (s) { return +s.slice(5, 7); });
+  var NOM = EN ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] : ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var NOML = EN ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    : ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var LOC = EN ? "en-US" : "es-MX";
+  var VIR = ["#440154", "#482878", "#3e4989", "#31688e", "#26828e", "#1f9e89", "#35b779", "#6ece58", "#b5de2b", "#fde725"];
+  var anios = []; ANIO.forEach(function (a) { if (anios.indexOf(a) < 0) anios.push(a); });
+  var ultimo = T - 1; while (ultimo > 0 && Q.parcial[ultimo]) ultimo--;
+  var NOMBRE_REGION = EN ? (M.region_en || M.region) : M.region;
+
+  var estado = { sel: null, a0: anios[0], a1: anios[anios.length - 1], resaltar: -1, crudo: false, poli: null };
+  var modoPoli = false, vertices = [];
+  function fuente() { return estado.crudo && Q.crudo ? Q.crudo : Q.serie; }
+  function $(id) { return document.getElementById(id); }
+  function pon(id, es, en) { $(id).textContent = t(es, en); }
+  function fmt(v) { return v >= 100 ? Math.round(v).toLocaleString(LOC) : (Math.round(v * 10) / 10).toLocaleString(LOC); }
+  function mesAnio(m, a) { return EN ? NOML[m - 1] + " " + a : NOML[m - 1] + " de " + a; }
+  function color(f) {
+    if (!(f > 0)) return "#eceff3";
+    var x = Math.min(1, Math.max(0, f)) * (VIR.length - 1), i = Math.floor(x), k = x - i;
+    if (i >= VIR.length - 1) return VIR[VIR.length - 1];
+    var a = VIR[i], b = VIR[i + 1], r = [1, 3, 5].map(function (p) {
+      var u = parseInt(a.substr(p, 2), 16), v = parseInt(b.substr(p, 2), 16);
+      return Math.round(u + (v - u) * k).toString(16).padStart(2, "0");
+    });
+    return "#" + r.join("");
+  }
+  function textoSobre(f) { return f > 0.55 ? "#1c2430" : (f > 0 ? "#ffffff" : "#8a93a0"); }
+  function mediana(v) { if (!v.length) return 0; var s = v.slice().sort(function (a, b) { return a - b; }), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
+  function celdasSel() {
+    if (estado.sel) return estado.sel;
+    var todas = []; for (var c = 0; c < NC; c++) todas.push(c); return todas;
+  }
+  function serieSel() {
+    var cs = celdasSel(), s = new Array(T).fill(0);
+    var F = fuente();
+    cs.forEach(function (c) { var v = F[c]; for (var k = 0; k < T; k++) s[k] += v[k]; });
+    return s;
+  }
+  function centro(c) { var j = Math.floor(c / NX), i = c % NX; return [LON0 + (i + 0.5) * G, LAT0 + (j + 0.5) * G]; }
+
+  // ---------------- Static labels ----------------
+  pon("titulo", "Calendario de quemas", "Burn Calendar");
+  $("region").textContent = NOMBRE_REGION;
+  document.title = t("Calendario de quemas", "Burn Calendar") + " · " + NOMBRE_REGION;
+  document.documentElement.lang = EN ? "en" : "es";
+  $("sub").textContent = t("Registro armonizado de puntos de calor MODIS + VIIRS (NASA FIRMS). Unidad: ", "Harmonized MODIS + VIIRS hot spot record (NASA FIRMS). Unit: ") +
+    (EN ? (M.unidad_en || M.unidad) : M.unidad) + t(". Datos hasta ", ". Data through ") + Q.meses[T - 1] + ".";
+  pon("lblRegion", "Región", "Region"); pon("btnIdioma", "English", "Español");
+  pon("h1", "1. Elige la zona", "1. Choose an area");
+  pon("btnTodo", "Toda la región", "Whole region");
+  pon("btnPoli", "Dibujar polígono", "Draw polygon"); pon("btnPoliFin", "Terminar polígono", "Finish polygon");
+  pon("lCrudo", "Ver el registro sin armonizar (MODIS y VIIRS tal cual)", "Show the unharmonized record (MODIS and VIIRS as they come)");
+  pon("lCmp", "Comparar el año", "Compare year");
+  pon("lAreas", "Mostrar áreas protegidas en el mapa", "Show protected areas on the map");
+  pon("h7", "7. Fuego en áreas protegidas", "7. Fire in protected areas");
+  pon("h8", "8. Comprobación: ¿la alerta era real?", "8. Ground check: was the alert real?");
+  pon("lPuntos", "Mostrar las detecciones VIIRS del evento", "Show the event's VIIRS detections");
+  pon("h9", "9. Reproducir una temporada", "9. Replay a season");
+  pon("lRepAnio", "Año", "Year"); pon("lRepVel", "Velocidad", "Speed");
+  pon("guiaT", "Cómo leer esta herramienta", "How to read this tool");
+  $("guiaTxt").innerHTML = t(
+    "<b>Qué muestra.</b> Cada número es una cantidad de puntos de calor detectados por satélite, expresada en la escala del sensor VIIRS. Un fuego grande produce muchos puntos; no es un conteo de incendios.<br>" +
+    "<b>Por qué armonizar.</b> MODIS y VIIRS no ven lo mismo. Activa «Ver el registro sin armonizar» para ver el salto artificial que aparece cuando cambia el sensor.<br>" +
+    "<b>Qué tan confiable es.</b> El error se mide con años apartados (sección 5). Vale para el total de la región; en una sola celda es mayor.<br>" +
+    "<b>El periodo crítico</b> son los meses seguidos en que cada mes supera su parte promedio (1/12) del fuego de la zona. Se marca en rojo en el calendario.<br>" +
+    "<b>Las alertas</b> señalan lo que se sale de lo normal para esa zona y esa época; no dicen la causa.<br>" +
+    "<b>El riesgo</b> es una probabilidad estimada, no un pronóstico de incendios. Casi todos los fuegos los inicia una persona.",
+    "<b>What it shows.</b> Each number is a count of satellite-detected hot spots, expressed on the scale of the VIIRS sensor. A large fire produces many hot spots; this is not a count of fires.<br>" +
+    "<b>Why harmonize.</b> MODIS and VIIRS do not see the same thing. Turn on “Show the unharmonized record” to see the artificial jump that appears when the sensor changes.<br>" +
+    "<b>How reliable it is.</b> Error is measured on held-out years (section 5). It applies to the regional total; for a single cell it is larger.<br>" +
+    "<b>The critical period</b> is the run of consecutive months in which each month holds more than its average share (1/12) of the area's fire. It is marked in red in the calendar.<br>" +
+    "<b>Alerts</b> flag what departs from normal for that area and time of year; they do not state the cause.<br>" +
+    "<b>Risk</b> is an estimated probability, not a fire forecast. Almost all fires are started by people.");
+  pon("ayudaMapa", "Arrastra sobre el mapa para marcar un rectángulo, o toca una celda.", "Drag on the map to draw a rectangle, or click a cell.");
+  pon("menos", "Menos", "Less"); pon("mas", "Más", "More");
+  pon("lLa0", "Lat mín", "Min lat"); pon("lLa1", "Lat máx", "Max lat"); pon("lLo0", "Lon mín", "Min lon"); pon("lLo1", "Lon máx", "Max lon");
+  pon("btnCoord", "Aplicar", "Apply");
+  pon("h2", "2. Calendario de actividad de fuego", "2. Burning activity calendar");
+  pon("lDesde", "Desde", "From"); pon("lHasta", "Hasta", "To");
+  pon("btnCsv", "Descargar CSV mensual", "Download monthly CSV");
+  pon("btnCsvCeldas", "Descargar CSV por celda", "Download CSV by cell");
+  pon("btnPuntos", "Descargar puntos de calor (CSV)", "Download hot spots (CSV)");
+  pon("btnPng", "Descargar calendario (imagen)", "Download calendar (image)");
+  pon("btnReporte", "Reporte de la zona (imprimir o PDF)", "Area report (print or PDF)");
+  pon("btnSon", "♪ Escuchar 25 años de fuego", "♪ Listen to 25 years of fire");
+  pon("h10", "10. El calendario oficial de quemas contra lo que ven los satélites", "10. The official burn calendar against what satellites see");
+  pon("h11", "11. ¿Quema agrícola o incendio forestal?", "11. Agricultural burn or wildfire?");
+  pon("clavesT", "Hallazgos clave de toda la región (haz clic en una tarjeta para verlo)", "Key findings for the whole region (click a card to see it)");
+  $("empieza").innerHTML = t("<b>Empieza aquí:</b> elige una zona en el mapa (o deja toda la región), lee su resumen y su calendario, y descarga los datos o un reporte. Más abajo: anomalías, validación, riesgo semanal, áreas protegidas" + (Q.evidencia ? ", una alerta comprobada con imágenes" : "") + ", la reproducción de una temporada, el calendario oficial de quemas contra el satélite y si el fuego parece quema agrícola o incendio. Con ♪ puedes escuchar el calendario.",
+    "<b>Start here:</b> pick an area on the map (or keep the whole region), read its briefing and calendar, and download the data or a report. Further down: anomalies, validation, weekly risk, protected areas" + (Q.evidencia ? ", an alert verified with imagery," : "") + " a season replay, the official burn calendar against the satellites, and whether fire looks like an agricultural burn or a wildfire. With ♪ you can listen to the calendar.");
+  $("notaCal").innerHTML = t("<i>Cursiva</i>: mes anterior a VIIRS, convertido desde MODIS con el modelo de armonización. Borde punteado: mes incompleto. Meses en rojo: periodo crítico de la zona.",
+    "<i>Italics</i>: month before VIIRS, converted from MODIS with the harmonization model. Dashed border: incomplete month. Months in red: the area's critical period.");
+  pon("h3", "3. Resumen de la zona", "3. Area summary");
+  pon("h4", "4. Anomalías recientes en la zona", "4. Recent anomalies in the area");
+  pon("lTipo", "Tipo", "Type");
+  pon("h5", "5. ¿Qué tan bien funciona la armonización?", "5. How well does the harmonization work?");
+  pon("h6", "6. Riesgo semanal y clima", "6. Weekly risk and climate");
+  pon("lSemana", "Semana", "Week");
+  pon("btnSemMax", "Ir a la semana con más fuego", "Go to the week with the most fire");
+  pon("tCalor", "Calor de la semana anterior (rojo: más caliente de lo normal)", "Heat in the previous week (red: hotter than normal)");
+  pon("tRiesgo", "Riesgo estimado para la semana", "Estimated risk for the week");
+  pon("tFuego", "Fuego que sí se detectó esa semana", "Fire actually detected that week");
+  $("mapa").setAttribute("aria-label", t("Mapa de actividad de fuego por celda", "Map of fire activity by cell"));
+  $("pie").innerHTML = t("Datos: NASA FIRMS (MODIS, VIIRS NOAA-20) y NASA POWER. Contornos: Natural Earth. Declaración de IA: el código de esta herramienta se generó con ayuda de una herramienta de IA (Claude) y fue revisado por el equipo.",
+    "Data: NASA FIRMS (MODIS, VIIRS NOAA-20) and NASA POWER. Outlines: Natural Earth. AI disclosure: the code of this tool was generated with the assistance of an AI tool (Claude) and reviewed by the team.");
+  if (M.sintetico) { $("aviso").style.display = "block"; pon("aviso", "DATOS SINTÉTICOS DE PRUEBA. Estas cifras no son observaciones reales; sirven solo para probar la herramienta.", "SYNTHETIC TEST DATA. These figures are not real observations; they only serve to test the tool."); }
+  $("btnIdioma").addEventListener("click", function () { location.search = "?region=" + M.clave + "&lang=" + (EN ? "es" : "en"); });
+  $("lnkSimple").href = "index.html?region=" + M.clave + "&lang=" + (EN ? "en" : "es"); pon("lnkSimple", "← App simple", "← Simple app");
+
+  // ---------------- Map ----------------
+  var PAD = 0.6, KX = Math.cos((LAT0 + LAT1) / 2 * Math.PI / 180), S = 100;
+  var VW = (LON1 - LON0 + 2 * PAD) * KX * S, VH = (LAT1 - LAT0 + 2 * PAD) * S;
+  function px(lon) { return (lon - LON0 + PAD) * KX * S; }
+  function py(lat) { return (LAT1 + PAD - lat) * S; }
+  function lonDe(x) { return x / (KX * S) + LON0 - PAD; }
+  function latDe(y) { return LAT1 + PAD - y / S; }
+  var svg = $("mapa"); svg.setAttribute("viewBox", "0 0 " + VW.toFixed(1) + " " + VH.toFixed(1));
+  function costa(relleno, linea, extra) {
+    var h = [];
+    COSTA.forEach(function (p) { p.anillos.forEach(function (r) {
+      h.push('<path d="M' + r.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + 'Z" fill="' + relleno + '" stroke="' + linea + '" stroke-width="1.2"' + (extra || "") + "/>");
+    }); });
+    return h.join("");
+  }
+
+  function dibujarMapa() {
+    var t0 = [], maxv = 0, vals = new Array(NC).fill(0), n, c, k;
+    for (k = 0; k < T; k++) if (ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) t0.push(k);
+    n = Math.max(1, t0.length / 12);
+    var F = fuente();
+    for (c = 0; c < NC; c++) { var s = 0, v = F[c]; t0.forEach(function (i) { s += v[i]; }); vals[c] = s / n; if (vals[c] > maxv) maxv = vals[c]; }
+    var h = [costa("#f4f1ea", "#9aa4b1")];
+    var enSel = {}; if (estado.sel) estado.sel.forEach(function (i) { enSel[i] = 1; });
+    for (c = 0; c < NC; c++) {
+      if (!Q.tierra[c] && !(vals[c] > 0)) continue;
+      var j = Math.floor(c / NX), i = c % NX, f = maxv > 0 ? Math.sqrt(vals[c] / maxv) : 0;
+      var op = estado.sel && !enSel[c] ? 0.35 : 0.92;
+      h.push('<rect x="' + px(LON0 + i * G).toFixed(1) + '" y="' + py(LAT0 + (j + 1) * G).toFixed(1) + '" width="' + (G * KX * S).toFixed(1) + '" height="' + (G * S).toFixed(1) +
+        '" fill="' + color(f) + '" fill-opacity="' + op + '" stroke="#fff" stroke-width="0.5"><title>' + centro(c)[1].toFixed(2) + ", " + centro(c)[0].toFixed(2) + ": " + fmt(vals[c]) + t(" por año", " per year") + "</title></rect>");
+    }
+    h.push(costa("none", "#56606d", ' pointer-events="none"'));
+    if ($("chkAreas").checked && Q.areas) Q.areas.areas.forEach(function (a) {
+      a.anillos.forEach(function (r) { h.push('<path d="M' + r.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + 'Z" fill="none" stroke="' + (a.id === areaSel ? "#b3401a" : "#ffffff") + '" stroke-width="' + (a.id === areaSel ? 3.5 : 2) + '" stroke-dasharray="' + (a.id === areaSel ? "" : "5 3") + '" pointer-events="none"/>'); });
+    });
+    function trazo(P, cerrar) { return "M" + P.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + (cerrar ? "Z" : ""); }
+    if (estado.sel && estado.poli) {
+      h.push('<path d="' + trazo(estado.poli, true) + '" fill="none" stroke="#111" stroke-width="2.5" pointer-events="none"/>');
+    } else if (estado.sel) {
+      var b = cajaDe(estado.sel);
+      h.push('<rect x="' + px(b[0]) + '" y="' + py(b[3]) + '" width="' + (px(b[2]) - px(b[0])) + '" height="' + (py(b[1]) - py(b[3])) + '" fill="none" stroke="#111" stroke-width="2.5" pointer-events="none"/>');
+    }
+    if (modoPoli && vertices.length) {
+      h.push('<path d="' + trazo(vertices, false) + '" fill="none" stroke="#b3401a" stroke-width="2.5" stroke-dasharray="6 4" pointer-events="none"/>');
+      vertices.forEach(function (q) { h.push('<circle cx="' + px(q[0]) + '" cy="' + py(q[1]) + '" r="6" fill="#b3401a" stroke="#fff" stroke-width="2" pointer-events="none"/>'); });
+    }
+    if (estado.resaltar >= 0) {
+      var q = centro(estado.resaltar);
+      h.push('<circle cx="' + px(q[0]) + '" cy="' + py(q[1]) + '" r="' + (G * S * 0.9) + '" fill="none" stroke="#b3401a" stroke-width="4" pointer-events="none"/>');
+    }
+    h.push('<rect id="arrastre" fill="rgba(0,0,0,.12)" stroke="#111" stroke-dasharray="6 4" stroke-width="1.5" visibility="hidden" pointer-events="none"/>');
+    svg.innerHTML = h.join("");
+    $("leyMapa").textContent = t("Promedio anual ", "Yearly average ") + estado.a0 + "–" + estado.a1 + t(" (máx. ", " (max ") + fmt(maxv) + t(" por celda)", " per cell)");
+  }
+  function cajaDe(cs) {
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    cs.forEach(function (c) { var j = Math.floor(c / NX), i = c % NX; x0 = Math.min(x0, i); x1 = Math.max(x1, i); y0 = Math.min(y0, j); y1 = Math.max(y1, j); });
+    return [LON0 + x0 * G, LAT0 + y0 * G, LON0 + (x1 + 1) * G, LAT0 + (y1 + 1) * G];
+  }
+  function seleccionarCaja(lo0, la0, lo1, la1) {
+    var cs = [];
+    for (var c = 0; c < NC; c++) { var q = centro(c); if (q[0] >= lo0 && q[0] <= lo1 && q[1] >= la0 && q[1] <= la1) cs.push(c); }
+    estado.sel = cs.length && cs.length < NC ? cs : null; estado.poli = null; estado.resaltar = -1; todo();
+  }
+  function dentroPoli(x, y, P) {
+    var c = false;
+    for (var i = 0, j = P.length - 1; i < P.length; j = i++) {
+      if (((P[i][1] > y) !== (P[j][1] > y)) && (x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0])) c = !c;
+    }
+    return c;
+  }
+  function terminarPoligono() {
+    var P = vertices.slice(); modoPoli = false; vertices = [];
+    $("btnPoliFin").style.display = "none"; pon("btnPoli", "Dibujar polígono", "Draw polygon");
+    if (P.length >= 3) {
+      var cs = []; for (var c = 0; c < NC; c++) { var q = centro(c); if (dentroPoli(q[0], q[1], P)) cs.push(c); }
+      if (cs.length) { estado.sel = cs; estado.poli = P; estado.resaltar = -1; }
+    }
+    todo();
+  }
+  function puntoSvg(ev) {
+    var r = svg.getBoundingClientRect();
+    return [(ev.clientX - r.left) / (r.width || 1) * VW, (ev.clientY - r.top) / (r.height || 1) * VH];
+  }
+  var ini = null;
+  svg.addEventListener("pointerdown", function (ev) { ini = puntoSvg(ev); if (svg.setPointerCapture) { try { svg.setPointerCapture(ev.pointerId); } catch (e) {} } });
+  svg.addEventListener("pointermove", function (ev) {
+    if (!ini || modoPoli) return; var p = puntoSvg(ev), a = $("arrastre"); if (!a) return;
+    a.setAttribute("x", Math.min(ini[0], p[0])); a.setAttribute("y", Math.min(ini[1], p[1]));
+    a.setAttribute("width", Math.abs(p[0] - ini[0])); a.setAttribute("height", Math.abs(p[1] - ini[1])); a.setAttribute("visibility", "visible");
+  });
+  svg.addEventListener("pointerup", function (ev) {
+    if (!ini) return; var p = puntoSvg(ev), a = ini; ini = null;
+    if (modoPoli) { vertices.push([lonDe(p[0]), latDe(p[1])]); dibujarMapa(); return; }
+    if (Math.abs(p[0] - a[0]) < 6 && Math.abs(p[1] - a[1]) < 6) {
+      var lon = lonDe(p[0]), lat = latDe(p[1]);
+      if (lon < LON0 || lon >= LON1 || lat < LAT0 || lat >= LAT1) return;
+      estado.sel = [Math.floor((lat - LAT0) / G) * NX + Math.floor((lon - LON0) / G)]; estado.poli = null; estado.resaltar = -1; todo();
+    } else {
+      seleccionarCaja(lonDe(Math.min(a[0], p[0])), latDe(Math.max(a[1], p[1])), lonDe(Math.max(a[0], p[0])), latDe(Math.min(a[1], p[1])));
+    }
+  });
+  svg.addEventListener("pointercancel", function () { ini = null; });
+
+  // ---------------- Calendar ----------------
+  function dibujarCalendario(s) {
+    var vis = [], k;
+    for (k = 0; k < T; k++) if (ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) vis.push(s[k]);
+    var orden = vis.slice().sort(function (a, b) { return a - b; }), tope = orden[Math.floor(orden.length * 0.99)] || 1;
+    var h = ["<tr><th>" + t("Año", "Year") + "</th>" + NOM.map(function (m, i) { return (estado.critico && estado.critico.indexOf(i) >= 0 ? '<th class="critico" title="' + t("Periodo crítico", "Critical period") + '">' : "<th>") + m + "</th>"; }).join("") + "<th>Total</th></tr>"];
+    for (var y = anios.length - 1; y >= 0; y--) {
+      var a = anios[y]; if (a < estado.a0 || a > estado.a1) continue;
+      var fila = '<tr><td class="anio">' + a + "</td>", tot = 0;
+      for (var m = 1; m <= 12; m++) {
+        k = Q.meses.indexOf(a + "-" + (m < 10 ? "0" : "") + m);
+        if (k < 0) { fila += "<td></td>"; continue; }
+        var v = s[k], f = tope > 0 ? Math.sqrt(Math.min(1, v / tope)) : 0, cl = [];
+        if (Q.origen[k] !== "viirs") cl.push("conv"); if (Q.parcial[k]) cl.push("parcial");
+        tot += v;
+        fila += '<td data-k="' + k + '" class="' + cl.join(" ") + '" style="background:' + color(f) + ";color:" + textoSobre(f) + '" title="' + NOML[m - 1] + " " + a + ": " + fmt(v) +
+          (Q.origen[k] === "viirs" ? " (VIIRS)" : t(" (convertido desde MODIS)", " (converted from MODIS)")) + (Q.parcial[k] ? t(", mes incompleto", ", incomplete month") : "") + '">' + (v >= 1 ? Math.round(v) : (v > 0 ? "<1" : "0")) + "</td>";
+      }
+      h.push(fila + '<td class="total">' + Math.round(tot).toLocaleString(LOC) + "</td></tr>");
+    }
+    $("cal").innerHTML = h.join("");
+  }
+
+  // ---------------- Summary ----------------
+  function dibujarResumen(s) {
+    var a = ANIO[ultimo], m = MES[ultimo], x = s[ultimo], hist = [], k, e;
+    for (k = 0; k < T; k++) if (MES[k] === m && ANIO[k] !== a && !Q.parcial[k]) hist.push(s[k]);
+    var med = mediana(hist), debajo = hist.filter(function (v) { return v < x; }).length;
+    var medMes = [];
+    for (var mm = 1; mm <= 12; mm++) { var vv = []; for (k = 0; k < T; k++) if (MES[k] === mm && !Q.parcial[k]) vv.push(s[k]); medMes.push(mediana(vv)); }
+    var pico = medMes.indexOf(Math.max.apply(null, medMes));
+    var totAnio = {}, cuenta = {};
+    for (k = 0; k < T; k++) { totAnio[ANIO[k]] = (totAnio[ANIO[k]] || 0) + s[k]; cuenta[ANIO[k]] = (cuenta[ANIO[k]] || 0) + (Q.parcial[k] ? 0 : 1); }
+    var mejor = null; anios.forEach(function (y) { if (cuenta[y] === 12 && (mejor === null || totAnio[y] > totAnio[mejor])) mejor = y; });
+    var comp = med > 0 ? (x / med >= 1 ? fmt(x / med) + t(" veces la mediana", " times the median") : Math.round((1 - x / med) * 100) + t("% por debajo de la mediana", "% below the median"))
+      : (x > 0 ? t("la mediana histórica es 0", "the historical median is 0") : t("igual a la mediana (0)", "equal to the median (0)"));
+    var tj = [
+      [t("Último mes completo: ", "Latest complete month: ") + mesAnio(m, a), fmt(x), comp + t(". Mediana histórica de ", ". Historical median for ") + NOML[m - 1] + ": " + fmt(med) + t(". Supera a ", ". Higher than ") + debajo + t(" de ", " of ") + hist.length + t(" años.", " years.")],
+      [t("Mes con más actividad", "Most active month"), NOML[pico], t("Mediana de ", "Median of ") + fmt(medMes[pico]) + t(" detecciones en ese mes.", " detections in that month.")],
+      [t("Año con más actividad", "Most active year"), mejor === null ? "n/a" : String(mejor), mejor === null ? "" : fmt(totAnio[mejor]) + t(" detecciones en el año.", " detections in the year.")],
+      [t("Zona seleccionada", "Selected area"), celdasSel().length + t(" celdas", " cells"), t("Cada celda mide ", "Each cell is ") + G + "° (" + t("unos ", "about ") + Math.round(G * 111) + " km)."]
+    ];
+    $("tarjetas").innerHTML = tj.map(function (q) { return '<div class="tarjeta"><div class="t">' + q[0] + '</div><div class="v">' + q[1] + '</div><div class="d">' + q[2] + "</div></div>"; }).join("");
+
+    var W = 900, H = 220, L = 50, B = 30, Tp = 22, ult = [];
+    for (mm = 1; mm <= 12; mm++) { var tt = -1; for (k = ultimo; k >= 0 && k > ultimo - 12; k--) if (MES[k] === mm) { tt = k; break; } ult.push(tt); }
+    var maxv = Math.max(1, Math.max.apply(null, medMes), Math.max.apply(null, ult.map(function (i) { return i < 0 ? 0 : s[i]; })));
+    var bw = (W - L - 10) / 12, g = ['<text x="' + L + '" y="14" style="font-weight:600;fill:#1c2430">' + t("Últimos 12 meses (puntos) contra la mediana histórica de cada mes (barras)", "Last 12 months (dots) against the historical median of each month (bars)") + "</text>"];
+    for (e = 0; e <= 4; e++) { var yy = H - B - (H - B - Tp) * e / 4; g.push('<line x1="' + L + '" x2="' + (W - 10) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(maxv * e / 4) + "</text>"); }
+    for (k = 0; k < 12; k++) {
+      var bh = (H - B - Tp) * medMes[k] / maxv, x0 = L + k * bw;
+      g.push('<rect x="' + (x0 + 6) + '" y="' + (H - B - bh) + '" width="' + (bw - 12) + '" height="' + bh + '" fill="#31688e"><title>' + t("Mediana de ", "Median for ") + NOML[k] + ": " + fmt(medMes[k]) + "</title></rect>");
+      g.push('<text x="' + (x0 + bw / 2) + '" y="' + (H - 10) + '" text-anchor="middle">' + NOM[k] + "</text>");
+      if (ult[k] >= 0) { var cy = H - B - (H - B - Tp) * s[ult[k]] / maxv;
+        g.push('<circle cx="' + (x0 + bw / 2) + '" cy="' + cy + '" r="6" fill="#b3401a" stroke="#fff" stroke-width="2"><title>' + NOML[k] + " " + ANIO[ult[k]] + ": " + fmt(s[ult[k]]) + "</title></circle>"); }
+    }
+    $("clima").innerHTML = g.join("");
+    dibujarAcumulado(s);
+  }
+  // Acumulado del año elegido contra todos los demás: ¿cómo va (o cómo quedó) la temporada?
+  function dibujarAcumulado(s) {
+    var W = 900, H = 260, L = 60, B = 30, Tp = 24, porAnio = {}, k, maxv = 1;
+    anios.forEach(function (a) { porAnio[a] = []; });
+    for (k = 0; k <= ultimo; k++) { var A = porAnio[ANIO[k]]; A[MES[k] - 1] = s[k]; }
+    var acum = {}, completos = [];
+    anios.forEach(function (a) {
+      var v = porAnio[a], c = [], tot = 0, n = 0;
+      for (var m = 0; m < 12; m++) { if (v[m] === undefined) { if (n) break; else { c.push(null); continue; } } tot += v[m]; n++; c.push(tot); }
+      if (n === 0) return; acum[a] = c; if (n === 12 && c.length === 12 && c[0] !== null) completos.push(a);
+      if (tot > maxv) maxv = tot;
+    });
+    var sel = +$("anioCmp").value; if (!acum[sel]) return;
+    function X(m) { return L + (W - L - 60) * m / 11; } function Y(v) { return H - B - (H - B - Tp) * v / maxv; }
+    function linea(c, col, w, op) {
+      var d = "", ini = true; c.forEach(function (v, m) { if (v === null) return; d += (ini ? "M" : "L") + X(m).toFixed(1) + " " + Y(v).toFixed(1); ini = false; });
+      return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-opacity="' + op + '"/>';
+    }
+    var g = ['<text x="' + L + '" y="14" style="font-weight:600;fill:#1c2430">' + t("Detecciones acumuladas en el año: el año elegido contra todos los demás", "Cumulative detections through the year: the chosen year against all others") + "</text>"];
+    for (var e = 0; e <= 4; e++) { var yy = Y(maxv * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 60) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(maxv * e / 4) + "</text>"); }
+    for (k = 0; k < 12; k++) g.push('<text x="' + X(k) + '" y="' + (H - 10) + '" text-anchor="middle">' + NOM[k] + "</text>");
+    completos.forEach(function (a) { if (a !== sel) g.push(linea(acum[a], "#8a93a0", 1.2, 0.55)); });
+    // mediana mes a mes de los años completos
+    var med = []; for (var m = 0; m < 12; m++) med.push(mediana(completos.filter(function (a) { return a !== sel; }).map(function (a) { return acum[a][m]; })));
+    g.push(linea(med, "#1c2430", 2, 1).replace("/>", ' stroke-dasharray="6 4"/>'));
+    g.push(linea(acum[sel], "#b3401a", 3.5, 1));
+    var cs = acum[sel], um = cs.length - 1; while (um > 0 && cs[um] === null) um--;
+    g.push('<text x="' + (X(um) + 6) + '" y="' + (Y(cs[um]) + 4) + '" style="font-weight:700;fill:#b3401a">' + sel + "</text>");
+    g.push('<text x="' + (X(11) + 6) + '" y="' + (Y(med[11]) + 4) + '">' + t("mediana", "median") + "</text>");
+    $("acum").innerHTML = g.join("");
+    // lugar del año elegido, comparando hasta el mismo mes
+    var otros = completos.filter(function (a) { return a !== sel; }), mayor = otros.filter(function (a) { return acum[a][um] > cs[um]; }).length;
+    var hasta = um < 11 ? t(" hasta ", " through ") + NOML[um] : "";
+    $("acumTxt").textContent = sel + hasta + ": " + fmt(cs[um]) + t(" detecciones, lugar ", " detections, rank ") + (mayor + 1) + t(" de ", " of ") + (otros.length + 1) +
+      (med[um] > 0 ? t("; ", "; ") + (cs[um] >= med[um] ? "+" : "−") + Math.abs(Math.round((cs[um] / med[um] - 1) * 100)) + t("% respecto a la mediana.", "% against the median.") : ".");
+  }
+
+  // ---------------- Anomalies ----------------
+  var ETQ = { fuera_de_lugar: t("Fuera de lugar", "Out of place"), fuera_de_temporada: t("Fuera de temporada", "Out of season"), fuera_de_escala: t("Fuera de escala", "Out of scale") };
+  $("tipo").innerHTML = '<option value="">' + t("Todas", "All") + "</option>" + Object.keys(ETQ).map(function (k) { return '<option value="' + k + '">' + ETQ[k] + "</option>"; }).join("");
+  function dibujarAnomalias() {
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    var tipo = $("tipo").value;
+    var L = Q.anomalias.filter(function (a) { return en[a.celda] && (!tipo || a.tipo === tipo); });
+    $("nAlertas").textContent = L.length + t(" en la zona (últimos meses revisados)", " in the area (recent months checked)") + (L.length > 40 ? t(", se muestran las 40 más fuertes", ", showing the 40 strongest") : "");
+    $("lista").innerHTML = L.slice(0, 40).map(function (a) {
+      return '<div class="alerta" data-c="' + a.celda + '"><div class="cab"><span class="etq">' + ETQ[a.tipo] + "</span>" +
+        (verificada(a) ? '<span class="etq verif" data-ev="1" title="' + t("Ver la comprobación con imágenes (sección 8)", "See the check with imagery (section 8)") + '">✓ ' + t("comprobada con imágenes", "verified with imagery") + "</span>" : "") +
+        mesAnio(+a.mes.slice(5), a.mes.slice(0, 4)) + " · " + a.lat.toFixed(2) + ", " + a.lon.toFixed(2) + '</div><div class="txt">' + (EN ? (a.text || a.texto) : a.texto) + "</div></div>";
+    }).join("") || '<div class="nota">' + t("Sin anomalías en esta zona.", "No anomalies in this area.") + "</div>";
+  }
+  $("lista").addEventListener("click", function (ev) {
+    if (ev.target.getAttribute && ev.target.getAttribute("data-ev")) { irA("secEvid"); return; }
+    var d = ev.target.closest ? ev.target.closest(".alerta") : null; if (!d) return;
+    estado.resaltar = +d.getAttribute("data-c"); dibujarMapa();
+    if (svg.scrollIntoView) svg.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  $("tipo").addEventListener("change", dibujarAnomalias);
+
+  // ---------------- Validation ----------------
+  function dibujarValidacion() {
+    var V = Q.validacion, r = V.resultados, usado = V.metodo_elegido, m = r[usado], c = r.modis_crudo;
+    var NOMBRES = {
+      factor_unico: t("un solo factor de conversión", "a single conversion factor"), factor_mes: t("un factor de conversión por mes del año", "one conversion factor per calendar month"),
+      factor_zona: t("un factor de conversión por celda", "one conversion factor per cell"), factor_mes_zona: t("factores por mes y por celda", "factors per month and per cell"),
+      poisson: t("regresión de Poisson por mes y zona", "Poisson regression by month and zone") };
+    $("valTxt").innerHTML = t("Prueba con años apartados (", "Held-out year test (") + V.anios[0] + "–" + V.anios[V.anios.length - 1] + t("): se entrena sin un año y se predice ese año.", "): the model is trained without one year and predicts that year.") +
+      "<ul style='margin:6px 0 0 18px;padding:0'><li><b>" + t("MODIS sin corregir", "Uncorrected MODIS") + "</b>: " + t("error mediano mensual de ", "median monthly error of ") + c.error_pct_mediano_mensual + "%" + t(" y sesgo total de ", " and total bias of ") + c.sesgo_total_pct + "%.</li>" +
+      "<li><b>" + t("Serie armonizada", "Harmonized series") + "</b>: " + t("error mediano mensual de ", "median monthly error of ") + m.error_pct_mediano_mensual + "%, " + t("sesgo de ", "bias of ") + m.sesgo_total_pct + "%" + t(" y R² de ", " and R² of ") + m.r2_mensual_region + ".</li></ul>";
+    var S2 = V.serie, W = 700, H = 260, L = 50, B = 28, Tp = 26, campo = "armonizado";
+    var maxv = 1; S2.forEach(function (d) { maxv = Math.max(maxv, d.viirs_real, d[campo]); });
+    function X(i) { return L + (W - L - 10) * i / Math.max(1, S2.length - 1); } function Y(v) { return H - B - (H - B - Tp) * v / maxv; }
+    function linea(k, col, dash, w) { return '<path d="M' + S2.map(function (d, i) { return X(i).toFixed(1) + " " + Y(d[k]).toFixed(1); }).join("L") + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + "/>"; }
+    var g = [];
+    for (var e = 0; e <= 4; e++) { var yy = Y(maxv * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 10) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(maxv * e / 4) + "</text>"); }
+    S2.forEach(function (d, i) { if (d.mes.slice(5) === "01") g.push('<text x="' + X(i) + '" y="' + (H - 8) + '" text-anchor="middle">' + d.mes.slice(0, 4) + "</text>"); });
+    g.push(linea("modis_crudo", "#8a93a0", "2 4", 1.5), linea("viirs_real", "#1c2430", "", 2.6), linea(campo, "#b3401a", "7 4", 2));
+    g.push('<g transform="translate(' + L + ',12)"><line x1="0" x2="24" y1="0" y2="0" stroke="#1c2430" stroke-width="2.6"/><text x="30" y="4">' + t("VIIRS real", "Actual VIIRS") + "</text>" +
+      '<line x1="120" x2="144" y1="0" y2="0" stroke="#b3401a" stroke-width="2" stroke-dasharray="7 4"/><text x="150" y="4">' + t("Armonizado desde MODIS (año apartado)", "Harmonized from MODIS (held-out year)") + "</text>" +
+      '<line x1="400" x2="424" y1="0" y2="0" stroke="#8a93a0" stroke-width="1.5" stroke-dasharray="2 4"/><text x="430" y="4">' + t("MODIS sin corregir", "Uncorrected MODIS") + "</text></g>");
+    $("val").innerHTML = g.join("");
+    $("valNota").textContent = t("Detecciones mensuales de toda la región. Método usado: ", "Monthly detections for the whole region. Method used: ") + (NOMBRES[usado] || usado) +
+      t(" (elegido entre ", " (chosen among ") + Object.keys(NOMBRES).length + t(" por menor error). VIIRS: ", " by lowest error). VIIRS: ") + (V.viirs_usado || "").replace("viirs_", "").toUpperCase() + ".";
+  }
+
+  // ---------------- CSV ----------------
+  function bajar(nombre, filas) {
+    var b = new Blob(["﻿" + filas.join("\n")], { type: "text/csv;charset=utf-8" }), u = URL.createObjectURL(b), a = document.createElement("a");
+    a.href = u; a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 1000);
+  }
+  $("btnCsv").addEventListener("click", function () {
+    var s = serieSel(), f = ["month,year,month_number," + (estado.crudo ? "raw_detections" : "harmonized_detections") + ",source,incomplete_month,cells_in_area"], n = celdasSel().length;
+    for (var k = 0; k < T; k++) if (ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) f.push([Q.meses[k], ANIO[k], MES[k], s[k].toFixed(1), Q.origen[k], Q.parcial[k] ? 1 : 0, n].join(","));
+    bajar("burn_calendar_monthly_" + M.clave + ".csv", f);
+  });
+  $("btnCsvCeldas").addEventListener("click", function () {
+    var f = ["month,cell_center_lat,cell_center_lon,harmonized_detections,source"];
+    celdasSel().forEach(function (c) { var q = centro(c), v = Q.serie[c];
+      for (var k = 0; k < T; k++) if (v[k] > 0 && ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) f.push([Q.meses[k], q[1].toFixed(3), q[0].toFixed(3), v[k].toFixed(1), Q.origen[k]].join(",")); });
+    bajar("burn_calendar_by_cell_" + M.clave + ".csv", f);
+  });
+
+  // ---------------- Region ----------------
+  (function () {
+    var R = window.REGIONES || [{ clave: M.clave, nombre: M.region, nombre_en: M.region_en }], sel = $("selRegion");
+    sel.innerHTML = R.map(function (r) { return '<option value="' + r.clave + '"' + (r.clave === M.clave ? " selected" : "") + ">" + (EN ? (r.nombre_en || r.nombre) : r.nombre) + "</option>"; }).join("");
+    sel.addEventListener("change", function () { location.search = "?region=" + sel.value + "&lang=" + (EN ? "en" : "es"); });
+  })();
+
+  // ---------------- Individual hot spots ----------------
+  // Each year lives in web/data/puntos/<key>_<year>.js and is loaded only when requested.
+  var puntosCache = {}, puntosEspera = {};
+  window.PUNTOS_LISTO = function (clave, anio, texto) { puntosCache[anio] = texto; if (puntosEspera[anio]) puntosEspera[anio](); };
+  function cargarAnio(anio, listo) {
+    if (puntosCache[anio] !== undefined) { listo(); return; }
+    puntosEspera[anio] = listo;
+    var sc = document.createElement("script"); sc.src = "data/puntos/" + M.clave + "_" + anio + ".js";
+    sc.onerror = function () { puntosCache[anio] = ""; listo(); };
+    document.head.appendChild(sc);
+  }
+  function filtrarPuntos(anio, en, filas) {
+    var L = (puntosCache[anio] || "").split("\n");
+    for (var i = 0; i < L.length; i++) { var f = L[i]; if (!f) continue; var k = f.lastIndexOf(","); if (en[f.slice(k + 1)]) filas.push(f.slice(0, k)); }
+  }
+  $("btnPuntos").addEventListener("click", function () {
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    var lista = anios.filter(function (a) { return a >= estado.a0 && a <= estado.a1; }), filas = ["latitude,longitude,acq_date,acq_time_utc,satellite,confidence,frp_mw,daynight"], i = 0;
+    (function sig() {
+      if (i >= lista.length) {
+        $("puntosTxt").textContent = (filas.length - 1).toLocaleString(LOC) + t(" puntos de calor descargados.", " hot spots downloaded.");
+        bajar("hot_spots_" + M.clave + "_" + estado.a0 + "-" + estado.a1 + ".csv", filas); return;
+      }
+      $("puntosTxt").textContent = t("Cargando ", "Loading ") + lista[i] + "…";
+      cargarAnio(lista[i], function () { filtrarPuntos(lista[i], en, filas); i++; sig(); });
+    })();
+  });
+
+  // ---------------- Weekly risk and climate ----------------
+  function miniMapa(id, valores, colorDe, titulo) {
+    var h = [costa("#f4f1ea", "#9aa4b1")], el = $(id); el.setAttribute("viewBox", "0 0 " + VW.toFixed(1) + " " + VH.toFixed(1));
+    for (var c = 0; c < NC; c++) {
+      if (!Q.tierra[c]) continue; var j = Math.floor(c / NX), i = c % NX;
+      h.push('<rect x="' + px(LON0 + i * G).toFixed(1) + '" y="' + py(LAT0 + (j + 1) * G).toFixed(1) + '" width="' + (G * KX * S).toFixed(1) + '" height="' + (G * S).toFixed(1) +
+        '" fill="' + colorDe(valores[c]) + '" stroke="#fff" stroke-width="0.4"><title>' + titulo(valores[c]) + "</title></rect>");
+    }
+    el.innerHTML = h.join("");
+  }
+  function divergente(z) {            // blue (cooler) - light grey - red (hotter)
+    var k0 = Math.max(-1, Math.min(1, z / 2.5)), a = k0 < 0 ? [33, 102, 172] : [178, 24, 43], k = Math.abs(k0);
+    return "rgb(" + [0, 1, 2].map(function (n) { return Math.round(240 + (a[n] - 240) * k); }).join(",") + ")";
+  }
+  function dibujarSemana() {
+    var R = Q.riesgo, w = +$("semana").value, f = R.fuego[w], maxf = 1, tot = 0;
+    f.forEach(function (v) { if (v > maxf) maxf = v; tot += v; });
+    var d = new Date(R.semanas[w] + "T12:00:00");
+    $("semanaTxt").textContent = EN ? "Week of " + NOML[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() : "Semana del " + d.getDate() + " de " + NOML[d.getMonth()] + " de " + d.getFullYear();
+    miniMapa("mCalor", R.calor[w], function (v) { return divergente(v / 10); }, function (v) { return (v / 10).toFixed(1) + t(" desviaciones respecto a lo normal", " standard deviations from normal"); });
+    miniMapa("mRiesgo", R.riesgo[w], function (v) { return color(Math.max(0.02, v / 100)); }, function (v) { return t("Probabilidad estimada de fuego: ", "Estimated probability of fire: ") + v + "%"; });
+    miniMapa("mFuego", f, function (v) { return v > 0 ? color(Math.sqrt(v / maxf)) : "#eceff3"; }, function (v) { return v + t(" detecciones", " detections"); });
+    var orden = []; for (var c = 0; c < NC; c++) if (Q.tierra[c]) orden.push(c);
+    orden.sort(function (a, b) { return R.riesgo[w][b] - R.riesgo[w][a]; });
+    var n = Math.max(1, Math.round(orden.length * 0.2)), dentro = 0; for (var k = 0; k < n; k++) dentro += f[orden[k]];
+    $("semanaNota").textContent = tot > 0 ? t("Esa semana hubo ", "That week had ") + tot.toLocaleString(LOC) + t(" detecciones; el ", " detections; ") + Math.round(dentro / tot * 100) +
+      t("% cayó en el 20% de celdas con mayor riesgo estimado.", "% fell in the 20% of cells with the highest estimated risk.") : t("Esa semana no hubo detecciones.", "No detections that week.");
+  }
+  function dibujarRiesgo() {
+    var R = Q.riesgo; if (!R) return;
+    $("secRiesgo").style.display = "";
+    var m = R.metricas, b = R.bolsas, ae = R.anios_entrenamiento || ["", ""], ap = R.anios_prueba || ["", ""];
+    $("riesgoTxt").innerHTML = t("Para cada celda y semana se estima la probabilidad de que haya fuego, usando solo lo que se sabía la semana anterior. Se entrenó con las semanas de ",
+      "For each cell and week, the tool estimates the probability of fire using only what was known the week before. It was trained on weeks from ") + ae[0] + t(" a ", " to ") + ae[1] +
+      t(" y se probó con las de ", " and tested on ") + ap[0] + t(" a ", " to ") + ap[1] + t(". Fuente: NASA POWER (clima diario, 0.5° x 0.625°) y FIRMS VIIRS ", ". Source: NASA POWER (daily climate, 0.5° x 0.625°) and FIRMS VIIRS ") + (R.viirs || "") + "." +
+      "<ul class='hallazgos' style='margin:8px 0 0 18px;padding:0'>" +
+      "<li><b>" + t("Solo el calendario", "Calendar only") + "</b> " + t("(dónde y cuándo suele arder): el 10% de celdas-semana con más riesgo concentra el ", "(where and when it usually burns): the 10% of cell-weeks with the highest risk holds ") + m.calendario.captura_top10 + t("% de las detecciones.", "% of the detections.") + "</li>" +
+      "<li><b>" + t("Calendario + fuego de la semana anterior", "Calendar + fire in the previous week") + "</b>: " + t("sube a ", "rises to ") + m.fuego_reciente.captura_top10 + t("%. Es el modelo que usa el mapa.", "%. This is the model the map uses.") + "</li>" +
+      "<li><b>" + t("Agregar calor y sequedad semanales", "Adding weekly heat and dryness") + "</b>: " + t("queda en ", "stays at ") + m.con_clima.captura_top10 + t("%. A esta resolución (unos 55 km) el clima de la semana no mejora el pronóstico local.", "%. At this resolution (about 55 km) weekly weather does not improve the local forecast.") + "</li>" +
+      (b.pct_fuego_con_bolsa !== null ? "<li><b>" + t("Bolsas de calor", "Heat pockets") + "</b>: " + t("en celdas sin fuego previo, hubo fuego la semana siguiente en el ", "in cells with no fire the week before, fire followed in ") + b.pct_fuego_con_bolsa +
+        t("% de los casos con anomalía térmica y en el ", "% of cases with a heat anomaly and in ") + b.pct_fuego_sin_bolsa + t("% sin ella. El calor solo no anticipa el fuego.", "% without one. Heat alone does not anticipate fire.") + "</li>" : "") +
+      "</ul>";
+    var sl = $("semana"); sl.max = R.semanas.length - 1;
+    var mejor = 0, mv = -1; R.fuego.forEach(function (f, w) { var s = 0; f.forEach(function (v) { s += v; }); if (s > mv) { mv = s; mejor = w; } });
+    sl.value = mejor; sl.addEventListener("input", dibujarSemana);
+    $("btnSemMax").addEventListener("click", function () { sl.value = mejor; dibujarSemana(); });
+    dibujarSemana();
+    var Tm = R.temporadas; if (!Tm) return;
+    var A = Tm.anios, W = 640, H = 330, L = 64, B = 44, Tp = 30, x0 = 1e9, x1 = -1e9, y1 = 0, e;
+    A.forEach(function (a) { x0 = Math.min(x0, a.suelo); x1 = Math.max(x1, a.suelo); y1 = Math.max(y1, a.fuego); });
+    var dx = (x1 - x0) * 0.08; x0 -= dx; x1 += dx; y1 *= 1.08;
+    function X(v) { return L + (W - L - 16) * (v - x0) / (x1 - x0); } function Y(v) { return H - B - (H - B - Tp) * v / y1; }
+    var g = ['<text x="' + L + '" y="16" style="font-weight:600;fill:#1c2430">' + t("Cada punto es un año: suelo más seco, más fuego", "Each dot is a year: drier soil, more fire") + "</text>"];
+    for (e = 0; e <= 4; e++) { var yy = Y(y1 * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 16) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(y1 * e / 4) + "</text>"); }
+    for (e = 0; e <= 4; e++) { var xv = x0 + (x1 - x0) * e / 4; g.push('<text x="' + X(xv) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + xv.toFixed(2) + "</text>"); }
+    g.push('<text x="' + ((L + W) / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + t("Humedad del suelo de marzo a mayo (0 = seco, 1 = saturado)", "Soil wetness, March to May (0 = dry, 1 = saturated)") + "</text>");
+    g.push('<text transform="translate(14,' + ((H - B + Tp) / 2) + ') rotate(-90)" text-anchor="middle">' + t("Detecciones de marzo a junio", "Detections, March to June") + "</text>");
+    A.forEach(function (a) { g.push('<circle cx="' + X(a.suelo) + '" cy="' + Y(a.fuego) + '" r="5" fill="#b3401a" stroke="#fff" stroke-width="1.5"><title>' + a.anio + ": " + fmt(a.fuego) + t(" detecciones, humedad ", " detections, wetness ") + a.suelo + '</title></circle><text x="' + (X(a.suelo) + 7) + '" y="' + (Y(a.fuego) + 4) + '">' + String(a.anio).slice(2) + "</text>"); });
+    $("disp").innerHTML = g.join("");
+    var c = Tm.correlaciones, p = Tm.pronostico;
+    $("tempTxt").innerHTML = "<h2 style='margin-top:0'>" + t("Lo que sí explica el clima: la fuerza de cada temporada", "What climate does explain: how strong each season is") + "</h2>" +
+      t("Con la serie armonizada de ", "Using the harmonized series of ") + A.length + t(" años se compara el fuego de cada temporada con el clima de marzo a mayo.", " years, each season's fire is compared with the March to May climate.") +
+      "<ul class='hallazgos' style='margin:8px 0 0 18px;padding:0'>" +
+      "<li><b>" + t("Humedad del suelo", "Soil wetness") + "</b>: " + t("correlación de ", "correlation of ") + c.suelo + t(". Es la relación más fuerte.", ". This is the strongest relationship.") + "</li>" +
+      "<li><b>" + t("Humedad del aire", "Air humidity") + "</b>: " + t("correlación de ", "correlation of ") + c.humedad + ".</li>" +
+      "<li><b>" + t("Temperatura de la superficie", "Surface temperature") + "</b>: " + t("correlación de ", "correlation of ") + c.ts + ".</li>" +
+      "<li><b>" + t("¿Se puede anticipar en marzo?", "Can it be anticipated in March?") + "</b> " + t("Con la humedad del suelo y del aire de febrero y marzo, el pronóstico de las detecciones de abril a junio acierta si la temporada quedará arriba o abajo de lo normal en ",
+        "Using February and March soil wetness and air humidity, the forecast of April to June detections gets above/below normal right in ") + p.acierto_arriba_abajo_mediana_pct + t("% de los años (correlación ", "% of years (correlation ") + p.corr_anio_apartado + t("). Es una señal débil.", "). The signal is weak.") + "</li>" +
+      "</ul><div class='nota'>" + t("Correlación no es causa: el fuego casi siempre lo inicia una persona; la sequedad determina cuánto se extiende y cuánto dura.", "Correlation is not causation: fire is almost always started by people; dryness determines how far it spreads and how long it lasts.") + "</div>";
+  }
+
+
+  // ---------------- Protected areas ----------------
+  var areaSel = null;
+  function nombreA(a) { return EN ? (a.nombre_en || a.nombre) : a.nombre; }
+  function desigA(a) { return EN && a.desig_en && a.desig_en !== "Not Reported" ? a.desig_en : a.desig; }
+  function dibujarAreas() {
+    var AP = Q.areas; if (!AP || !AP.areas.length) return;
+    $("secAreas").style.display = "";
+    var pc = AP.pct_dentro, ys = Object.keys(pc).map(Number).sort(), uy = ys[ys.length - 1];
+    var medPct = mediana(ys.map(function (y) { return pc[y]; }));
+    $("areasTxt").innerHTML = t("Puntos de calor dentro de los límites oficiales de cada área protegida (WDPA), en la misma escala armonizada. ",
+      "Hot spots inside the official boundaries of each protected area (WDPA), on the same harmonized scale. ") +
+      t("En ", "In ") + uy + t(", el ", ", ") + pc[uy] + t("% del fuego de la región cayó dentro de alguna área protegida (mediana de los años: ", "% of the region's fire fell inside a protected area (median across years: ") + medPct + "%). " +
+      t("La tabla está ordenada por cuántas detecciones superó el último año a su mediana. Haz clic en un área. Solo se cuentan los puntos dentro de la región de análisis, así que un área que la cruza queda cubierta en parte.",
+        "The table is sorted by how many detections the latest year exceeded its median. Click an area. Only hot spots inside the analysis region are counted, so an area that crosses its edge is partly covered.");
+    // Orden: detecciones por encima de lo normal en el último año (evita que un área con mediana casi cero domine)
+    var L = AP.areas.slice().sort(function (a, b) { return (b.ultimo - b.mediana_anual) - (a.ultimo - a.mediana_anual); });
+    var h = ["<tr><th style='text-align:left'>" + t("Área protegida", "Protected area") + "</th><th>km²</th><th>" + L[0].ultimo_anio + "</th><th>" + t("Mediana", "Median") + "</th><th>" + t("Veces", "Times") + "</th><th>" + t("Lugar", "Rank") + "</th><th>" + t("Alertas", "Alerts") + "</th></tr>"];
+    L.forEach(function (a) {
+      var v = a.veces, f = v === null ? 0 : Math.min(1, Math.log(1 + v) / Math.log(6));
+      h.push('<tr data-a="' + a.id + '" style="cursor:pointer"><td style="text-align:left;padding-right:8px">' + nombreA(a) + '</td><td>' + fmt(a.km2) + "</td><td>" + fmt(a.ultimo) + "</td><td>" + fmt(a.mediana_anual) +
+        '</td><td style="background:' + (v === null ? "#eceff3" : color(f)) + ";color:" + (v === null ? "#5b6675" : textoSobre(f)) + '">' + (v === null ? "–" : fmt(v) + "×") + "</td><td>" + a.lugar + "/" + a.anios + "</td><td>" + (a.alertas.length || "") + "</td></tr>");
+    });
+    $("tablaAreas").innerHTML = h.join("");
+    $("tablaAreas").addEventListener("click", function (ev) { var r = ev.target.closest ? ev.target.closest("tr[data-a]") : null; if (r) elegirArea(+r.getAttribute("data-a")); });
+    elegirArea(L[0].id);
+  }
+  function elegirArea(id) {
+    var a = Q.areas.areas.filter(function (x) { return x.id === id; })[0]; if (!a) return; areaSel = id;
+    [].forEach.call($("tablaAreas").querySelectorAll("tr[data-a]"), function (r) { r.style.outline = +r.getAttribute("data-a") === id ? "2px solid #b3401a" : ""; });
+    $("areaNombre").textContent = nombreA(a);
+    $("areaDesc").textContent = desigA(a) + " · " + fmt(a.km2) + " km² · " + a.ultimo_anio + ": " + fmt(a.ultimo) + t(" detecciones, lugar ", " detections, rank ") + a.lugar + t(" de ", " of ") + a.anios +
+      (a.alertas.length ? t(". Meses fuera de escala: ", ". Out-of-scale months: ") + a.alertas.map(function (x) { return x.mes; }).join(", ") : "") + ".";
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; a.anillos.forEach(function (r) { r.forEach(function (q) { x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }); });
+    var pad = Math.max(x1 - x0, y1 - y0) * 0.15 + 0.05, X0 = x0 - pad, X1 = x1 + pad, Y0 = y0 - pad, Y1 = y1 + pad, kx = Math.cos((Y0 + Y1) / 2 * Math.PI / 180);
+    var W = 600, Hh = Math.min(420, Math.max(180, W * (Y1 - Y0) / ((X1 - X0) * kx)));
+    function ax(l) { return (l - X0) / (X1 - X0) * W; } function ay(l) { return (Y1 - l) / (Y1 - Y0) * Hh; }
+    var g = [];
+    COSTA.forEach(function (p) { p.anillos.forEach(function (r) { g.push('<path d="M' + r.map(function (q) { return ax(q[0]).toFixed(1) + " " + ay(q[1]).toFixed(1); }).join("L") + 'Z" fill="#f4f1ea" stroke="#9aa4b1"/>'); }); });
+    var F = Q.serie, mx = 0, tot = [], c, k;
+    for (c = 0; c < NC; c++) { var s = 0; for (k = 0; k < T; k++) s += F[c][k]; tot.push(s); }
+    function fuera(q) { return q[0] + G / 2 < X0 || q[0] - G / 2 > X1 || q[1] + G / 2 < Y0 || q[1] - G / 2 > Y1; }
+    for (c = 0; c < NC; c++) { if (!fuera(centro(c)) && tot[c] > mx) mx = tot[c]; }
+    for (c = 0; c < NC; c++) { var q2 = centro(c); if (!Q.tierra[c] || fuera(q2)) continue;
+      g.push('<rect x="' + ax(q2[0] - G / 2) + '" y="' + ay(q2[1] + G / 2) + '" width="' + (ax(q2[0] + G / 2) - ax(q2[0] - G / 2)) + '" height="' + (ay(q2[1] - G / 2) - ay(q2[1] + G / 2)) + '" fill="' + color(mx > 0 ? Math.sqrt(tot[c] / mx) : 0) + '" fill-opacity="0.55"/>'); }
+    a.anillos.forEach(function (r) { g.push('<path d="M' + r.map(function (q) { return ax(q[0]).toFixed(1) + " " + ay(q[1]).toFixed(1); }).join("L") + 'Z" fill="rgba(179,64,26,0.12)" stroke="#b3401a" stroke-width="2.5"/>'); });
+    $("areaMapa").setAttribute("viewBox", "0 0 " + W + " " + Hh.toFixed(0)); $("areaMapa").innerHTML = g.join("");
+    var sA = a.serie, vis = sA.slice().sort(function (x, y) { return x - y; }), tope = vis[Math.floor(vis.length * 0.99)] || 1;
+    var hh = ["<tr><th>" + t("Año", "Year") + "</th>" + NOM.map(function (m) { return "<th>" + m + "</th>"; }).join("") + "<th>Total</th></tr>"];
+    for (var y = anios.length - 1; y >= 0; y--) { var yr = anios[y], fila = '<tr><td class="anio">' + yr + "</td>", tt = 0;
+      for (var m = 1; m <= 12; m++) { var kk = Q.meses.indexOf(yr + "-" + (m < 10 ? "0" : "") + m); if (kk < 0) { fila += "<td></td>"; continue; }
+        var v = sA[kk], f = tope > 0 ? Math.sqrt(Math.min(1, v / tope)) : 0; tt += v; fila += '<td style="background:' + color(f) + ";color:" + textoSobre(f) + '">' + (v >= 1 ? Math.round(v) : (v > 0 ? "<1" : "")) + "</td>"; }
+      hh.push(fila + '<td class="total">' + Math.round(tt).toLocaleString(LOC) + "</td></tr>"); }
+    $("areaCal").innerHTML = hh.join("");
+    if ($("chkAreas").checked) dibujarMapa();
+  }
+  $("chkAreas").addEventListener("change", dibujarMapa);
+
+  // ---------------- Evidence ----------------
+  function dibujarEvidencia() {
+    var E = Q.evidencia; if (!E) return;
+    $("secEvid").style.display = "";
+    var b = E.bbox, W = 1000, Hh = Math.round(W * (b[3] - b[1]) / (b[2] - b[0]));
+    function ex(l) { return (l - b[0]) / (b[2] - b[0]) * W; } function ey(l) { return (b[3] - l) / (b[3] - b[1]) * Hh; }
+    var area = Q.areas ? Q.areas.areas.filter(function (a) { return a.id === E.area_id; })[0] : null;
+    $("evidTxt").innerHTML = "<b>" + (EN ? E.title : E.titulo) + ".</b> " + (EN ? E.alert : E.alerta) + " " +
+      t("Fuego detectado del ", "Fire detected from ") + E.fechas_fuego[0] + t(" al ", " to ") + E.fechas_fuego[1] + ". " +
+      t("Para comprobarlo usamos imágenes de otro satélite y un producto independiente de pérdida de vegetación.", "To check it we used imagery from another satellite and an independent vegetation-loss product.");
+    function panel(im, i) {
+      var g = ['<svg viewBox="0 0 ' + W + " " + Hh + '" role="img" aria-label="' + (EN ? im.en : im.es) + '"><image href="' + im.src + '" x="0" y="0" width="' + W + '" height="' + Hh + '" preserveAspectRatio="none"/>'];
+      if (area) area.anillos.forEach(function (r) { g.push('<path d="M' + r.map(function (q) { return ex(q[0]).toFixed(1) + " " + ey(q[1]).toFixed(1); }).join("L") + 'Z" fill="none" stroke="#ffffff" stroke-width="3" stroke-dasharray="10 6"/>'); });
+      if (i > 0) g.push('<g class="evPts">' + E.puntos.map(function (q) { return '<circle cx="' + ex(q[0]).toFixed(1) + '" cy="' + ey(q[1]).toFixed(1) + '" r="3.2" fill="#ff5a1f" stroke="#fff" stroke-width="0.8"/>'; }).join("") + "</g>");
+      g.push("</svg>");
+      return "<div><h3>" + (EN ? im.en : im.es) + " · " + im.fecha + "</h3>" + g.join("") + '<div class="nota">' + (EN ? im.layer : im.capa) + "</div></div>";
+    }
+    $("evidImgs").innerHTML = E.imagenes.map(panel).join("");
+    $("chkPuntos").addEventListener("change", function () { [].forEach.call(document.querySelectorAll(".evPts"), function (g) { g.style.display = $("chkPuntos").checked ? "" : "none"; }); });
+    var P = E.prueba;
+    $("evidPrueba").innerHTML = '<div class="tarjetas"><div class="tarjeta"><div class="t">' + t("Detecciones del evento sobre vegetación perdida (píxel exacto de 30 m)", "Event detections on lost vegetation (exact 30-m pixel)") + '</div><div class="v">' + P.pixel_exacto.evento + '%</div><div class="d">' + t("contra ", "against ") + P.pixel_exacto.azar + t("% de puntos al azar en la misma zona", "% of random points in the same area") + "</div></div>" +
+      '<div class="tarjeta"><div class="t">' + t("Con margen de medio píxel VIIRS (unos 190 m)", "Allowing half a VIIRS pixel (about 190 m)") + '</div><div class="v">' + P.medio_pixel_viirs.evento + '%</div><div class="d">' + t("contra ", "against ") + P.medio_pixel_viirs.azar + t("% al azar", "% at random") + "</div></div>" +
+      '<div class="tarjeta"><div class="t">' + t("Detecciones del evento", "Event detections") + '</div><div class="v">' + E.n_detecciones + '</div><div class="d">' + E.dentro_area + t(" dentro del área protegida (contorno punteado)", " inside the protected area (dashed outline)") + "</div></div></div>" +
+      '<p style="margin:8px 0 0">' + (EN ? P.text : P.texto) + "</p>";
+    $("evidFuente").textContent = (EN ? E.source : E.fuente);
+  }
+
+  // ---------------- Season replay ----------------
+  var SEM = null, repTimer = null, cacheSem = {};
+  window.SEMANAL_LISTO = function (clave, datos) { SEM = datos; iniciarReplay(); };
+  function iniciarReplay() {
+    var ys = Object.keys(SEM).map(Number).sort(function (a, b) { return b - a; });
+    $("repAnio").innerHTML = ys.map(function (y) { return "<option>" + y + "</option>"; }).join("");
+    var ini = ys.indexOf(2024) >= 0 ? 2024 : ys[0]; $("repAnio").value = ini;
+    $("repSem").value = semanaPico(ini);
+    $("repAnio").addEventListener("change", function () { $("repSem").value = semanaPico(+$("repAnio").value); pararReplay(); cuadro(); });
+    $("repSem").addEventListener("input", function () { pararReplay(); cuadro(); });
+    $("repPlay").addEventListener("click", function () { if (repTimer) pararReplay(); else reproducir(); });
+    pon("repPlay", "▶ Reproducir", "▶ Play");
+    cuadro();
+  }
+  function pararReplay() { if (repTimer) { clearInterval(repTimer); repTimer = null; } pon("repPlay", "▶ Reproducir", "▶ Play"); }
+  function reproducir() {
+    var sl = $("repSem"); if (+sl.value >= 51) sl.value = 0;
+    pon("repPlay", "❚❚ Pausa", "❚❚ Pause");
+    repTimer = setInterval(function () { if (+sl.value >= 51) { pararReplay(); return; } sl.value = +sl.value + 1; cuadro(); }, +$("repVel").value);
+  }
+  function semanaPico(y) { var W = cacheSem[y] || (cacheSem[y] = semanasDe(y)), mejor = 0, mv = -1; W.forEach(function (w, k) { var s = 0; for (var c in w) s += w[c]; if (s > mv) { mv = s; mejor = k; } }); return mejor; }
+  function semanasDe(y) { var a = SEM[y] || [], w = []; for (var i = 0; i < 52; i++) w.push({}); for (var k = 0; k < a.length; k += 3) w[a[k]][a[k + 1]] = a[k + 2] / 10; return w; }
+  function curva(yy) { var w = cacheSem[yy] || (cacheSem[yy] = semanasDe(yy)), out = [], a = 0; for (var k = 0; k < 52; k++) { for (var cc in w[k]) a += w[k][cc]; out.push(a); } return out; }
+  function cuadro() {
+    var y = +$("repAnio").value, s = +$("repSem").value, W = cacheSem[y] || (cacheSem[y] = semanasDe(y));
+    var acum = new Array(NC).fill(0), sem = W[s], totS = 0, c, k;
+    for (k = 0; k <= s; k++) for (c in W[k]) acum[c] += W[k][c];
+    for (c in sem) totS += sem[c];
+    var mx = 1; for (c in sem) mx = Math.max(mx, sem[c]);
+    var g = [costa("#f4f1ea", "#9aa4b1")];
+    for (c = 0; c < NC; c++) { if (!acum[c] && !Q.tierra[c]) continue; var j = Math.floor(c / NX), i = c % NX, v = sem[c] || 0;
+      var fill = v > 0 ? color(0.25 + 0.75 * Math.sqrt(v / mx)) : (acum[c] > 0 ? "#c9bfae" : "#eef0f2");
+      g.push('<rect x="' + px(LON0 + i * G).toFixed(1) + '" y="' + py(LAT0 + (j + 1) * G).toFixed(1) + '" width="' + (G * KX * S).toFixed(1) + '" height="' + (G * S).toFixed(1) + '" fill="' + fill + '" stroke="#fff" stroke-width="0.4"/>'); }
+    g.push(costa("none", "#56606d", ' pointer-events="none"'));
+    var d0 = new Date(Date.UTC(y, 0, 1 + 7 * s));
+    var etq = (EN ? "Week of " + NOML[d0.getUTCMonth()] + " " + d0.getUTCDate() + ", " + y : "Semana del " + d0.getUTCDate() + " de " + NOML[d0.getUTCMonth()] + " de " + y);
+    g.push('<text x="' + (VW - 20) + '" y="40" text-anchor="end" style="font:700 30px system-ui,sans-serif;fill:#1c2430">' + etq + "</text>");
+    $("repMapa").setAttribute("viewBox", "0 0 " + VW.toFixed(1) + " " + VH.toFixed(1)); $("repMapa").innerHTML = g.join("");
+    $("repTxt").textContent = etq + " · " + fmt(totS) + t(" esta semana", " this week");
+    var ys = Object.keys(SEM).map(Number), todas = ys.filter(function (yy) { return yy !== y && SEM[yy].length > 30; }).map(curva), med = [];
+    for (k = 0; k < 52; k++) med.push(mediana(todas.map(function (cv) { return cv[k]; })));
+    var cy = curva(y), mxc = Math.max(cy[51], med[51], 1) * 1.08, Wc = 520, Hc = 300, L = 56, B = 30, Tp = 20;
+    function X(q) { return L + (Wc - L - 12) * q / 51; } function Y(v) { return Hc - B - (Hc - B - Tp) * v / mxc; }
+    var gg = ['<text x="' + L + '" y="12" style="font-weight:600;fill:#1c2430">' + t("Acumulado del año contra la mediana", "Year to date against the median") + "</text>"];
+    for (var e = 0; e <= 4; e++) { var yy2 = Y(mxc * e / 4); gg.push('<line x1="' + L + '" x2="' + (Wc - 12) + '" y1="' + yy2 + '" y2="' + yy2 + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy2 + 4) + '" text-anchor="end">' + fmt(mxc * e / 4) + "</text>"); }
+    [0, 2, 4, 6, 8, 10].forEach(function (m) { var q = (Date.UTC(2001, m, 1) - Date.UTC(2001, 0, 1)) / 6048e5; gg.push('<text x="' + X(q) + '" y="' + (Hc - 10) + '" text-anchor="middle">' + NOM[m] + "</text>"); });
+    gg.push('<path d="M' + med.map(function (v, q) { return X(q).toFixed(1) + " " + Y(v).toFixed(1); }).join("L") + '" fill="none" stroke="#1c2430" stroke-width="2" stroke-dasharray="6 4"/>');
+    gg.push('<path d="M' + cy.slice(0, s + 1).map(function (v, q) { return X(q).toFixed(1) + " " + Y(v).toFixed(1); }).join("L") + '" fill="none" stroke="#b3401a" stroke-width="3.5"/>');
+    gg.push('<circle cx="' + X(s) + '" cy="' + Y(cy[s]) + '" r="5" fill="#b3401a"/>');
+    gg.push('<text x="' + (Wc - 14) + '" y="' + (Y(med[51]) - 6) + '" text-anchor="end">' + t("mediana", "median") + "</text>");
+    $("repCurva").innerHTML = gg.join("");
+    $("repNota").textContent = y + ": " + fmt(cy[s]) + t(" detecciones acumuladas; la mediana a esta fecha es ", " detections so far; the median by this date is ") + fmt(med[s]) +
+      t(". En el mapa, gris: celdas que ya ardieron este año.", ". On the map, grey: cells that already burned this year.");
+  }
+  (function () { var sc = document.createElement("script"); sc.src = "data/semanal/" + M.clave + ".js"; sc.onerror = function () { $("secReplay").style.display = "none"; }; document.head.appendChild(sc); })();
+
+
+  // ---------------- Critical period, briefing, key findings, image and report ----------------
+  // Complete years only (12 months, none incomplete).
+  var completo = {};
+  (function () { var c = {}; for (var k = 0; k < T; k++) if (!Q.parcial[k]) c[ANIO[k]] = (c[ANIO[k]] || 0) + 1; anios.forEach(function (a) { completo[a] = c[a] === 12; }); })();
+  function esc(x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  // Critical period: the run of consecutive calendar months (it may wrap from December to January) in which
+  // each month holds more than the monthly average share (1/12) of all detections; if there are several runs,
+  // the one with the most detections. Returns null when there is no marked season.
+  function periodoCritico(s) {
+    var tot = new Array(12).fill(0), suma = 0, k, i;
+    for (k = 0; k < T; k++) if (completo[ANIO[k]]) { tot[MES[k] - 1] += s[k]; suma += s[k]; }
+    if (!(suma > 0)) return null;
+    var arriba = tot.map(function (v) { return v / suma > 1 / 12; });
+    if (arriba.every(Boolean) || !arriba.some(Boolean)) return null;
+    var mejor = null;
+    for (i = 0; i < 12; i++) {
+      if (!arriba[i] || arriba[(i + 11) % 12]) continue;
+      var n = 0, sm = 0; while (n < 12 && arriba[(i + n) % 12]) { sm += tot[(i + n) % 12]; n++; }
+      if (!mejor || sm > mejor.suma) mejor = { ini: i, n: n, suma: sm };
+    }
+    var meses = []; for (i = 0; i < mejor.n; i++) meses.push((mejor.ini + i) % 12);
+    var desde = null; anios.forEach(function (a) { if (completo[a] && desde === null) desde = a; });
+    return { meses: meses, n: mejor.n, ini: mejor.ini, fin: (mejor.ini + mejor.n - 1) % 12, pct: Math.round(mejor.suma / suma * 100), desde: desde };
+  }
+  function nombrePeriodo(pc, corto) { var N = corto ? NOM : NOML; return pc.n === 1 ? N[pc.ini] : N[pc.ini] + (corto ? "–" : t(" a ", " to ")) + N[pc.fin]; }
+  function totalesAnio(s) { var o = {}; for (var k = 0; k < T; k++) if (completo[ANIO[k]]) o[ANIO[k]] = (o[ANIO[k]] || 0) + s[k]; return o; }
+  function lugarDe(o, a) { var v = o[a], r = 1; for (var y in o) if (o[y] > v) r++; return r; }
+  function descZona() {
+    if (!estado.sel) return t("Toda la región", "Whole region");
+    var b = cajaDe(estado.sel);
+    return (estado.poli ? t("Polígono", "Polygon") : t("Zona", "Area")) + ": " + estado.sel.length + t(" celdas, lat ", " cells, lat ") + b[1] + t(" a ", " to ") + b[3] + ", lon " + b[0] + t(" a ", " to ") + b[2];
+  }
+  function dibujarBriefing(s) {
+    var pc = periodoCritico(s), tot = totalesAnio(s), ys = Object.keys(tot).map(Number).sort(function (a, b) { return a - b; }), n = ys.length, ua = ys[n - 1];
+    var med = mediana(ys.map(function (y) { return tot[y]; })), lug = lugarDe(tot, ua);
+    var top = ys.slice().sort(function (a, b) { return tot[b] - tot[a]; }).slice(0, 3);
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    var al = Q.anomalias.filter(function (a) { return en[a.celda]; });
+    var ultA = al.slice().sort(function (a, b) { return a.mes < b.mes ? 1 : (a.mes > b.mes ? -1 : 0); })[0];
+    var h = "<b>" + t("Resumen para quien decide. ", "Briefing. ") + "</b>" + (estado.sel ? t("En la zona elegida", "In the selected area") : t("En toda la región", "Across the whole region")) + ", ";
+    h += pc ? t("el periodo crítico es ", "the critical period is ") + "<b>" + nombrePeriodo(pc) + "</b>" + t(": esos meses concentran el ", ": these months hold ") + pc.pct + t("% de las detecciones desde ", "% of all detections since ") + pc.desde + ". "
+      : t("no hay una temporada de fuego marcada. ", "there is no marked fire season. ");
+    h += t("Años más activos: ", "Most active years: ") + top.join(", ") + ". ";
+    h += ua + t(" quedó en el lugar ", " ranked ") + lug + t(" de ", " of ") + n + (med > 0 ? " (" + (tot[ua] >= med ? "+" : "−") + Math.abs(Math.round((tot[ua] / med - 1) * 100)) + t("% respecto a la mediana)", "% against the median)") : "") + ". ";
+    h += al.length ? al.length + t(" anomalías en los últimos 36 meses; la más reciente: ", " anomalies in the last 36 months; the latest: ") + ETQ[ultA.tipo].toLowerCase() + t(" en ", " in ") + mesAnio(+ultA.mes.slice(5), ultA.mes.slice(0, 4)) + "."
+      : t("Sin anomalías en los últimos 36 meses.", "No anomalies in the last 36 months.");
+    if (estado.crudo) h += " <b>" + t("(Registro sin armonizar: estas cifras mezclan dos sensores.)", "(Unharmonized record: these figures mix two sensors.)") + "</b>";
+    $("briefing").innerHTML = h;
+    estado.critico = pc ? pc.meses : [];
+  }
+  function verificada(a) {
+    var E = Q.evidencia; if (!E) return false; var b = E.bbox, m0 = E.fechas_fuego[0].slice(0, 7), m1 = E.fechas_fuego[1].slice(0, 7);
+    return a.lon >= b[0] - G / 2 && a.lon <= b[2] + G / 2 && a.lat >= b[1] - G / 2 && a.lat <= b[3] + G / 2 && a.mes >= m0 && a.mes <= m1;
+  }
+  function irA(id) { var el = $(id); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  function dibujarClaves() {
+    var s = new Array(T).fill(0), r = new Array(T).fill(0), c, k;
+    for (c = 0; c < NC; c++) for (k = 0; k < T; k++) { s[k] += Q.serie[c][k]; if (Q.crudo) r[k] += Q.crudo[c][k]; }
+    var V = Q.validacion.resultados, m = V[Q.validacion.metodo_elegido], cr = V.modis_crudo, tj = [];
+    tj.push([t("Armonización probada con años apartados", "Harmonization tested on held-out years"), m.error_pct_mediano_mensual + "%",
+      t("de error mensual, contra ", "median monthly error, against ") + cr.error_pct_mediano_mensual + t("% de MODIS sin corregir", "% for uncorrected MODIS"), "secVal"]);
+    var pc = periodoCritico(s);
+    if (pc) tj.push([t("Periodo crítico", "Critical period"), nombrePeriodo(pc, true), pc.pct + t("% de las detecciones desde ", "% of all detections since ") + pc.desde + t(" caen en esos meses", " fall in these months"), "sec2"]);
+    if (Q.crudo) {
+      var th = totalesAnio(s), tr = totalesAnio(r), rec = null, y;
+      for (y in tr) if (rec === null || tr[y] > tr[rec]) rec = y;
+      var lh = lugarDe(th, rec), n = Object.keys(th).length;
+      if (lh > 1) tj.push([t("El cambio de sensor engaña", "The sensor switch misleads"), rec + t(": lugar ", ": rank ") + lh + t(" de ", " of ") + n,
+        t("Sin armonizar parece el año récord. Haz clic para verlo.", "Unharmonized, it looks like the record year. Click to see it."), "sec2", 1]);
+    }
+    if (Q.evidencia) { var P = Q.evidencia.prueba; tj.push([t("Una alerta comprobada desde el espacio", "An alert verified from space"), P.pixel_exacto.evento + "%",
+      t("de las detecciones de junio de 2024 caen sobre vegetación perdida (", "of the flagged event's hot spots fall on lost vegetation (") + P.pixel_exacto.azar + t("% al azar)", "% at random)"), "secEvid"]); }
+    else { var t2 = totalesAnio(s), top = Object.keys(t2).sort(function (a, b) { return t2[b] - t2[a]; }).slice(0, 3);
+      tj.push([t("Años más activos", "Most active years"), top.join(", "), t("en la serie armonizada", "in the harmonized series"), "sec3"]); }
+    $("clavesTj").innerHTML = tj.map(function (q) { return '<div class="tarjeta" role="link" tabindex="0" data-ir="' + q[3] + '"' + (q[4] ? ' data-crudo="1"' : "") + '><div class="t">' + q[0] + '</div><div class="v">' + q[1] + '</div><div class="d">' + q[2] + '</div><div class="ir">' + t("Ver →", "See →") + "</div></div>"; }).join("");
+    function abrir(d) {
+      if (d.getAttribute("data-crudo") && !$("chkCrudo").checked) { $("chkCrudo").checked = true; $("chkCrudo").dispatchEvent(new Event("change")); }
+      irA(d.getAttribute("data-ir"));
+    }
+    $("clavesTj").addEventListener("click", function (ev) { var d = ev.target.closest ? ev.target.closest(".tarjeta") : null; if (d) abrir(d); });
+    $("clavesTj").addEventListener("keydown", function (ev) { if (ev.key === "Enter" && ev.target.classList.contains("tarjeta")) abrir(ev.target); });
+  }
+  function calendarioSvg() {
+    var s = serieSel(), filas = anios.filter(function (a) { return a >= estado.a0 && a <= estado.a1; }).reverse(), vis = [], k;
+    for (k = 0; k < T; k++) if (ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) vis.push(s[k]);
+    var orden = vis.slice().sort(function (a, b) { return a - b; }), tope = orden[Math.floor(orden.length * 0.99)] || 1;
+    var cw = 58, ch = 22, L = 60, Tp = 78, W = L + 12 * cw + 90, H = Tp + filas.length * ch + 40;
+    var g = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '" font-family="Arial, Helvetica, sans-serif">', '<rect width="100%" height="100%" fill="#ffffff"/>'];
+    g.push('<text x="' + L + '" y="28" font-size="18" font-weight="700" fill="#1c2430">' + esc(t("Calendario de quemas", "Burn Calendar") + " · " + NOMBRE_REGION) + "</text>");
+    g.push('<text x="' + L + '" y="48" font-size="12" fill="#5b6675">' + esc(descZona() + " · " + estado.a0 + "–" + estado.a1 + " · " + (EN ? (M.unidad_en || M.unidad) : M.unidad) + (estado.crudo ? t(" · SIN ARMONIZAR", " · UNHARMONIZED") : "")) + "</text>");
+    NOM.forEach(function (m, i) { var cr = estado.critico && estado.critico.indexOf(i) >= 0;
+      if (cr) g.push('<rect x="' + (L + i * cw + 3) + '" y="' + (Tp - 19) + '" width="' + (cw - 6) + '" height="16" rx="3" fill="#b3401a"/>');
+      g.push('<text x="' + (L + i * cw + cw / 2) + '" y="' + (Tp - 7) + '" font-size="11" text-anchor="middle" fill="' + (cr ? "#ffffff" : "#5b6675") + '">' + esc(m) + "</text>"); });
+    g.push('<text x="' + (L + 12 * cw + 45) + '" y="' + (Tp - 7) + '" font-size="11" text-anchor="middle" fill="#5b6675">Total</text>');
+    filas.forEach(function (a, r) { var y = Tp + r * ch, tot = 0;
+      g.push('<text x="' + (L - 8) + '" y="' + (y + 15) + '" font-size="11" text-anchor="end" font-weight="700" fill="#1c2430">' + a + "</text>");
+      for (var m = 1; m <= 12; m++) { k = Q.meses.indexOf(a + "-" + (m < 10 ? "0" : "") + m); if (k < 0) continue;
+        var v = s[k], f = tope > 0 ? Math.sqrt(Math.min(1, v / tope)) : 0; tot += v;
+        g.push('<rect x="' + (L + (m - 1) * cw + 1) + '" y="' + (y + 1) + '" width="' + (cw - 2) + '" height="' + (ch - 2) + '" fill="' + color(f) + '"/>');
+        g.push('<text x="' + (L + (m - 1) * cw + cw / 2) + '" y="' + (y + 15) + '" font-size="10" text-anchor="middle" fill="' + textoSobre(f) + '"' + (Q.origen[k] !== "viirs" ? ' font-style="italic"' : "") + ">" + (v >= 1 ? Math.round(v) : (v > 0 ? "&lt;1" : "0")) + "</text>"); }
+      g.push('<text x="' + (L + 12 * cw + 45) + '" y="' + (y + 15) + '" font-size="11" text-anchor="middle" font-weight="700" fill="#1c2430">' + Math.round(tot).toLocaleString(LOC) + "</text>"); });
+    g.push('<text x="' + L + '" y="' + (Tp + filas.length * ch + 22) + '" font-size="10" fill="#5b6675">' + esc(t("Fuente: NASA FIRMS (MODIS y VIIRS), registro armonizado (Burn Calendar). Cursiva: convertido desde MODIS. Meses en rojo: periodo crítico.",
+      "Source: NASA FIRMS (MODIS and VIIRS), harmonized record (Burn Calendar). Italics: converted from MODIS. Months in red: critical period.")) + "</text>");
+    g.push("</svg>");
+    return { svg: g.join(""), w: W, h: H };
+  }
+  function bajarBlob(nombre, b) { var u = URL.createObjectURL(b), a = document.createElement("a"); a.href = u; a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 1500); }
+  $("btnPng").addEventListener("click", function () {
+    var o = calendarioSvg(), base = "burn_calendar_" + M.clave + "_" + estado.a0 + "-" + estado.a1, img = new Image(), sc = 2;
+    function comoSvg() { bajarBlob(base + ".svg", new Blob([o.svg], { type: "image/svg+xml" })); }
+    img.onload = function () {
+      try { var cv = document.createElement("canvas"); cv.width = o.w * sc; cv.height = o.h * sc; var cx = cv.getContext("2d"); cx.scale(sc, sc); cx.drawImage(img, 0, 0);
+        cv.toBlob(function (b) { if (b) bajarBlob(base + ".png", b); else comoSvg(); }, "image/png"); } catch (e) { comoSvg(); }
+    };
+    img.onerror = comoSvg;
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(o.svg);
+  });
+  function prepararImpresion() {
+    var hoy = new Date();
+    $("impCab").innerHTML = "<h1 style='font-size:20px;margin:0'>" + t("Reporte de zona · Calendario de quemas", "Area report · Burn Calendar") + " · " + esc(NOMBRE_REGION) + "</h1>" +
+      "<div class='nota' style='margin:2px 0 8px'>" + esc(descZona()) + " · " + estado.a0 + "–" + estado.a1 + " · " + t("generado el ", "generated on ") + hoy.toISOString().slice(0, 10) +
+      " · " + t("Datos: NASA FIRMS (MODIS, VIIRS) armonizados; hasta ", "Data: NASA FIRMS (MODIS, VIIRS), harmonized; through ") + Q.meses[T - 1] + "</div>" +
+      '<div class="briefing">' + $("briefing").innerHTML + "</div>";
+  }
+  window.addEventListener("beforeprint", prepararImpresion);
+  $("btnReporte").addEventListener("click", function () { prepararImpresion(); window.print(); });
+
+
+  // ---------------- Listen to the calendar (sonification) ----------------
+  // Each month is one note: higher and louder means more fire. 70 ms per month.
+  var son = null;
+  function pararSon() {
+    if (!son) return;
+    clearInterval(son.timer); try { son.ctx.close(); } catch (e) {}
+    [].forEach.call(document.querySelectorAll("#cal td.suena"), function (td) { td.classList.remove("suena"); });
+    son = null; pon("btnSon", "♪ Escuchar 25 años de fuego", "♪ Listen to 25 years of fire"); $("sonTxt").textContent = "";
+  }
+  $("btnSon").addEventListener("click", function () {
+    if (son) { pararSon(); return; }
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { $("sonTxt").textContent = t("Este navegador no reproduce sonido.", "This browser cannot play sound."); return; }
+    var ctx = new AC(), s = serieSel(), ks = [], k;
+    for (k = 0; k < T; k++) if (ANIO[k] >= estado.a0 && ANIO[k] <= estado.a1) ks.push(k);
+    var mx = 1; ks.forEach(function (i) { if (s[i] > mx) mx = s[i]; });
+    var dt = 0.07, t0 = ctx.currentTime + 0.15;
+    ks.forEach(function (i, n) {
+      var f = Math.sqrt(Math.max(0, s[i]) / mx); if (!(f > 0.02)) return;
+      var o = ctx.createOscillator(), g = ctx.createGain(), at = t0 + n * dt;
+      o.type = "triangle"; o.frequency.value = 196 * Math.pow(2, 3 * f);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.04 + 0.22 * f, at + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dt * 0.95);
+      o.connect(g); g.connect(ctx.destination); o.start(at); o.stop(at + dt);
+    });
+    son = { ctx: ctx, timer: null, ultimo: null };
+    pon("btnSon", "■ Detener", "■ Stop");
+    son.timer = setInterval(function () {
+      var n = Math.floor((ctx.currentTime - t0) / dt);
+      if (n >= ks.length) { pararSon(); return; }
+      if (n < 0) return;
+      var td = document.querySelector('#cal td[data-k="' + ks[n] + '"]');
+      if (son.ultimo && son.ultimo !== td) son.ultimo.classList.remove("suena");
+      if (td) { td.classList.add("suena"); son.ultimo = td; }
+      $("sonTxt").textContent = mesAnio(MES[ks[n]], ANIO[ks[n]]) + ": " + fmt(s[ks[n]]);
+    }, 30);
+  });
+
+  // ---------------- Official burn calendar and type of fire (web/data/extra) ----------------
+  var EX = null;
+  window.EXTRA_LISTO = function (clave, datos) { EX = datos; dibujarOficial(); dibujarTipo(); };
+  function fechaCorta(mmdd) { var m = +mmdd.slice(0, 2), d = +mmdd.slice(3, 5); return EN ? NOML[m - 1] + " " + d : d + " de " + NOML[m - 1]; }
+  function dibujarOficial() {
+    var O = EX && EX.oficial; if (!O) return;
+    $("secOficial").style.display = "";
+    var permitido = O.tipo === "permitido", zona = EN ? O.zona_en : O.zona, P = O.por_anio;
+    var ys = Object.keys(P).map(Number).filter(function (a) { return a >= 2001; }).sort(function (a, b) { return a - b; });
+    // "No permitido" = fuera de la ventana permitida, o dentro de la ventana prohibida
+    function noPerm(a) { var v = P[a]; return permitido ? v.total - v.dentro : v.dentro; }
+    function pct(a0, a1) { var n = 0, d = 0; ys.forEach(function (a) { if (a >= a0 && a <= a1) { n += noPerm(a); d += P[a].total; } }); return d > 0 ? Math.round(n / d * 1000) / 10 : 0; }
+    var todo_ = pct(2001, 2025), antes = pct(2001, 2010), despues = pct(2016, 2025);
+    var ventana = fechaCorta(O.inicio) + t(" al ", " to ") + fechaCorta(O.fin);
+    $("oficialTxt").innerHTML = (permitido
+      ? t("El calendario oficial de quemas de <b>", "The official burn calendar of <b>") + zona + t("</b> permite las quemas agrícolas del ", "</b> allows agricultural burning from ") + ventana + ". "
+      : t("En <b>", "In <b>") + zona + t("</b> las quemas están prohibidas durante el período crítico, del ", "</b> burning is banned during the critical period, from ") + ventana + ". ") +
+      t("Comparamos esa regla con lo que vieron los satélites, en el registro armonizado de 25 años. Entre 2001 y 2025, el <b>", "We compared that rule with what the satellites saw, in the harmonized 25-year record. Between 2001 and 2025, <b>") + todo_ +
+      t("%</b> del fuego de la zona ocurrió cuando no se permite quemar", "%</b> of the zone's fire happened when burning is not allowed") +
+      (permitido ? t(" (fuera de la temporada de quemas)", " (outside the burning season)") : t(" (durante la prohibición)", " (during the ban)")) +
+      t(". Esa parte pasó de ", ". That share went from ") + antes + t("% en 2001-2010 a ", "% in 2001-2010 to ") + despues + t("% en 2016-2025.", "% in 2016-2025.") + (function () {
+        var ua = ys[ys.length - 1]; if (ua <= 2025) return "";
+        var v = noPerm(ua) / P[ua].total, lugar = 1; ys.forEach(function (a) { if (a !== ua && noPerm(a) / P[a].total > v) lugar++; });
+        return " <b>" + ua + t(" (datos hasta ", " (data through ") + Q.meses[T - 1] + "): " + Math.round(v * 1000) / 10 + "%" +
+          (lugar === 1 ? t(", la parte más alta de los ", ", the highest share in ") + ys.length + t(" años.", " years.") : t(", lugar ", ", rank ") + lugar + t(" de ", " of ") + ys.length + ".") + "</b>";
+      })();
+    // Weekly chart: average detections per week of the year, window shaded
+    var S = O.semanas, W = 640, H = 300, L = 54, B = 48, Tp = 44, mx = 1, e, k;
+    S.forEach(function (v) { if (v > mx) mx = v; });
+    function X(i) { return L + (W - L - 10) * i / 52; } function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+    var g = ['<text x="' + L + '" y="14" style="font-weight:600;fill:#1c2430">' + t("Fuego promedio por semana en la zona", "Average fire per week in the zone") + "</text>"];
+    g.push('<rect x="' + X(O.sem_ini) + '" y="' + Tp + '" width="' + (X(O.sem_fin + 1) - X(O.sem_ini)) + '" height="' + (H - B - Tp) + '" fill="' + (permitido ? "#e6f2ec" : "#f8e1d8") + '"/>');
+    g.push('<text x="' + ((X(O.sem_ini) + X(O.sem_fin + 1)) / 2) + '" y="' + (Tp - 6) + '" text-anchor="middle" style="fill:' + (permitido ? "#1f7a4d" : "#b3401a") + ';font-weight:600">' + (permitido ? t("Temporada de quemas", "Burning season") : t("Quemas prohibidas", "Burning banned")) + "</text>");
+    for (e = 0; e <= 4; e++) { var yy = Y(mx * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 10) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(mx * e / 4) + "</text>"); }
+    for (k = 0; k < 52; k++) {
+      var dentro = k >= O.sem_ini && k <= O.sem_fin, np = permitido ? !dentro : dentro;
+      g.push('<rect x="' + (X(k) + 1) + '" y="' + Y(S[k]) + '" width="' + Math.max(1, X(1) - X(0) - 2) + '" height="' + (H - B - Y(S[k])) + '" fill="' + (np ? "#b3401a" : "#31688e") + '"><title>' + t("Semana ", "Week ") + (k + 1) + ": " + fmt(S[k]) + "</title></rect>");
+    }
+    [0, 2, 4, 6, 8, 10].forEach(function (m) { var q = (Date.UTC(2001, m, 1) - Date.UTC(2001, 0, 1)) / 6048e5; g.push('<text x="' + X(q) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + NOM[m] + "</text>"); });
+    g.push('<g transform="translate(' + L + ',' + (H - 4) + ')"><rect x="0" y="-9" width="10" height="10" fill="#b3401a"/><text x="14" y="0">' + t("cuando no se permite quemar", "when burning is not allowed") + '</text><rect x="210" y="-9" width="10" height="10" fill="#31688e"/><text x="224" y="0">' + t("cuando sí se permite", "when it is allowed") + "</text></g>");
+    $("oficialSem").innerHTML = g.join("");
+    // Per-year share of fire when burning is not allowed
+    var g2 = ['<text x="' + L + '" y="14" style="font-weight:600;fill:#1c2430">' + t("Parte del fuego cuando no se permite quemar, por año", "Share of fire when burning is not allowed, by year") + "</text>"], mx2 = 0;
+    ys.forEach(function (a) { mx2 = Math.max(mx2, noPerm(a) / P[a].total); }); mx2 = Math.max(0.1, Math.ceil(mx2 * 10) / 10);
+    function X2(i) { return L + (W - L - 10) * i / ys.length; } function Y2(v) { return H - B - (H - B - Tp) * v / mx2; }
+    for (e = 0; e <= 4; e++) { var y2 = Y2(mx2 * e / 4); g2.push('<line x1="' + L + '" x2="' + (W - 10) + '" y1="' + y2 + '" y2="' + y2 + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (y2 + 4) + '" text-anchor="end">' + Math.round(mx2 * e / 4 * 100) + "%</text>"); }
+    ys.forEach(function (a, i) { var v = noPerm(a) / P[a].total;
+      g2.push('<rect x="' + (X2(i) + 2) + '" y="' + Y2(v) + '" width="' + (X2(1) - X2(0) - 4) + '" height="' + (H - B - Y2(v)) + '" fill="#b3401a"><title>' + a + ": " + Math.round(v * 1000) / 10 + "%</title></rect>");
+      if (a % 5 === 0) g2.push('<text x="' + (X2(i) + (X2(1) - X2(0)) / 2) + '" y="' + (H - 12) + '" text-anchor="middle">' + a + "</text>"); });
+    $("oficialAnios").innerHTML = g2.join("");
+    var tj = [];
+    if (O.cruce_clases) {
+      var cc = O.cruce_clases;
+      function p(c) { var v = cc[c], d = v.dentro + v.fuera; return d ? Math.round((permitido ? v.fuera : v.dentro) / d * 100) : 0; }
+      tj.push([t("Quemas pequeñas de un día", "Small one-day burns"), p("pequeno") + "%", t("de sus detecciones ocurrieron cuando no se permite quemar", "of their detections happened when burning is not allowed")]);
+      tj.push([t("Incendios grandes o largos", "Large or long fires"), p("grande") + "%", t("de sus detecciones ocurrieron cuando no se permite quemar", "of their detections happened when burning is not allowed")]);
+      tj.push([t("Cómo leerlo", "How to read it"), permitido ? t("Las quemas siguen el calendario", "Burns follow the calendar") : t("Los incendios ignoran la prohibición", "Wildfires ignore the ban"),
+        permitido ? t("La mayoría del fuego cae en la temporada permitida; lo que queda fuera es lo que hay que vigilar.", "Most fire falls in the allowed season; what falls outside it is what to watch.")
+          : t("Las quemas pequeñas se hacen sobre todo fuera del período crítico; los incendios grandes ocurren casi todos dentro.", "Small burns mostly happen outside the critical period; almost all large fires happen inside it.")]);
+    }
+    $("oficialTj").innerHTML = tj.map(function (q) { return '<div class="tarjeta"><div class="t">' + q[0] + '</div><div class="v">' + q[1] + '</div><div class="d">' + q[2] + "</div></div>"; }).join("");
+    $("oficialFuente").textContent = t("Fuente de la regla: ", "Rule source: ") + O.fuente + " " + (EN ? O.nota_en : O.nota) + t(" Las quemas pequeñas y los incendios grandes usan solo VIIRS (", " Small burns and large fires use VIIRS only (") + (EX.eventos ? EX.eventos.sensor.replace("viirs_", "").toUpperCase() : "") + ", 2018-2025)." +
+      t(" Contorno de la zona: ", " Zone outline: ") + "Natural Earth.";
+  }
+  var CLASES = [["#6ece58", t("Pequeña, un día (típico de quema agrícola o controlada)", "Small, one day (typical of agricultural or controlled burning)")],
+    ["#31688e", t("Intermedia", "Intermediate")], ["#440154", t("Grande o larga (típico de incendio forestal)", "Large or long (typical of wildfire)")]];
+  function dibujarTipo() {
+    var E = EX && EX.eventos; if (!E) return;
+    $("secTipo").style.display = "";
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    var porMes = [], tot = [0, 0, 0], anios_ = {}, i, m;
+    for (m = 0; m < 12; m++) porMes.push([0, 0, 0]);
+    var A = E.celda_mes;
+    for (i = 0; i < A.length; i += 5) { if (!en[A[i]]) continue; m = +A[i + 1].slice(5) - 1; anios_[A[i + 1].slice(0, 4)] = 1;
+      for (var c = 0; c < 3; c++) { porMes[m][c] += A[i + 2 + c]; tot[c] += A[i + 2 + c]; } }
+    var ny = Math.max(1, Object.keys(anios_).length), suma = tot[0] + tot[1] + tot[2];
+    var grandes = E.grandes.filter(function (e) { return en[e[5]]; });
+    var R = E.reglas;
+    $("tipoTxt").innerHTML = suma > 0 ? (estado.sel ? t("En la zona elegida", "In the selected area") : t("En toda la región", "Across the whole region")) +
+      t(", de las detecciones VIIRS de ", ", of the VIIRS detections from ") + Object.keys(anios_).sort()[0] + t(" a ", " to ") + Object.keys(anios_).sort().slice(-1)[0] + ": <b>" +
+      Math.round(tot[0] / suma * 100) + "%</b>" + t(" vinieron de quemas pequeñas de un día, ", " came from small one-day burns, ") + "<b>" + Math.round(tot[1] / suma * 100) + "%</b>" + t(" de eventos intermedios y ", " from intermediate events and ") +
+      "<b>" + Math.round(tot[2] / suma * 100) + "%</b>" + t(" de incendios grandes o largos (", " from large or long fires (") + grandes.length.toLocaleString(LOC) + t(" eventos).", " events).")
+      : t("Sin detecciones VIIRS en esta zona.", "No VIIRS detections in this area.");
+    var W = 640, H = 300, L = 54, B = 56, Tp = 26, mx = 1, e;
+    porMes.forEach(function (v) { mx = Math.max(mx, (v[0] + v[1] + v[2]) / ny); });
+    function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+    var bw = (W - L - 10) / 12, g = ['<text x="' + L + '" y="14" style="font-weight:600;fill:#1c2430">' + t("Detecciones promedio por mes, según el tipo de evento", "Average detections per month, by type of event") + "</text>"];
+    for (e = 0; e <= 4; e++) { var yy = Y(mx * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 10) + '" y1="' + yy + '" y2="' + yy + '" stroke="#e6e9ee"/><text x="' + (L - 6) + '" y="' + (yy + 4) + '" text-anchor="end">' + fmt(mx * e / 4) + "</text>"); }
+    porMes.forEach(function (v, k) { var base = 0;
+      for (var c = 0; c < 3; c++) { var h = v[c] / ny; if (h <= 0) continue;
+        g.push('<rect x="' + (L + k * bw + 5) + '" y="' + Y(base + h) + '" width="' + (bw - 10) + '" height="' + (Y(base) - Y(base + h)) + '" fill="' + CLASES[c][0] + '"><title>' + NOML[k] + ": " + fmt(h) + " · " + CLASES[c][1] + "</title></rect>"); base += h; }
+      g.push('<text x="' + (L + k * bw + bw / 2) + '" y="' + (H - B + 16) + '" text-anchor="middle">' + NOM[k] + "</text>"); });
+    CLASES.forEach(function (q, c) { var yl = H - 26 + (c > 1 ? 14 : 0), xl = L + (c === 1 ? 330 : 0);
+      g.push('<rect x="' + xl + '" y="' + (yl - 9) + '" width="10" height="10" fill="' + q[0] + '"/><text x="' + (xl + 14) + '" y="' + yl + '">' + q[1] + "</text>"); });
+    $("tipoMes").innerHTML = g.join("");
+    $("tipoListaT").textContent = t("Incendios grandes o largos en la zona (haz clic para verlo en el mapa)", "Large or long fires in the area (click to see it on the map)");
+    $("tipoLista").innerHTML = grandes.slice(0, 25).map(function (e) {
+      return '<div class="evento" data-c="' + e[5] + '"><b>' + e[0] + (e[1] !== e[0] ? " → " + e[1] : "") + "</b> · " + e[2].toLocaleString(LOC) + t(" detecciones", " detections") + " · " + e[3].toFixed(2) + ", " + e[4].toFixed(2) + "</div>";
+    }).join("") || '<div class="nota">' + t("Ninguno en esta zona.", "None in this area.") + "</div>";
+    $("tipoNota").textContent = t("Cómo se clasifica: las detecciones VIIRS a menos de ", "How it is classified: VIIRS detections less than ") + R.dist_km + t(" km y a no más de 1 día de distancia forman un evento. Pequeño: hasta ", " km and at most 1 day apart form one event. Small: up to ") +
+      R.peq_n + t(" detecciones en un solo día. Grande o largo: ", " detections in a single day. Large or long: ") + R.grande_n + t(" detecciones o más, o ", " detections or more, or ") + R.grande_dias +
+      t(" días o más. Es una estimación: un punto de calor no dice la causa del fuego. Prueba: en Portugal, donde quemar está prohibido en verano, casi todos los incendios grandes caen en ese período y la mayoría de las quemas pequeñas, fuera (sección 10).",
+        " days or more. It is an estimate: a hot spot does not tell what caused the fire. A check: in Portugal, where burning is banned in summer, almost all large fires fall in that period and most small burns fall outside it (section 10).");
+  }
+  $("tipoLista").addEventListener("click", function (ev) {
+    var d = ev.target.closest ? ev.target.closest(".evento") : null; if (!d) return;
+    estado.resaltar = +d.getAttribute("data-c"); dibujarMapa(); if (svg.scrollIntoView) svg.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  (function () { var sc = document.createElement("script"); sc.src = "data/extra/" + M.clave + ".js"; sc.onerror = function () {}; document.head.appendChild(sc); })();
+
+  // ---------------- Controls ----------------
+  function todo() {
+    var s = serieSel(), b = estado.sel ? cajaDe(estado.sel) : [LON0, LAT0, LON1, LAT1];
+    $("lo0").value = b[0]; $("la0").value = b[1]; $("lo1").value = b[2]; $("la1").value = b[3];
+    $("selTxt").textContent = estado.sel ? t("Zona: ", "Area: ") + estado.sel.length + t(" celdas, latitud ", " cells, latitude ") + b[1] + t(" a ", " to ") + b[3] + t(", longitud ", ", longitude ") + b[0] + t(" a ", " to ") + b[2] + "."
+      : t("Zona: toda la región.", "Area: whole region.");
+    pararSon(); dibujarBriefing(s); dibujarMapa(); dibujarCalendario(s); dibujarResumen(s); dibujarAnomalias(); if (EX) dibujarTipo();
+  }
+  ["a0", "a1"].forEach(function (id) {
+    $(id).innerHTML = anios.map(function (a) { return "<option>" + a + "</option>"; }).join("");
+    $(id).addEventListener("change", function () {
+      estado.a0 = +$("a0").value; estado.a1 = +$("a1").value;
+      if (estado.a0 > estado.a1) { var x = estado.a0; estado.a0 = estado.a1; estado.a1 = x; $("a0").value = estado.a0; $("a1").value = estado.a1; }
+      todo();
+    });
+  });
+  $("a0").value = estado.a0; $("a1").value = estado.a1;
+  $("btnTodo").addEventListener("click", function () { estado.sel = null; estado.poli = null; estado.resaltar = -1; modoPoli = false; vertices = []; $("btnPoliFin").style.display = "none"; pon("btnPoli", "Dibujar polígono", "Draw polygon"); todo(); });
+  $("btnPoli").addEventListener("click", function () {
+    if (modoPoli) { modoPoli = false; vertices = []; $("btnPoliFin").style.display = "none"; pon("btnPoli", "Dibujar polígono", "Draw polygon"); dibujarMapa(); return; }
+    modoPoli = true; vertices = []; $("btnPoliFin").style.display = ""; pon("btnPoli", "Cancelar", "Cancel");
+    pon("selTxt", "Haz clic en el mapa para marcar cada vértice y luego «Terminar polígono».", "Click on the map to place each vertex, then “Finish polygon”.");
+  });
+  $("btnPoliFin").addEventListener("click", terminarPoligono);
+  $("chkCrudo").addEventListener("change", function () {
+    estado.crudo = $("chkCrudo").checked;
+    $("crudoNota").style.display = estado.crudo ? "block" : "none";
+    todo();
+  });
+  pon("crudoNota", "Registro SIN armonizar. El aumento que se ve cuando empieza VIIRS no es más fuego: es otro sensor que detecta más puntos. Así se vería la historia si se juntaran los datos tal cual.",
+    "UNHARMONIZED record. The increase you see when VIIRS starts is not more fire: it is a different sensor that detects more hot spots. This is what history would look like if the data were simply put together.");
+  (function () {
+    var c = $("anioCmp"), porAnio = {}; for (var k = 0; k <= ultimo; k++) porAnio[ANIO[k]] = 1;
+    c.innerHTML = anios.slice().reverse().filter(function (a) { return porAnio[a]; }).map(function (a) { return "<option>" + a + "</option>"; }).join("");
+    c.addEventListener("change", function () { dibujarAcumulado(serieSel()); });
+  })();
+  $("btnCoord").addEventListener("click", function () { seleccionarCaja(+$("lo0").value, +$("la0").value, +$("lo1").value, +$("la1").value); });
+  $("rampa").style.background = "linear-gradient(90deg," + VIR.join(",") + ")";
+  dibujarValidacion(); dibujarClaves(); todo(); dibujarRiesgo(); dibujarAreas(); dibujarEvidencia();
+})();
+</script>
+</body>
+</html>

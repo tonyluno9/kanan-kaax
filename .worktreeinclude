@@ -1,0 +1,3 @@
+# Copies these gitignored files into every worktree Claude Code creates
+no_publicar/claude/CONTEXTO_COMPLETO.md
+no_publicar/claude/MEGA_PROMPT_REDISENO.md

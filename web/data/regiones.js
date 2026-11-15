@@ -1,0 +1,1 @@
+window.REGIONES=[{"clave": "yucatan", "nombre": "Península de Yucatán", "nombre_en": "Yucatán Peninsula"}, {"clave": "portugal", "nombre": "Portugal y oeste de España", "nombre_en": "Portugal and western Spain"}];
