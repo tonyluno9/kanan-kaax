@@ -1,0 +1,130 @@
+/*
+  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Challenge: Harmonization of MODIS and VIIRS Hot Spots.
+  AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
+  and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
+
+  Design tokens (primitive -> semantic -> component) and base styles.
+  Direction: "an Earth-observation instrument". Night-blue canvas, fire is the only warm colour,
+  viridis is reserved for data.
+*/
+
+:root {
+  /* ---------- primitives ---------- */
+  --night-0: #05070D;
+  --night-1: #0A0F1C;
+  --night-2: #111829;
+  --night-3: #18213A;
+  --night-4: #222D4A;
+  --paper-0: #F4F1EA;
+  --paper-1: #B4BCCB;
+  --paper-2: #8A94AA;           /* 5.9:1 on --night-1 (AA for small text) */
+  --ember-0: #FFB347;
+  --ember-1: #FF8A3D;
+  --ember-2: #FF6B2C;
+  --ember-3: #C2361B;
+  --green: #3DDC97;
+  --amber: #F5B841;
+  --red: #FF5A5F;
+  --blue: #5AA9FF;
+  /* viridis (data only, never decoration) */
+  --v0: #440154; --v1: #482878; --v2: #3e4989; --v3: #31688e; --v4: #26828e;
+  --v5: #1f9e89; --v6: #35b779; --v7: #6ece58; --v8: #b5de2b; --v9: #fde725;
+
+  /* ---------- semantic ---------- */
+  --bg: var(--night-0);
+  --surface-1: var(--night-1);
+  --surface-2: var(--night-2);
+  --surface-3: var(--night-3);
+  --surface-4: var(--night-4);
+  --glass: rgba(10, 15, 28, .74);
+  --glass-strong: rgba(10, 15, 28, .86);
+  --line: rgba(255, 255, 255, .08);
+  --line-2: rgba(255, 255, 255, .14);
+  --line-3: rgba(255, 255, 255, .24);
+  --text: var(--paper-0);
+  --text-2: var(--paper-1);
+  --text-3: var(--paper-2);
+  --accent: var(--ember-2);
+  --accent-hi: var(--ember-0);
+  --accent-ink: #1A0A03;        /* text on ember */
+  --accent-grad: linear-gradient(135deg, var(--ember-0) 0%, var(--ember-2) 55%, var(--ember-3) 100%);
+  --accent-glow: rgba(255, 107, 44, .35);
+  --accent-soft: rgba(255, 107, 44, .12);
+  --ok: var(--green);
+  --warn: var(--amber);
+  --bad: var(--red);
+  --info: var(--blue);
+  --ramp: linear-gradient(90deg, var(--v0), var(--v1), var(--v2), var(--v3), var(--v4), var(--v5), var(--v6), var(--v7), var(--v8), var(--v9));
+
+  /* ---------- type ---------- */
+  --font-ui: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --fs-11: 11px; --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-15: 15px; --fs-16: 16px;
+  --fs-20: 20px; --fs-24: 24px; --fs-32: 32px; --fs-40: 40px; --fs-56: 56px;
+  --tracking-kicker: .14em;
+
+  /* ---------- space, radius, elevation ---------- */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px;
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 18px; --r-xl: 22px; --r-pill: 999px;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 24px rgba(0, 0, 0, .28);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 24px 60px rgba(0, 0, 0, .45);
+  --blur: blur(16px) saturate(140%);
+
+  /* ---------- motion ---------- */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --t-fast: 150ms;
+  --t-med: 220ms;
+  --t-slow: 280ms;
+
+  /* ---------- layout ---------- */
+  --gap: 12px;
+  --bar-h: 56px;
+  --sheet-w: 420px;
+  --z-map-ui: 500;
+  --z-sheet: 1500;
+  --z-bar: 2000;
+  --z-tip: 3000;
+}
+@media (max-width: 1099px) { :root { --sheet-w: 360px; } }
+@media (min-width: 1800px) { :root { --sheet-w: 480px; --bar-h: 64px; } }
+
+/* ---------- base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font: 400 var(--fs-15)/1.5 var(--font-ui);
+  color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+@media (min-width: 1800px) { body { font-size: var(--fs-16); } }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.01em; }
+a { color: var(--accent-hi); text-underline-offset: 3px; }
+b, strong { font-weight: 600; color: var(--text); }
+.mono, .num { font-family: var(--font-mono); font-feature-settings: "tnum" 1, "zero" 0; letter-spacing: -.01em; }
+.serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -.005em; }
+.kicker {
+  font: 500 var(--fs-11)/1 var(--font-mono); letter-spacing: var(--tracking-kicker);
+  text-transform: uppercase; color: var(--text-3);
+}
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* visible focus everywhere (keyboard only) */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; border-radius: var(--r-xs); }
+
+/* thin, quiet scrollbars */
+* { scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}

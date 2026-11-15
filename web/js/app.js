@@ -1,0 +1,847 @@
+/*
+  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Challenge: Harmonization of MODIS and VIIRS Hot Spots.
+  AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
+  and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
+*/
+(function () {
+  "use strict";
+  // =====================================================================
+  //  Basics
+  // =====================================================================
+  var EN = window.IDIOMA !== "es";
+  function t(es, en) { return EN ? en : es; }
+  function $(id) { return document.getElementById(id); }
+  var Q = window.QUEMAS;
+  if (!Q) { document.body.innerHTML = "<p style='padding:24px'>" + t("Faltan los datos en web/data/. Corran python ejecutar.py.", "Data files are missing in web/data/. Run python ejecutar.py.") + "</p>"; return; }
+  var M = Q.meta, NX = M.nx, NY = M.ny, G = M.malla, NC = NX * NY, T = Q.meses.length;
+  var LON0 = M.bbox[0], LAT0 = M.bbox[1], LON1 = M.bbox[2], LAT1 = M.bbox[3];
+  var ANIO = Q.meses.map(function (s) { return +s.slice(0, 4); });
+  var MES = Q.meses.map(function (s) { return +s.slice(5, 7); });
+  var NOM = EN ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] : ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var NOML = EN ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    : ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var LOC = EN ? "en-US" : "es-MX";
+  var VIR = ["#440154", "#482878", "#3e4989", "#31688e", "#26828e", "#1f9e89", "#35b779", "#6ece58", "#b5de2b", "#fde725"];
+  var NOMBRE_REGION = EN ? (M.region_en || M.region) : M.region;
+  var anios = []; ANIO.forEach(function (a) { if (anios.indexOf(a) < 0) anios.push(a); });
+  var ultimo = T - 1; while (ultimo > 0 && Q.parcial[ultimo]) ultimo--;
+  var completo = {};
+  (function () { var c = {}; for (var k = 0; k < T; k++) if (!Q.parcial[k]) c[ANIO[k]] = (c[ANIO[k]] || 0) + 1; anios.forEach(function (a) { completo[a] = c[a] === 12; }); })();
+  var aniosComp = anios.filter(function (a) { return completo[a]; });
+  function fmt(v) { return v >= 100 ? Math.round(v).toLocaleString(LOC) : (Math.round(v * 10) / 10).toLocaleString(LOC); }
+  function mesAnio(m, a) { return EN ? NOML[m - 1] + " " + a : NOML[m - 1] + " de " + a; }
+  function esc(x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function mediana(v) { if (!v.length) return 0; var s = v.slice().sort(function (a, b) { return a - b; }), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
+  function color(f) {
+    if (!(f > 0)) return "#eceff3";
+    var x = Math.min(1, Math.max(0, f)) * (VIR.length - 1), i = Math.floor(x), k = x - i;
+    if (i >= VIR.length - 1) return VIR[VIR.length - 1];
+    var a = VIR[i], b = VIR[i + 1], r = [1, 3, 5].map(function (p) {
+      var u = parseInt(a.substr(p, 2), 16), v = parseInt(b.substr(p, 2), 16);
+      return Math.round(u + (v - u) * k).toString(16).padStart(2, "0");
+    });
+    return "#" + r.join("");
+  }
+  function textoSobre(f) { return f > 0.55 ? "#14213D" : "#ffffff"; }
+  function centro(c) { var j = Math.floor(c / NX), i = c % NX; return [LON0 + (i + 0.5) * G, LAT0 + (j + 0.5) * G]; }
+  function celdaEn(lat, lon) {
+    if (lon < LON0 || lon >= LON1 || lat < LAT0 || lat >= LAT1) return -1;
+    return Math.floor((lat - LAT0) / G) * NX + Math.floor((lon - LON0) / G);
+  }
+  var TOTAL = []; (function () { for (var c = 0; c < NC; c++) { var s = 0, v = Q.serie[c]; for (var k = 0; k < T; k++) s += v[k]; TOTAL.push(s); } })();
+  function conDatos(c) { return Q.tierra[c] || TOTAL[c] > 0; }
+  // Tooltip that follows the pointer (charts)
+  var TIP = $("tip");
+  function tip(ev, html) { if (!html) { TIP.style.display = "none"; return; } TIP.innerHTML = html; TIP.style.display = "block";
+    var x = ev.clientX + 14, y = ev.clientY + 14; if (x + 250 > innerWidth) x = ev.clientX - 250; if (y + 80 > innerHeight) y = ev.clientY - 70; TIP.style.left = x + "px"; TIP.style.top = y + "px"; }
+  function conTip(el) {
+    el.addEventListener("mousemove", function (ev) { var d = ev.target.closest ? ev.target.closest("[data-tip]") : null; tip(ev, d ? d.getAttribute("data-tip") : null); });
+    el.addEventListener("mouseleave", function () { tip(null, null); });
+  }
+
+  // =====================================================================
+  //  State
+  // =====================================================================
+  var estado = {
+    sel: { tipo: "region", celdas: null, area: null, nombre: NOMBRE_REGION, lat: null, lon: null, c: -1 },
+    escala: 1,           // 0 = one cell, 1 = surroundings (5x5 cells), 2 = whole region
+    crudo: false,
+    mapa: { tipo: "promedio" }, // promedio | mes | semana | riesgo
+    tab: "cal"
+  };
+  function celdasSel() {
+    if (estado.sel.tipo === "region") { var a = []; for (var c = 0; c < NC; c++) a.push(c); return a; }
+    return estado.sel.celdas;
+  }
+  function serieSel() {
+    if (estado.sel.tipo === "area" && !estado.crudo) return estado.sel.area.serie.slice();
+    var F = estado.crudo && Q.crudo ? Q.crudo : Q.serie, s = new Array(T).fill(0);
+    celdasSel().forEach(function (c) { var v = F[c]; for (var k = 0; k < T; k++) s[k] += v[k]; });
+    return s;
+  }
+  function alrededor(c, r) {
+    var j0 = Math.floor(c / NX), i0 = c % NX, out = [];
+    for (var j = j0 - r; j <= j0 + r; j++) for (var i = i0 - r; i <= i0 + r; i++) {
+      if (i < 0 || j < 0 || i >= NX || j >= NY) continue; var cc = j * NX + i; if (conDatos(cc)) out.push(cc);
+    }
+    return out.length ? out : [c];
+  }
+
+  // =====================================================================
+  //  Static texts
+  // =====================================================================
+  document.documentElement.lang = EN ? "en" : "es";
+  document.title = t("Calendario de quemas", "Burn Calendar") + " · " + NOMBRE_REGION;
+  $("titulo").textContent = t("Calendario de quemas", "Burn Calendar");
+  $("subtitulo").textContent = t("25 años de fuego visto desde el espacio · NASA", "25 years of fire seen from space · NASA data");
+  $("q").placeholder = t("Busca un lugar o dirección (ej. Tizimín, Yucatán)", "Search a place or address (e.g. Tizimín, Yucatán)");
+  $("btnIdioma").textContent = EN ? "Español" : "English";
+  $("lnkTec").textContent = t("Vista técnica", "Technical view");
+  $("lnkTec").href = "tecnico.html?region=" + M.clave + "&lang=" + (EN ? "en" : "es");
+  $("kResp").textContent = t("En 10 segundos", "In 10 seconds");
+  $("lFecha").textContent = t("Imagen del día", "Image date");
+  $("pie").innerHTML = t("Datos: NASA FIRMS (MODIS y VIIRS NOAA-20), NASA POWER y NASA GIBS. Mapas: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, etiquetas © Esri. Búsqueda: OpenStreetMap Nominatim. ",
+    "Data: NASA FIRMS (MODIS and VIIRS NOAA-20), NASA POWER and NASA GIBS. Maps: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, labels © Esri. Search: OpenStreetMap Nominatim. ") +
+    t("Declaración de IA: el código se generó con ayuda de una herramienta de IA (Claude) y fue revisado por el equipo La Com. ", "AI disclosure: the code was generated with the assistance of an AI tool (Claude) and reviewed by team La Com. ") +
+    '<a href="' + $("lnkTec").href + '">' + t("Vista técnica completa", "Full technical view") + "</a>.";
+  if (M.sintetico) $("avisoSint").innerHTML = '<div class="aviso">' + t("DATOS SINTÉTICOS DE PRUEBA: no son observaciones reales.", "SYNTHETIC TEST DATA: not real observations.") + "</div>";
+  $("btnIdioma").addEventListener("click", function () { location.search = "?region=" + M.clave + "&lang=" + (EN ? "es" : "en"); });
+  (function () {
+    var R = window.REGIONES || [{ clave: M.clave, nombre: M.region, nombre_en: M.region_en }], s = $("selRegion");
+    s.innerHTML = R.map(function (r) { return '<option value="' + r.clave + '"' + (r.clave === M.clave ? " selected" : "") + ">" + esc(EN ? (r.nombre_en || r.nombre) : r.nombre) + "</option>"; }).join("");
+    s.addEventListener("change", function () { location.search = "?region=" + s.value + "&lang=" + (EN ? "en" : "es"); });
+  })();
+
+  // =====================================================================
+  //  Map: Leaflet with NASA GIBS / CARTO tiles, or a simple SVG map if Leaflet could not load
+  // =====================================================================
+  var MAPA = null;
+  var BASES = {
+    sat: { nombre: t("Satélite NASA", "NASA satellite") },
+    dia: { nombre: t("Imagen del día", "Daily image") },
+    calles: { nombre: t("Calles", "Streets") }
+  };
+  function crearLeaflet() {
+    var L = window.L;
+    var map = L.map("mapa", { zoomControl: true, preferCanvas: true, minZoom: 4, maxZoom: 13, worldCopyJump: false, attributionControl: true });
+    map.zoomControl.setPosition("topleft");
+    var gibs = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/";
+    var capas = {
+      sat: L.tileLayer(gibs + "BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg", { maxNativeZoom: 8, maxZoom: 13, attribution: "NASA GIBS · Blue Marble" }),
+      dia: L.tileLayer(gibs + "VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg", { maxNativeZoom: 9, maxZoom: 13, time: "2024-05-25", attribution: "NASA GIBS · VIIRS NOAA-20" }),
+      calles: L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap contributors" })
+    };
+    var etiquetas = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 13, pane: "overlayPane", attribution: "Labels © Esri" });
+    var base = null;
+    function ponerBase(k) {
+      if (base) map.removeLayer(base); base = capas[k]; base.addTo(map); base.bringToBack();
+      if (k === "calles") map.removeLayer(etiquetas); else if (!map.hasLayer(etiquetas)) etiquetas.addTo(map);
+      $("fechaBox").style.display = k === "dia" ? "block" : "none";
+      [].forEach.call(document.querySelectorAll("#capas button"), function (b) { b.classList.toggle("on", b.getAttribute("data-k") === k); });
+    }
+    map.createPane("celdas"); map.getPane("celdas").style.zIndex = 420;
+    map.createPane("contornos"); map.getPane("contornos").style.zIndex = 430; map.getPane("contornos").style.pointerEvents = "none";
+    map.createPane("etiq"); map.getPane("etiq").style.zIndex = 440; map.getPane("etiq").style.pointerEvents = "none";
+    etiquetas.options.pane = "etiq";
+    var rects = {}, ren = L.canvas({ padding: 0.3 });
+    for (var c = 0; c < NC; c++) {
+      if (!conDatos(c)) continue;
+      var j = Math.floor(c / NX), i = c % NX;
+      rects[c] = L.rectangle([[LAT0 + j * G, LON0 + i * G], [LAT0 + (j + 1) * G, LON0 + (i + 1) * G]],
+        { pane: "celdas", renderer: ren, weight: 0.4, color: "#ffffff", opacity: 0.35, fillOpacity: 0, interactive: true });
+      (function (cc) { rects[cc].bindTooltip(function () { return textoCelda(cc); }, { sticky: true, className: "celda", direction: "top", opacity: 0.95 }); })(c);
+      rects[c].addTo(map);
+    }
+    var selCapa = null, zonaCapa = null, areasCapa = null, imgCapa = null, ptsCapa = null, marca = null;
+    var api = {
+      tipo: "leaflet",
+      pintar: function (valores, colorDe, opac) {
+        for (var cc in rects) { var v = valores[cc]; var f = colorDe(v); rects[cc].setStyle({ fillColor: f || "#000", fillOpacity: f ? (opac || 0.62) : 0 }); }
+      },
+      seleccion: function (cs, anillos) {
+        if (selCapa) map.removeLayer(selCapa); selCapa = null;
+        if (anillos) selCapa = L.polygon(anillos.map(function (r) { return r.map(function (q) { return [q[1], q[0]]; }); }), { pane: "contornos", color: "#ffb347", weight: 3, fill: false });
+        else if (cs && cs.length) {
+          var b = cajaDe(cs); selCapa = L.rectangle([[b[1], b[0]], [b[3], b[2]]], { pane: "contornos", color: "#ffb347", weight: 3, fill: false, dashArray: "6 4" });
+        }
+        if (selCapa) selCapa.addTo(map);
+      },
+      marcar: function (lat, lon) { if (marca) map.removeLayer(marca); marca = null; if (lat === null) return;
+        marca = L.circleMarker([lat, lon], { pane: "contornos", radius: 7, color: "#fff", weight: 3, fillColor: "#e8692e", fillOpacity: 1 }).addTo(map); },
+      irA: function (lat, lon, z) { map.flyTo([lat, lon], z || Math.max(map.getZoom(), 8), { duration: 0.8 }); },
+      encuadrar: function (b) { map.flyToBounds([[b[1], b[0]], [b[3], b[2]]], { padding: [30, 30], duration: 0.8 }); },
+      zona: function (anillos) { if (zonaCapa) map.removeLayer(zonaCapa); zonaCapa = null;
+        if (anillos) zonaCapa = L.polygon(anillos.map(function (r) { return r.map(function (q) { return [q[1], q[0]]; }); }), { pane: "contornos", color: "#7fdcff", weight: 2.5, fill: false, dashArray: "8 6" }).addTo(map); },
+      areas: function (lista, marcada) { if (areasCapa) map.removeLayer(areasCapa); areasCapa = null; if (!lista) return;
+        areasCapa = L.layerGroup(lista.map(function (a) { return L.polygon(a.anillos.map(function (r) { return r.map(function (q) { return [q[1], q[0]]; }); }),
+          { pane: "contornos", color: a.id === marcada ? "#ffb347" : "#ffffff", weight: a.id === marcada ? 3 : 1.5, dashArray: a.id === marcada ? "" : "4 3", fill: false }); })).addTo(map); },
+      imagen: function (src, b, puntos) { if (imgCapa) map.removeLayer(imgCapa); if (ptsCapa) map.removeLayer(ptsCapa); imgCapa = ptsCapa = null; if (!src) return;
+        imgCapa = L.imageOverlay(src, [[b[1], b[0]], [b[3], b[2]]], { pane: "contornos", opacity: 1 }).addTo(map);
+        if (puntos) ptsCapa = L.layerGroup(puntos.map(function (q) { return L.circleMarker([q[1], q[0]], { pane: "contornos", renderer: ren, radius: 3, color: "#fff", weight: 0.8, fillColor: "#ff5a1f", fillOpacity: 1 }); })).addTo(map); },
+      puntos: function (lista) { if (ptsCapa) map.removeLayer(ptsCapa); ptsCapa = null; if (!lista) return;
+        ptsCapa = L.layerGroup(lista.map(function (q) { return L.circleMarker([q[0], q[1]], { pane: "contornos", renderer: ren, radius: 2.4, color: "#ffd9a0", weight: 0.5, fillColor: "#ff5a1f", fillOpacity: 0.9 }); })).addTo(map); },
+      alClic: function (fn) { map.on("click", function (e) { fn(e.latlng.lat, e.latlng.lng); }); },
+      base: ponerBase,
+      fecha: function (d) { capas.dia.options.time = d; capas.dia.redraw(); }
+    };
+    map.fitBounds([[LAT0, LON0], [LAT1, LON1]], { padding: [10, 10] });
+    ponerBase("sat");
+    [].forEach.call(document.querySelectorAll("#mapa .flot"), function (el) { L.DomEvent.disableClickPropagation(el); L.DomEvent.disableScrollPropagation(el); });
+    // The map container can change size after fonts and layout settle (or on rotation): keep Leaflet in sync.
+    var primera = true;
+    function ajustar() { map.invalidateSize(false); if (primera) { primera = false; map.fitBounds([[LAT0, LON0], [LAT1, LON1]], { padding: [10, 10] }); } }
+    if (window.ResizeObserver) new ResizeObserver(function () { ajustar(); }).observe($("mapa"));
+    window.addEventListener("load", function () { setTimeout(ajustar, 50); });
+    return api;
+  }
+  // Fallback when Leaflet (or the internet) is not available: a plain SVG map of the grid and coastline.
+  function crearSvg() {
+    var cont = $("mapa"), PAD = 0.4, KX = Math.cos((LAT0 + LAT1) / 2 * Math.PI / 180), S = 100;
+    var VW = (LON1 - LON0 + 2 * PAD) * KX * S, VH = (LAT1 - LAT0 + 2 * PAD) * S;
+    function px(lon) { return (lon - LON0 + PAD) * KX * S; } function py(lat) { return (LAT1 + PAD - lat) * S; }
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.id = "svgmapa"; svg.setAttribute("viewBox", "0 0 " + VW + " " + VH); svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    cont.insertBefore(svg, cont.firstChild); cont.style.background = "#dfe9f2";
+    var costa = (Q.costa || []).map(function (p) { return p.anillos.map(function (r) { return '<path d="M' + r.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + 'Z" fill="#f4f1ea" stroke="#9aa4b1" stroke-width="1.2"/>'; }).join(""); }).join("");
+    var capas = { celdas: "", sel: "", zona: "", areas: "", marca: "", img: "" };
+    function dibujar() { svg.innerHTML = costa + capas.celdas + capas.img + capas.zona + capas.areas + capas.sel + capas.marca; }
+    function anillo(r) { return "M" + r.map(function (q) { return px(q[0]).toFixed(1) + " " + py(q[1]).toFixed(1); }).join("L") + "Z"; }
+    var api = {
+      tipo: "svg",
+      pintar: function (valores, colorDe) {
+        var h = [];
+        for (var c = 0; c < NC; c++) { if (!conDatos(c)) continue; var f = colorDe(valores[c]); var j = Math.floor(c / NX), i = c % NX;
+          h.push('<rect data-c="' + c + '" x="' + px(LON0 + i * G).toFixed(1) + '" y="' + py(LAT0 + (j + 1) * G).toFixed(1) + '" width="' + (G * KX * S).toFixed(1) + '" height="' + (G * S).toFixed(1) + '" fill="' + (f || "transparent") + '" stroke="#fff" stroke-width="0.4"/>'); }
+        capas.celdas = h.join(""); dibujar();
+      },
+      seleccion: function (cs, anillos) { capas.sel = "";
+        if (anillos) capas.sel = anillos.map(function (r) { return '<path d="' + anillo(r) + '" fill="none" stroke="#e8692e" stroke-width="3"/>'; }).join("");
+        else if (cs && cs.length) { var b = cajaDe(cs); capas.sel = '<rect x="' + px(b[0]) + '" y="' + py(b[3]) + '" width="' + (px(b[2]) - px(b[0])) + '" height="' + (py(b[1]) - py(b[3])) + '" fill="none" stroke="#e8692e" stroke-width="3" stroke-dasharray="6 4"/>'; }
+        dibujar(); },
+      marcar: function (lat, lon) { capas.marca = lat === null ? "" : '<circle cx="' + px(lon) + '" cy="' + py(lat) + '" r="7" fill="#e8692e" stroke="#fff" stroke-width="3"/>'; dibujar(); },
+      irA: function () {}, encuadrar: function () {},
+      zona: function (an) { capas.zona = an ? an.map(function (r) { return '<path d="' + anillo(r) + '" fill="none" stroke="#1f9ed1" stroke-width="2.5" stroke-dasharray="8 6"/>'; }).join("") : ""; dibujar(); },
+      areas: function (lista, marcada) { capas.areas = lista ? lista.map(function (a) { return a.anillos.map(function (r) { return '<path d="' + anillo(r) + '" fill="none" stroke="' + (a.id === marcada ? "#e8692e" : "#555") + '" stroke-width="' + (a.id === marcada ? 3 : 1.2) + '" stroke-dasharray="' + (a.id === marcada ? "" : "4 3") + '"/>'; }).join(""); }).join("") : ""; dibujar(); },
+      imagen: function (src, b) { capas.img = src ? '<image href="' + src + '" x="' + px(b[0]) + '" y="' + py(b[3]) + '" width="' + (px(b[2]) - px(b[0])) + '" height="' + (py(b[1]) - py(b[3])) + '" preserveAspectRatio="none"/>' : ""; dibujar(); },
+      puntos: function () {},
+      alClic: function (fn) { svg.addEventListener("click", function (ev) { var r = svg.getBoundingClientRect(), sc = Math.min(r.width / VW, r.height / VH), ox = (r.width - VW * sc) / 2, oy = (r.height - VH * sc) / 2;
+        var x = (ev.clientX - r.left - ox) / sc, y = (ev.clientY - r.top - oy) / sc; fn(LAT1 + PAD - y / S, x / (KX * S) + LON0 - PAD); }); },
+      base: function () {}, fecha: function () {}
+    };
+    svg.addEventListener("mousemove", function (ev) { var d = ev.target.getAttribute && ev.target.getAttribute("data-c"); tip(ev, d ? textoCelda(+d) : null); });
+    svg.addEventListener("mouseleave", function () { tip(null, null); });
+    $("capas").style.display = "none";
+    return api;
+  }
+  function cajaDe(cs) {
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    cs.forEach(function (c) { var j = Math.floor(c / NX), i = c % NX; x0 = Math.min(x0, i); x1 = Math.max(x1, i); y0 = Math.min(y0, j); y1 = Math.max(y1, j); });
+    return [LON0 + x0 * G, LAT0 + y0 * G, LON0 + (x1 + 1) * G, LAT0 + (y1 + 1) * G];
+  }
+
+  // Values painted on the map for the current map mode
+  var VALORES = new Array(NC).fill(0), MAXV = 1;
+  function textoCelda(c) {
+    var q = centro(c), m = estado.mapa, v = VALORES[c] || 0, txt;
+    if (m.tipo === "riesgo") txt = t("Riesgo estimado: ", "Estimated risk: ") + Math.round(v) + "%";
+    else if (m.tipo === "mes") txt = fmt(v) + t(" detecciones en ", " detections in ") + mesAnio(MES[m.k], ANIO[m.k]);
+    else if (m.tipo === "semana") txt = fmt(v) + t(" detecciones esa semana", " detections that week");
+    else txt = fmt(v) + t(" detecciones por año (promedio)", " detections per year (average)");
+    return "<b>" + q[1].toFixed(2) + ", " + q[0].toFixed(2) + "</b><br>" + txt;
+  }
+  function pintarMapa() {
+    if (!MAPA) return;
+    var m = estado.mapa, F = estado.crudo && Q.crudo ? Q.crudo : Q.serie, c, k;
+    VALORES = new Array(NC).fill(0);
+    if (m.tipo === "mes") { for (c = 0; c < NC; c++) VALORES[c] = F[c][m.k]; }
+    else if (m.tipo === "semana") { VALORES = m.valores; }
+    else if (m.tipo === "riesgo") { VALORES = m.valores; }
+    else { var n = Math.max(1, aniosComp.length); for (c = 0; c < NC; c++) { var s = 0; for (k = 0; k < T; k++) if (completo[ANIO[k]]) s += F[c][k]; VALORES[c] = s / n; } }
+    MAXV = 1; for (c = 0; c < NC; c++) if (VALORES[c] > MAXV) MAXV = VALORES[c];
+    if (m.tipo === "riesgo") MAPA.pintar(VALORES, function (v) { return v > 0 ? color(Math.max(0.03, v / 100)) : null; }, 0.7);
+    else MAPA.pintar(VALORES, function (v) { return v > 0 ? color(0.08 + 0.92 * Math.sqrt(v / MAXV)) : null; });
+    leyenda();
+    var mt = $("modo");
+    if (m.tipo === "promedio") mt.style.display = "none";
+    else { mt.style.display = "block"; $("modoTxt").textContent = m.tipo === "mes" ? t("Mapa: ", "Map: ") + mesAnio(MES[m.k], ANIO[m.k]) : m.tipo === "riesgo" ? t("Mapa: riesgo de la semana", "Map: risk for the week") : t("Mapa: una semana", "Map: one week"); }
+  }
+  function leyenda() {
+    var m = estado.mapa, tit = m.tipo === "riesgo" ? t("Riesgo estimado de fuego", "Estimated fire risk") : m.tipo === "mes" ? t("Detecciones en el mes", "Detections in the month")
+      : m.tipo === "semana" ? t("Detecciones en la semana", "Detections in the week") : t("Fuego promedio por año (" + aniosComp[0] + "–" + aniosComp[aniosComp.length - 1] + ")", "Average fire per year (" + aniosComp[0] + "–" + aniosComp[aniosComp.length - 1] + ")");
+    var max = m.tipo === "riesgo" ? "100%" : fmt(MAXV);
+    $("leyenda").innerHTML = "<b>" + tit + "</b>" + (estado.crudo ? ' <span class="semaforo" style="background:#b7791f">' + t("sin armonizar", "unharmonized") + "</span>" : "") +
+      '<div class="rampa" style="background:linear-gradient(90deg,' + VIR.join(",") + ')"></div><div class="ext"><span>' + t("poco", "low") + "</span><span>" + max + "</span></div>" +
+      '<div style="color:#6b7486;margin-top:4px">' + t("Cada cuadro mide 0.25° (unos 27 km). Haz clic para explorar.", "Each square is 0.25° (about 27 km). Click to explore.") + "</div>";
+  }
+  $("modoX").addEventListener("click", function () { pararReplay(); estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
+
+  // =====================================================================
+  //  Selection
+  // =====================================================================
+  var ESCALAS = [[0, t("Este cuadro (27 km)", "This square (27 km)")], [2, t("Alrededores (~125 km)", "Surroundings (~125 km)")], [9, t("Toda la región", "Whole region")]];
+  function seleccionarPunto(lat, lon, nombre, sinGeo) {
+    var c = celdaEn(lat, lon);
+    if (c < 0) { avisoFuera(lat, lon); return; }
+    if (estado.escala === 2) estado.escala = 1;
+    estado.sel = { tipo: "punto", celdas: null, area: null, nombre: nombre || null, lat: lat, lon: lon, c: c };
+    aplicarEscala();
+    if (MAPA) { MAPA.marcar(lat, lon); }
+    if (!nombre && !sinGeo) geoInverso(lat, lon);
+  }
+  function aplicarEscala() {
+    var s = estado.sel;
+    if (s.tipo === "punto" || (s.tipo === "region" && s.c >= 0)) {
+      if (estado.escala === 2) { s.tipo = "region"; s.celdas = null; }
+      else { s.tipo = "punto"; s.celdas = alrededor(s.c, estado.escala === 0 ? 0 : 2); }
+    }
+    if (MAPA) MAPA.seleccion(s.tipo === "region" ? null : s.celdas, s.tipo === "area" ? s.area.anillos : null);
+    actualizar();
+  }
+  function seleccionarArea(a) {
+    var cs = []; for (var c = 0; c < NC; c++) { var q = centro(c); if (dentroAnillos(q[0], q[1], a.anillos)) cs.push(c); }
+    if (!cs.length) { var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; a.anillos.forEach(function (r) { r.forEach(function (q) { x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }); }); var cc = celdaEn((y0 + y1) / 2, (x0 + x1) / 2); if (cc >= 0) cs = [cc]; }
+    estado.sel = { tipo: "area", celdas: cs, area: a, nombre: nombreA(a), lat: null, lon: null, c: cs[0] };
+    if (MAPA) { MAPA.marcar(null); MAPA.seleccion(null, a.anillos); MAPA.areas(Q.areas ? Q.areas.areas : null, a.id); MAPA.encuadrar(cajaAnillos(a.anillos)); }
+    actualizar();
+  }
+  function cajaAnillos(an) { var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; an.forEach(function (r) { r.forEach(function (q) { x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }); }); return [x0, y0, x1, y1]; }
+  function dentroAnillos(x, y, an) { var dentro = false; an.forEach(function (P) { for (var i = 0, j = P.length - 1; i < P.length; j = i++) { if (((P[i][1] > y) !== (P[j][1] > y)) && (x < (P[j][0] - P[i][0]) * (y - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0])) dentro = !dentro; } }); return dentro; }
+  function seleccionarRegion() {
+    estado.sel = { tipo: "region", celdas: null, area: null, nombre: NOMBRE_REGION, lat: null, lon: null, c: -1 }; estado.escala = 1;
+    if (MAPA) { MAPA.marcar(null); MAPA.seleccion(null); MAPA.encuadrar(M.bbox); }
+    actualizar();
+  }
+  function nombreA(a) { return EN ? (a.nombre_en || a.nombre) : a.nombre; }
+  function dibujarEscala() {
+    var s = estado.sel, h = "";
+    if (s.tipo === "punto" || (s.tipo === "region" && s.c >= 0)) {
+      h = ESCALAS.map(function (e, i) { return '<button data-e="' + i + '" class="' + (estado.escala === i ? "on" : "") + '">' + e[1] + "</button>"; }).join("");
+    } else if (s.tipo === "area") h = '<button class="on">' + t("Área protegida", "Protected area") + '</button><button data-reg="1">' + t("Ver toda la región", "Whole region") + "</button>";
+    else h = '<span class="sub" style="font-size:13px;color:#6b7486">' + t("Busca un lugar o haz clic en el mapa para ver un sitio en particular.", "Search a place or click the map to look at one spot.") + "</span>";
+    $("escala").innerHTML = h;
+  }
+  $("escala").addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return;
+    if (b.getAttribute("data-reg")) { seleccionarRegion(); return; }
+    var e = b.getAttribute("data-e"); if (e === null) return;
+    estado.escala = +e; aplicarEscala();
+  });
+
+  // =====================================================================
+  //  Search (OpenStreetMap Nominatim) and reverse geocoding
+  // =====================================================================
+  var ultimaPeticion = 0, cacheGeo = {};
+  function esperarTurno() { var ahora = Date.now(), espera = Math.max(0, ultimaPeticion + 1100 - ahora); ultimaPeticion = ahora + espera; return new Promise(function (r) { setTimeout(r, espera); }); }
+  function nominatim(url) {
+    if (cacheGeo[url]) return Promise.resolve(cacheGeo[url]);
+    return esperarTurno().then(function () { return fetch(url + "&accept-language=" + (EN ? "en" : "es")); })
+      .then(function (r) { return r.json(); }).then(function (j) { cacheGeo[url] = j; return j; });
+  }
+  var RES = $("resultados");
+  function mostrarResultados(html) { RES.innerHTML = html; RES.style.display = html ? "block" : "none"; }
+  $("formBuscar").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var q = $("q").value.trim(); if (!q) return;
+    var m = q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (m) { mostrarResultados(""); var lat = +m[1], lon = +m[2]; if (MAPA) MAPA.irA(lat, lon, 9); seleccionarPunto(lat, lon); return; }
+    mostrarResultados('<div class="nota">' + t("Buscando…", "Searching…") + "</div>");
+    var vb = [LON0, LAT1, LON1, LAT0].join(",");
+    nominatim("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&addressdetails=0&viewbox=" + vb + "&q=" + encodeURIComponent(q))
+      .then(function (L) {
+        if (!L.length) { mostrarResultados('<div class="nota">' + t("No encontré ese lugar. Prueba con el nombre de un pueblo o escribe coordenadas (lat, lon).", "Place not found. Try a town name, or type coordinates (lat, lon).") + "</div>"); return; }
+        var peso = function (r) { var at = r.addresstype || r.type || ""; return /^(city|town|village|hamlet|suburb|neighbourhood|quarter)$/.test(at) ? 0 : (r.category === "boundary" || at === "municipality" || at === "county") ? 2 : 1; };
+        L = L.map(function (r, i) { r._i = i; return r; }).sort(function (a, b) { return peso(a) - peso(b) || a._i - b._i; });
+        mostrarResultados(L.map(function (r, i) {
+          var dentro = celdaEn(+r.lat, +r.lon) >= 0;
+          return '<button data-i="' + i + '" data-lat="' + r.lat + '" data-lon="' + r.lon + '" data-n="' + esc(r.name || r.display_name.split(",")[0]) + '">' + (dentro ? "📍 " : "🌎 ") + esc(r.display_name) + (dentro ? "" : ' <span style="color:#6b7486">· ' + t("fuera de la región", "outside the region") + "</span>") + "</button>";
+        }).join(""));
+      })
+      .catch(function () { mostrarResultados('<div class="nota">' + t("La búsqueda necesita internet. También puedes escribir coordenadas: 21.1, -88.1", "Search needs internet. You can also type coordinates: 21.1, -88.1") + "</div>"); });
+  });
+  RES.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return;
+    var lat = +b.getAttribute("data-lat"), lon = +b.getAttribute("data-lon"), n = b.getAttribute("data-n");
+    mostrarResultados(""); $("q").blur();
+    if (celdaEn(lat, lon) < 0) { avisoFuera(lat, lon); return; }
+    if (MAPA) MAPA.irA(lat, lon, 9);
+    seleccionarPunto(lat, lon, n);
+  });
+  document.addEventListener("click", function (ev) { if (!ev.target.closest || !ev.target.closest(".search")) mostrarResultados(""); });
+  function avisoFuera(lat, lon) { setTimeout(function () { avisoFuera2(lat, lon); }, 0); }
+  function avisoFuera2(lat, lon) {
+    var otra = (window.REGIONES || []).filter(function (r) { return r.clave !== M.clave; });
+    mostrarResultados('<div class="nota">' + t("Ese lugar está fuera de ", "That place is outside ") + esc(NOMBRE_REGION) + t(". Por ahora la herramienta cubre la Península de Yucatán y Portugal con el oeste de España; el mismo código sirve para cualquier región.", ". For now the tool covers the Yucatán Peninsula and Portugal with western Spain; the same code works for any region.") +
+      (otra.length ? ' <button class="link" data-otra="' + otra[0].clave + '">' + t("Ir a ", "Go to ") + esc(EN ? (otra[0].nombre_en || otra[0].nombre) : otra[0].nombre) + "</button>" : "") + "</div>");
+  }
+  RES.addEventListener("click", function (ev) { var o = ev.target.getAttribute && ev.target.getAttribute("data-otra"); if (o) location.search = "?region=" + o + "&lang=" + (EN ? "en" : "es"); });
+  var geoTimer = null;
+  function geoInverso(lat, lon) {
+    clearTimeout(geoTimer);
+    geoTimer = setTimeout(function () {
+      var url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&lat=" + lat.toFixed(3) + "&lon=" + lon.toFixed(3);
+      nominatim(url).then(function (r) {
+        if (estado.sel.lat !== lat) return;
+        var a = r && r.address, n = a ? (a.city || a.town || a.village || a.municipality || a.county || a.state) : null;
+        if (n) { estado.sel.nombre = t("Cerca de ", "Near ") + n + (a.state && a.state !== n ? ", " + a.state : ""); dibujarLugar(); }
+      }).catch(function () {});
+    }, 700);
+  }
+
+  // =====================================================================
+  //  Answers ("In 10 seconds")
+  // =====================================================================
+  function periodoCritico(s) {
+    var tot = new Array(12).fill(0), suma = 0, k, i;
+    for (k = 0; k < T; k++) if (completo[ANIO[k]]) { tot[MES[k] - 1] += s[k]; suma += s[k]; }
+    if (!(suma > 0)) return null;
+    var arriba = tot.map(function (v) { return v / suma > 1 / 12; });
+    if (arriba.every(Boolean) || !arriba.some(Boolean)) return { meses: [], tot: tot, suma: suma };
+    var mejor = null;
+    for (i = 0; i < 12; i++) { if (!arriba[i] || arriba[(i + 11) % 12]) continue; var n = 0, sm = 0; while (n < 12 && arriba[(i + n) % 12]) { sm += tot[(i + n) % 12]; n++; } if (!mejor || sm > mejor.suma) mejor = { ini: i, n: n, suma: sm }; }
+    var meses = []; for (i = 0; i < mejor.n; i++) meses.push((mejor.ini + i) % 12);
+    return { meses: meses, n: mejor.n, ini: mejor.ini, fin: (mejor.ini + mejor.n - 1) % 12, pct: Math.round(mejor.suma / suma * 100), tot: tot, suma: suma };
+  }
+  function comoVaElAnio(s) {
+    var a = ANIO[ultimo], m = MES[ultimo], ytd = 0, k;
+    var anioActual = !completo[a];
+    var lim = anioActual ? m : 12, ref = anioActual ? a : a;
+    for (k = 0; k < T; k++) if (ANIO[k] === ref && MES[k] <= lim) ytd += s[k];
+    var otros = aniosComp.filter(function (y) { return y !== ref; }).map(function (y) { var v = 0; for (var k2 = 0; k2 < T; k2++) if (ANIO[k2] === y && MES[k2] <= lim) v += s[k2]; return { y: y, v: v }; });
+    var med = mediana(otros.map(function (o) { return o.v; })), lugar = 1 + otros.filter(function (o) { return o.v > ytd; }).length;
+    return { anio: ref, hasta: lim, ytd: ytd, med: med, ratio: med > 0 ? ytd / med : null, lugar: lugar, n: otros.length + 1 };
+  }
+  function anomaliasSel() {
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    return Q.anomalias.filter(function (a) { return en[a.celda]; }).sort(function (a, b) { return a.mes < b.mes ? 1 : (a.mes > b.mes ? -1 : 0); });
+  }
+  var ETQ = { fuera_de_lugar: t("Fuera de lugar", "Out of place"), fuera_de_temporada: t("Fuera de temporada", "Out of season"), fuera_de_escala: t("Fuera de escala", "Out of scale") };
+  var EXPL = { fuera_de_lugar: t("hubo fuego donde casi nunca hay", "fire where there almost never is"), fuera_de_temporada: t("hubo fuego en un mes que normalmente está tranquilo", "fire in a month that is normally quiet"), fuera_de_escala: t("hubo mucho más fuego de lo normal para ese mes", "far more fire than normal for that month") };
+  function dibujarLugar() {
+    var s = estado.sel;
+    $("lugarNom").textContent = s.tipo === "region" ? NOMBRE_REGION : (s.nombre || (s.lat !== null ? s.lat.toFixed(2) + ", " + s.lon.toFixed(2) : NOMBRE_REGION));
+    var sub;
+    if (s.tipo === "region") sub = t("Toda la región · datos de nov 2000 a ", "Whole region · data from Nov 2000 to ") + Q.meses[T - 1];
+    else if (s.tipo === "area") sub = (EN && s.area.desig_en && s.area.desig_en !== "Not Reported" ? s.area.desig_en : s.area.desig) + " · " + fmt(s.area.km2) + " km²";
+    else sub = (s.lat !== null ? s.lat.toFixed(3) + ", " + s.lon.toFixed(3) + " · " : "") + s.celdas.length + t(" cuadros de 27 km", " squares of 27 km");
+    $("lugarSub").textContent = sub;
+    dibujarEscala();
+  }
+  function dibujarRespuestas() {
+    var s = serieSel(), pc = periodoCritico(s), h;
+    // 1. When does it burn?
+    if (!pc) h = '<div class="q">🔥 ' + t("¿Cuándo hay fuego aquí?", "When does it burn here?") + '</div><div class="a">' + t("Casi nunca", "Almost never") + '</div><div class="d">' + t("Los satélites no han visto fuego en esta zona.", "Satellites have not seen fire in this area.") + "</div>";
+    else {
+      var mx = Math.max.apply(null, pc.tot) || 1;
+      var nomP = pc.meses.length ? (pc.n === 1 ? NOML[pc.ini] : NOML[pc.ini] + t(" a ", " to ") + NOML[pc.fin]) : t("Todo el año", "All year round");
+      nomP = nomP.charAt(0).toUpperCase() + nomP.slice(1);
+      h = '<div class="q">🔥 ' + t("¿Cuándo hay más fuego aquí?", "When does it burn the most here?") + '</div><div class="a">' + nomP + "</div>" +
+        '<div class="d">' + (pc.meses.length ? t("En esos meses ocurre el ", "These months hold ") + "<b>" + pc.pct + "%</b>" + t(" del fuego de todo el año.", " of the whole year's fire.") : t("No hay una temporada marcada.", "There is no marked season.")) + "</div>" +
+        '<div class="mini" data-tipctx="1">' + pc.tot.map(function (v, i) { return '<div class="' + (pc.meses.indexOf(i) >= 0 ? "cr" : "") + '" style="height:' + Math.max(3, Math.round(v / mx * 100)) + '%" data-tip="' + esc(NOML[i] + ": " + Math.round(v / pc.suma * 100) + t("% del fuego anual", "% of yearly fire")) + '"></div>'; }).join("") + "</div>" +
+        '<div class="minilab">' + NOM.map(function (n) { return "<span>" + n.slice(0, 1) + "</span>"; }).join("") + "</div>";
+    }
+    $("r1").innerHTML = h;
+    // 2. How is this year going?
+    var y = comoVaElAnio(s), col, est;
+    if (y.ratio === null) { col = "#6b7486"; est = t("Sin referencia", "No reference"); }
+    else if (y.ratio < 0.75) { col = "var(--ok)"; est = t("Más tranquilo de lo normal", "Quieter than normal"); }
+    else if (y.ratio <= 1.25) { col = "var(--sky)"; est = t("Normal", "Normal"); }
+    else if (y.ratio <= 2) { col = "var(--warn)"; est = t("Más fuego de lo normal", "More fire than normal"); }
+    else { col = "var(--bad)"; est = t("Mucho más fuego de lo normal", "Far more fire than normal"); }
+    var dif = y.ratio === null ? "" : (y.ratio >= 1 ? "+" : "−") + Math.abs(Math.round((y.ratio - 1) * 100)) + "%";
+    $("r2").innerHTML = '<div class="q">📅 ' + t("¿Cómo va ", "How is ") + y.anio + t("?", " going?") + '</div><div class="a">' + est + '</div>' +
+      '<div class="d">' + t("De enero a ", "January to ") + NOML[y.hasta - 1] + ": <b>" + fmt(y.ytd) + "</b>" + t(" detecciones contra ", " detections against ") + fmt(y.med) + t(" en un año típico", " in a typical year") +
+      (dif ? ' <span class="semaforo" style="background:' + col + '">' + dif + "</span>" : "") + "<br>" + t("Lugar ", "Rank ") + y.lugar + t(" de ", " of ") + y.n + t(" años (1 = el de más fuego).", " years (1 = the most fire).") + "</div>";
+    // 3. Anything unusual?
+    var al = anomaliasSel(), u = al[0];
+    if (!u) $("r3").innerHTML = '<div class="q">⚠️ ' + t("¿Hay algo raro?", "Anything unusual?") + '</div><div class="a">' + t("Nada fuera de lo normal", "Nothing out of the ordinary") + '</div><div class="d">' + t("en los últimos 36 meses.", "in the last 36 months.") + "</div>";
+    else $("r3").innerHTML = '<div class="q">⚠️ ' + t("¿Hay algo raro?", "Anything unusual?") + '</div><div class="a">' + t("Sí: ", "Yes: ") + al.length + (al.length === 1 ? t(" alerta", " alert") : t(" alertas", " alerts")) + "</div>" +
+      '<div class="d">' + t("La más reciente, ", "The latest, ") + mesAnio(+u.mes.slice(5), u.mes.slice(0, 4)) + ": " + EXPL[u.tipo] + ". " +
+      '<button class="link" data-ir="alertas">' + t("Ver alertas →", "See alerts →") + "</button></div>";
+  }
+  $("r3").addEventListener("click", function (ev) { if (ev.target.getAttribute("data-ir")) abrirTab("alertas", true); });
+  conTip($("r1"));
+
+  // =====================================================================
+  //  Tabs
+  // =====================================================================
+  var TABS = [["cal", t("Calendario", "Calendar")], ["anios", t("Años", "Years")], ["alertas", t("Alertas", "Alerts")], ["reglas", t("Reglas y tipo de fuego", "Rules & fire type")],
+    ["riesgo", t("Riesgo semanal", "Weekly risk")], ["areas", t("Áreas protegidas", "Protected areas")], ["prueba", t("Comprobado desde el espacio", "Verified from space")], ["como", t("¿Funciona?", "Does it work?")]];
+  $("tabs").innerHTML = TABS.map(function (x) { return '<button role="tab" data-t="' + x[0] + '">' + x[1] + "</button>"; }).join("");
+  $("tabs").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (b) abrirTab(b.getAttribute("data-t")); });
+  function abrirTab(k, scroll) {
+    estado.tab = k;
+    [].forEach.call(document.querySelectorAll("#tabs button"), function (b) { var on = b.getAttribute("data-t") === k; b.classList.toggle("on", on); b.setAttribute("aria-selected", on);
+      if (on) { var tb = $("tabs"); tb.scrollTo({ left: b.offsetLeft - tb.clientWidth / 2 + b.clientWidth / 2, behavior: "smooth" }); } });
+    [].forEach.call(document.querySelectorAll(".tab"), function (s) { s.classList.toggle("on", s.id === "tab-" + k); });
+    if (MAPA) { MAPA.zona(null); MAPA.imagen(null); if (k !== "areas" && estado.sel.tipo !== "area") MAPA.areas(null); if (k !== "cal") MAPA.puntos(null); }
+    if (k !== "riesgo" && estado.mapa.tipo === "riesgo") { estado.mapa = { tipo: "promedio" }; pintarMapa(); }
+    var f = { cal: tabCalendario, anios: tabAnios, alertas: tabAlertas, reglas: tabReglas, riesgo: tabRiesgo, areas: tabAreas, prueba: tabPrueba, como: tabComo }[k];
+    if (f) f();
+    if (scroll) $("tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // ---------- Calendar ----------
+  var son = null;
+  function tabCalendario() {
+    var s = serieSel(), pc = periodoCritico(s), cr = pc ? pc.meses : [];
+    var vis = s.filter(function (v, k) { return true; }), orden = vis.slice().sort(function (a, b) { return a - b; }), tope = orden[Math.floor(orden.length * 0.99)] || 1;
+    var h = ['<div class="tarjeta"><h3>' + t("Calendario de fuego, mes por mes", "Fire calendar, month by month") + "</h3>",
+      '<p class="lead">' + t("Cada fila es un año y cada cuadro un mes. Más claro = más fuego. ", "Each row is a year and each square a month. Brighter = more fire. ") + t("Pasa el cursor para ver la cifra; haz clic para ver ese mes en el mapa.", "Hover to see the number; click to see that month on the map.") + "</p>",
+      '<div class="cal" id="calGrid"><div></div>' + NOM.map(function (n, i) { return '<div class="h' + (cr.indexOf(i) >= 0 ? " cr" : "") + '">' + n + "</div>"; }).join("")];
+    for (var y = anios.length - 1; y >= 0; y--) {
+      var a = anios[y]; h.push('<div class="y">' + a + "</div>");
+      for (var m = 1; m <= 12; m++) {
+        var k = Q.meses.indexOf(a + "-" + (m < 10 ? "0" : "") + m);
+        if (k < 0) { h.push('<div class="c vacio"></div>'); continue; }
+        var v = s[k], f = tope > 0 ? Math.sqrt(Math.min(1, v / tope)) : 0;
+        h.push('<div class="c' + (Q.origen[k] !== "viirs" ? " conv" : "") + (estado.mapa.tipo === "mes" && estado.mapa.k === k ? " sel" : "") + '" data-k="' + k + '" style="background:' + color(f) + '" data-tip="' +
+          esc("<b>" + mesAnio(m, a) + "</b><br>" + fmt(v) + t(" detecciones", " detections") + (Q.origen[k] !== "viirs" ? "<br>" + t("convertido desde MODIS", "converted from MODIS") : "") + (Q.parcial[k] ? "<br>" + t("mes incompleto", "incomplete month") : "")) + '"></div>');
+      }
+    }
+    h.push("</div>");
+    h.push('<div class="rampa-ley">' + t("menos", "less") + '<i style="background:linear-gradient(90deg,' + VIR.join(",") + ')"></i>' + t("más", "more") + ' · <span style="display:inline-block;width:10px;height:10px;background:var(--fire);border-radius:3px"></span> ' + t("temporada de fuego", "fire season") + "</div>");
+    h.push('<div class="fila" style="margin-top:12px"><label class="toggle"><input type="checkbox" id="chkCrudo"' + (estado.crudo ? " checked" : "") + "> " + t("Ver el registro sin armonizar", "Show the unharmonized record") + "</label></div>");
+    if (estado.crudo) h.push('<div class="aviso" style="margin-top:8px">' + t("Así se vería la historia si se juntaran los sensores tal cual: el salto de 2018 no es más fuego, es otro satélite que ve más.", "This is how history would look if the sensors were simply put together: the jump in 2018 is not more fire, it is a different satellite that sees more.") + "</div>");
+    h.push('<div class="fila" style="margin-top:12px"><button class="boton prim" id="btnSon">' + (son ? "■ " + t("Detener", "Stop") : "♪ " + t("Escuchar 25 años de fuego", "Listen to 25 years of fire")) + '</button><span id="sonTxt" style="font-weight:600;color:var(--fireink);font-size:13px"></span></div>');
+    h.push('<details><summary>' + t("Descargar datos", "Download data") + '</summary><div class="fila" style="margin-top:8px"><button class="boton" id="dlCsv">' + t("Calendario (CSV)", "Calendar (CSV)") + '</button><button class="boton" id="dlPng">' + t("Calendario (imagen)", "Calendar (image)") + '</button><button class="boton" id="dlPts">' + t("Puntos de calor (CSV)", "Hot spots (CSV)") + '</button><span id="dlTxt" style="font-size:12px;color:#6b7486"></span></div></details>');
+    h.push('<details><summary>' + t("Ver los puntos de calor de un año en el mapa", "Show one year's hot spots on the map") + '</summary><div class="fila" style="margin-top:8px"><select id="ptsAnio" class="boton">' + anios.slice().reverse().map(function (a) { return "<option>" + a + "</option>"; }).join("") + '</select><button class="boton" id="ptsVer">' + t("Mostrar", "Show") + '</button><span id="ptsTxt" style="font-size:12px;color:#6b7486"></span></div></details>');
+    h.push('<details><summary>' + t("¿Qué significan los números?", "What do the numbers mean?") + "</summary><p>" + t("Cada número cuenta puntos de calor detectados por satélite, en la escala del sensor VIIRS. Un incendio grande produce muchos puntos; no es un número de incendios. Los meses con rayitas son anteriores a VIIRS y se convirtieron desde MODIS con el modelo de armonización.",
+      "Each number counts satellite-detected hot spots, on the scale of the VIIRS sensor. A large fire produces many hot spots; it is not a count of fires. Striped months are from before VIIRS and were converted from MODIS with the harmonization model.") + "</p></details></div>");
+    $("tab-cal").innerHTML = h.join("");
+    conTip($("calGrid"));
+    $("calGrid").addEventListener("click", function (ev) { var d = ev.target.closest ? ev.target.closest(".c[data-k]") : null; if (!d) return;
+      var k = +d.getAttribute("data-k"); pararReplay(); estado.mapa = { tipo: "mes", k: k }; marcarCalendario(); pintarMapa(); });
+    $("chkCrudo").addEventListener("change", function () { estado.crudo = this.checked; actualizar(); });
+    $("btnSon").addEventListener("click", alternarSonido);
+    $("dlCsv").addEventListener("click", bajarCsv); $("dlPng").addEventListener("click", bajarPng); $("dlPts").addEventListener("click", bajarPuntos);
+    $("ptsVer").addEventListener("click", verPuntos);
+  }
+  function marcarCalendario() { [].forEach.call(document.querySelectorAll("#calGrid .c.sel"), function (d) { d.classList.remove("sel"); });
+    if (estado.mapa.tipo === "mes") { var d = document.querySelector('#calGrid .c[data-k="' + estado.mapa.k + '"]'); if (d) d.classList.add("sel"); } }
+  function alternarSonido() {
+    if (son) { pararSon(); return; }
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ctx = new AC(), s = serieSel(), ks = []; for (var k = 0; k < T; k++) ks.push(k);
+    var mx = 1; ks.forEach(function (i) { if (s[i] > mx) mx = s[i]; });
+    var dt = 0.07, t0 = ctx.currentTime + 0.15;
+    ks.forEach(function (i, n) { var f = Math.sqrt(Math.max(0, s[i]) / mx); if (!(f > 0.02)) return;
+      var o = ctx.createOscillator(), g = ctx.createGain(), at = t0 + n * dt; o.type = "triangle"; o.frequency.value = 196 * Math.pow(2, 3 * f);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.04 + 0.22 * f, at + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, at + dt * 0.95);
+      o.connect(g); g.connect(ctx.destination); o.start(at); o.stop(at + dt); });
+    son = { ctx: ctx, ultimo: null }; $("btnSon").textContent = "■ " + t("Detener", "Stop");
+    son.timer = setInterval(function () { var n = Math.floor((ctx.currentTime - t0) / dt); if (n >= ks.length) { pararSon(); return; } if (n < 0) return;
+      var d = document.querySelector('#calGrid .c[data-k="' + ks[n] + '"]'); if (son.ultimo && son.ultimo !== d) son.ultimo.classList.remove("son"); if (d) { d.classList.add("son"); son.ultimo = d; }
+      var tx = $("sonTxt"); if (tx) tx.textContent = mesAnio(MES[ks[n]], ANIO[ks[n]]) + ": " + fmt(s[ks[n]]); }, 30);
+  }
+  function pararSon() { if (!son) return; clearInterval(son.timer); try { son.ctx.close(); } catch (e) {} [].forEach.call(document.querySelectorAll("#calGrid .c.son"), function (d) { d.classList.remove("son"); }); son = null;
+    var b = $("btnSon"); if (b) b.textContent = "♪ " + t("Escuchar 25 años de fuego", "Listen to 25 years of fire"); var tx = $("sonTxt"); if (tx) tx.textContent = ""; }
+  // downloads
+  function bajarBlob(nombre, b) { var u = URL.createObjectURL(b), a = document.createElement("a"); a.href = u; a.download = nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 1500); }
+  function descZona() { var s = estado.sel; return s.tipo === "region" ? NOMBRE_REGION : ($("lugarNom").textContent + (s.tipo !== "area" ? " (" + s.celdas.length + t(" cuadros", " squares") + ")" : "")); }
+  function bajarCsv() {
+    var s = serieSel(), f = ["# " + descZona(), "month,year,month_number," + (estado.crudo ? "raw_detections" : "harmonized_detections") + ",source,incomplete_month"];
+    for (var k = 0; k < T; k++) f.push([Q.meses[k], ANIO[k], MES[k], s[k].toFixed(1), Q.origen[k], Q.parcial[k] ? 1 : 0].join(","));
+    bajarBlob("burn_calendar_" + M.clave + ".csv", new Blob(["﻿" + f.join("\n")], { type: "text/csv;charset=utf-8" }));
+  }
+  function bajarPng() {
+    var s = serieSel(), filas = anios.slice().reverse(), orden = s.slice().sort(function (a, b) { return a - b; }), tope = orden[Math.floor(orden.length * 0.99)] || 1, pc = periodoCritico(s), cr = pc ? pc.meses : [];
+    var cw = 58, ch = 22, L = 60, Tp = 78, W = L + 12 * cw + 90, H = Tp + filas.length * ch + 40, k;
+    var g = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" font-family="Arial, Helvetica, sans-serif"><rect width="100%" height="100%" fill="#ffffff"/>',
+      '<text x="' + L + '" y="28" font-size="18" font-weight="700" fill="#14213D">' + esc(t("Calendario de quemas", "Burn Calendar") + " · " + descZona()) + "</text>",
+      '<text x="' + L + '" y="48" font-size="12" fill="#6b7486">' + esc((EN ? (M.unidad_en || M.unidad) : M.unidad) + (estado.crudo ? t(" · SIN ARMONIZAR", " · UNHARMONIZED") : "")) + "</text>"];
+    NOM.forEach(function (m, i) { var c = cr.indexOf(i) >= 0; if (c) g.push('<rect x="' + (L + i * cw + 3) + '" y="' + (Tp - 19) + '" width="' + (cw - 6) + '" height="16" rx="3" fill="#e8692e"/>');
+      g.push('<text x="' + (L + i * cw + cw / 2) + '" y="' + (Tp - 7) + '" font-size="11" text-anchor="middle" fill="' + (c ? "#fff" : "#6b7486") + '">' + esc(m) + "</text>"); });
+    filas.forEach(function (a, r) { var y = Tp + r * ch, tot = 0; g.push('<text x="' + (L - 8) + '" y="' + (y + 15) + '" font-size="11" text-anchor="end" font-weight="700" fill="#14213D">' + a + "</text>");
+      for (var m = 1; m <= 12; m++) { k = Q.meses.indexOf(a + "-" + (m < 10 ? "0" : "") + m); if (k < 0) continue; var v = s[k], f = Math.sqrt(Math.min(1, v / tope)); tot += v;
+        g.push('<rect x="' + (L + (m - 1) * cw + 1) + '" y="' + (y + 1) + '" width="' + (cw - 2) + '" height="' + (ch - 2) + '" fill="' + color(f) + '"/><text x="' + (L + (m - 1) * cw + cw / 2) + '" y="' + (y + 15) + '" font-size="10" text-anchor="middle" fill="' + textoSobre(f) + '">' + (v >= 1 ? Math.round(v) : (v > 0 ? "&lt;1" : "0")) + "</text>"); }
+      g.push('<text x="' + (L + 12 * cw + 45) + '" y="' + (y + 15) + '" font-size="11" text-anchor="middle" font-weight="700" fill="#14213D">' + Math.round(tot).toLocaleString(LOC) + "</text>"); });
+    g.push('<text x="' + L + '" y="' + (Tp + filas.length * ch + 22) + '" font-size="10" fill="#6b7486">' + esc(t("Fuente: NASA FIRMS (MODIS y VIIRS), registro armonizado. Meses en naranja: temporada de fuego.", "Source: NASA FIRMS (MODIS and VIIRS), harmonized record. Orange months: fire season.")) + "</text></svg>");
+    var svg = g.join(""), img = new Image(), base = "burn_calendar_" + M.clave;
+    function comoSvg() { bajarBlob(base + ".svg", new Blob([svg], { type: "image/svg+xml" })); }
+    img.onload = function () { try { var cv = document.createElement("canvas"); cv.width = W * 2; cv.height = H * 2; var cx = cv.getContext("2d"); cx.scale(2, 2); cx.drawImage(img, 0, 0); cv.toBlob(function (b) { if (b) bajarBlob(base + ".png", b); else comoSvg(); }, "image/png"); } catch (e) { comoSvg(); } };
+    img.onerror = comoSvg; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+  var puntosCache = {}, puntosEspera = {};
+  window.PUNTOS_LISTO = function (clave, anio, texto) { puntosCache[anio] = texto; if (puntosEspera[anio]) puntosEspera[anio](); };
+  function cargarAnio(anio, listo) { if (puntosCache[anio] !== undefined) { listo(); return; } puntosEspera[anio] = listo;
+    var sc = document.createElement("script"); sc.src = "data/puntos/" + M.clave + "_" + anio + ".js"; sc.onerror = function () { puntosCache[anio] = ""; listo(); }; document.head.appendChild(sc); }
+  function bajarPuntos() {
+    var en = {}; celdasSel().forEach(function (c) { en[c] = 1; }); var filas = ["latitude,longitude,acq_date,acq_time_utc,satellite,confidence,frp_mw,daynight"], i = 0;
+    (function sig() { if (i >= anios.length) { $("dlTxt").textContent = (filas.length - 1).toLocaleString(LOC) + t(" puntos", " hot spots"); bajarBlob("hot_spots_" + M.clave + ".csv", new Blob([filas.join("\n")], { type: "text/csv" })); return; }
+      $("dlTxt").textContent = t("Cargando ", "Loading ") + anios[i] + "…";
+      cargarAnio(anios[i], function () { (puntosCache[anios[i]] || "").split("\n").forEach(function (f) { if (!f) return; var k = f.lastIndexOf(","); if (en[f.slice(k + 1)]) filas.push(f.slice(0, k)); }); i++; sig(); }); })();
+  }
+  function verPuntos() {
+    var a = +$("ptsAnio").value, en = {}; celdasSel().forEach(function (c) { en[c] = 1; });
+    $("ptsTxt").textContent = t("Cargando…", "Loading…");
+    cargarAnio(a, function () { var L = [], n = 0; (puntosCache[a] || "").split("\n").forEach(function (f) { if (!f) return; var p = f.split(","); if (!en[p[p.length - 1]]) return; n++; if (L.length < 20000) L.push([+p[0], +p[1]]); });
+      if (MAPA) MAPA.puntos(L); $("ptsTxt").textContent = n.toLocaleString(LOC) + t(" puntos de calor en ", " hot spots in ") + a + (n > L.length ? t(" (se muestran 20,000)", " (showing 20,000)") : "") + (MAPA && MAPA.tipo === "svg" ? t(" · el mapa simple no los dibuja", " · the simple map does not draw them") : ""); });
+  }
+
+  // ---------- Years ----------
+  function tabAnios() {
+    var s = serieSel(), tot = {}, k; anios.forEach(function (a) { tot[a] = 0; }); for (k = 0; k < T; k++) tot[ANIO[k]] += s[k];
+    var lista = anios.filter(function (a) { return completo[a] || a === ANIO[T - 1]; }), comp = lista.filter(function (a) { return completo[a]; });
+    var med = mediana(comp.map(function (a) { return tot[a]; })), mx = Math.max.apply(null, lista.map(function (a) { return tot[a]; }).concat([1]));
+    var top = comp.slice().sort(function (a, b) { return tot[b] - tot[a]; }).slice(0, 3);
+    var W = 400, H = 220, L = 44, B = 26, Tp = 12, bw = (W - L - 6) / lista.length;
+    function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+    var g = ['<svg viewBox="0 0 ' + W + " " + H + '" style="width:100%;height:auto" id="barAnios">'];
+    for (var e = 0; e <= 4; e++) { var yy = Y(mx * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 4) + '" y1="' + yy + '" y2="' + yy + '" stroke="#ece9e2"/><text x="' + (L - 4) + '" y="' + (yy + 3) + '" font-size="9" text-anchor="end" fill="#6b7486">' + fmt(mx * e / 4) + "</text>"); }
+    g.push('<line x1="' + L + '" x2="' + (W - 4) + '" y1="' + Y(med) + '" y2="' + Y(med) + '" stroke="#14213D" stroke-dasharray="4 3"/><text x="' + (L + 4) + '" y="' + (Y(med) - 4) + '" font-size="9" fill="#14213D">' + t("año típico", "typical year") + "</text>");
+    lista.forEach(function (a, i) { var v = tot[a], parcial = !completo[a], esTop = top.indexOf(a) >= 0;
+      g.push('<rect x="' + (L + i * bw + 1) + '" y="' + Y(v) + '" width="' + Math.max(1, bw - 2) + '" height="' + (H - B - Y(v)) + '" rx="2" fill="' + (parcial ? "#f4b48f" : esTop ? "#e8692e" : "#31688e") + '" data-tip="' +
+        esc("<b>" + a + (parcial ? t(" (hasta ", " (through ") + Q.meses[T - 1] + ")" : "") + "</b><br>" + fmt(v) + t(" detecciones", " detections") + (med > 0 ? "<br>" + (v >= med ? "+" : "−") + Math.abs(Math.round((v / med - 1) * 100)) + t("% contra el año típico", "% against a typical year") : "")) + '"/>');
+      if (a % 5 === 0) g.push('<text x="' + (L + i * bw + bw / 2) + '" y="' + (H - 10) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + a + "</text>"); });
+    g.push("</svg>");
+    var h = '<div class="tarjeta"><h3>' + t("¿Qué años tuvieron más fuego?", "Which years had the most fire?") + '</h3><p class="lead">' + t("Los más activos: ", "The most active: ") + "<b>" + top.join(", ") + "</b>" + t(" (en naranja). La línea punteada es un año típico.", " (orange). The dashed line is a typical year.") + "</p>" + g.join("") +
+      '<label class="toggle" style="margin-top:8px"><input type="checkbox" id="chkCrudo2"' + (estado.crudo ? " checked" : "") + "> " + t("Ver sin armonizar (el récord falso)", "Show unharmonized (the false record)") + "</label>";
+    if (Q.crudo && estado.sel.tipo !== "area") {
+      var r = new Array(T).fill(0); celdasSel().forEach(function (c) { var v = Q.crudo[c]; for (var k2 = 0; k2 < T; k2++) r[k2] += v[k2]; });
+      var tr = {}; comp.forEach(function (a) { tr[a] = 0; }); for (k = 0; k < T; k++) if (tr[ANIO[k]] !== undefined) tr[ANIO[k]] += r[k];
+      var hReal = comp.slice().sort(function (a, b) { return tot[b] - tot[a]; }), rec = comp.slice().sort(function (a, b) { return tr[b] - tr[a]; })[0];
+      var lugar = hReal.indexOf(rec) + 1;
+      if (!estado.crudo && lugar > 1) h += '<div class="aviso" style="margin-top:10px">' + t("Sin armonizar, ", "Unharmonized, ") + "<b>" + rec + "</b>" + t(" parecería el año récord. Armonizado queda en el lugar ", " would look like the record year. Harmonized, it ranks ") + "<b>" + lugar + "</b>" + t(" de ", " of ") + comp.length + t(". Por eso hay que armonizar.", ". That is why harmonization matters.") + "</div>";
+    }
+    h += "</div>" + tarjetaAcumulado(s);
+    $("tab-anios").innerHTML = h; conTip($("barAnios"));
+    $("chkCrudo2").addEventListener("change", function () { estado.crudo = this.checked; actualizar(); });
+    var sa = $("anioCmp"); if (sa) sa.addEventListener("change", function () { $("acumBox").innerHTML = graficaAcumulado(serieSel(), +sa.value); conTip($("acumBox")); });
+    conTip($("acumBox"));
+  }
+  function tarjetaAcumulado(s) {
+    var ult = ANIO[T - 1];
+    return '<div class="tarjeta"><h3>' + t("Compara un año contra todos", "Compare one year with all the others") + '</h3><p class="lead">' + t("Fuego acumulado mes a mes. La línea naranja es el año elegido; la punteada, el año típico.", "Fire added up month by month. The orange line is the chosen year; the dashed line, a typical year.") + "</p>" +
+      '<select id="anioCmp" class="boton">' + anios.slice().reverse().filter(function (a) { return a >= anios[1]; }).map(function (a) { return "<option" + (a === ult ? " selected" : "") + ">" + a + "</option>"; }).join("") + '</select><div id="acumBox" style="margin-top:8px">' + graficaAcumulado(s, ult) + "</div></div>";
+  }
+  function graficaAcumulado(s, sel) {
+    var acum = {}, mx = 1;
+    anios.forEach(function (a) { var c = [], tot = 0, n = 0; for (var m = 1; m <= 12; m++) { var k = Q.meses.indexOf(a + "-" + (m < 10 ? "0" : "") + m); if (k < 0 || k > ultimo) { c.push(null); continue; } tot += s[k]; n++; c.push(tot); } if (n) { acum[a] = c; if (tot > mx) mx = tot; } });
+    var W = 400, H = 210, L = 44, B = 22, Tp = 10;
+    function X(m) { return L + (W - L - 30) * m / 11; } function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+    function linea(c, col, w, dash, op) { var d = "", ini = true; c.forEach(function (v, m) { if (v === null) { return; } d += (ini ? "M" : "L") + X(m).toFixed(1) + " " + Y(v).toFixed(1); ini = false; }); return d ? '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' stroke-opacity="' + (op || 1) + '"/>' : ""; }
+    var g = ['<svg viewBox="0 0 ' + W + " " + H + '" style="width:100%;height:auto">'];
+    for (var e = 0; e <= 4; e++) { var yy = Y(mx * e / 4); g.push('<line x1="' + L + '" x2="' + (W - 30) + '" y1="' + yy + '" y2="' + yy + '" stroke="#ece9e2"/><text x="' + (L - 4) + '" y="' + (yy + 3) + '" font-size="9" text-anchor="end" fill="#6b7486">' + fmt(mx * e / 4) + "</text>"); }
+    for (var m = 0; m < 12; m += 2) g.push('<text x="' + X(m) + '" y="' + (H - 6) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + NOM[m] + "</text>");
+    aniosComp.forEach(function (a) { if (a !== sel && acum[a]) g.push(linea(acum[a], "#9aa4b1", 1, "", 0.5)); });
+    var med = []; for (m = 0; m < 12; m++) med.push(mediana(aniosComp.filter(function (a) { return a !== sel && acum[a]; }).map(function (a) { return acum[a][m]; })));
+    g.push(linea(med, "#14213D", 2, "5 4")); if (acum[sel]) g.push(linea(acum[sel], "#e8692e", 3.5));
+    for (m = 0; m < 12; m++) { var v = acum[sel] ? acum[sel][m] : null; g.push('<rect x="' + (X(m) - 14) + '" y="' + Tp + '" width="28" height="' + (H - B - Tp) + '" fill="transparent" data-tip="' + esc("<b>" + NOML[m] + "</b><br>" + sel + ": " + (v === null ? "—" : fmt(v)) + "<br>" + t("Año típico: ", "Typical year: ") + fmt(med[m])) + '"/>'); }
+    g.push("</svg>"); return g.join("");
+  }
+
+  // ---------- Alerts ----------
+  function tabAlertas() {
+    var al = anomaliasSel(), filtro = estado.filtroAl || "";
+    var L = al.filter(function (a) { return !filtro || a.tipo === filtro; });
+    var cuenta = {}; al.forEach(function (a) { cuenta[a.tipo] = (cuenta[a.tipo] || 0) + 1; });
+    var h = '<div class="tarjeta"><h3>' + t("Lo que se salió de lo normal", "What departed from normal") + '</h3><p class="lead">' + t("La herramienta aprende qué es normal en cada lugar y cada mes, y avisa cuando algo no cuadra (últimos 36 meses). No dice la causa.", "The tool learns what is normal for each place and month, and flags what does not fit (last 36 months). It does not state the cause.") + "</p>" +
+      '<div class="fila" style="margin-bottom:10px"><button class="boton' + (!filtro ? " prim" : "") + '" data-f="">' + t("Todas", "All") + " (" + al.length + ")</button>" + Object.keys(ETQ).map(function (k) { return '<button class="boton' + (filtro === k ? " prim" : "") + '" data-f="' + k + '">' + ETQ[k] + " (" + (cuenta[k] || 0) + ")</button>"; }).join("") + "</div>" +
+      (L.length ? L.slice(0, 60).map(function (a) {
+        return '<div class="item" data-c="' + a.celda + '" data-mes="' + a.mes + '" data-lat="' + a.lat + '" data-lon="' + a.lon + '"><div class="t"><span class="etq">' + ETQ[a.tipo] + "</span>" + (verificada(a) ? '<span class="etq v">✓ ' + t("comprobada", "verified") + "</span>" : "") + mesAnio(+a.mes.slice(5), a.mes.slice(0, 4)) + "</div><div>" + esc(EN ? (a.text || a.texto) : a.texto) + "</div></div>";
+      }).join("") : '<p class="lead">' + t("Sin alertas en esta zona.", "No alerts in this area.") + "</p>") + "</div>";
+    $("tab-alertas").innerHTML = h;
+    $("tab-alertas").onclick = function (ev) {
+      var f = ev.target.getAttribute && ev.target.getAttribute("data-f"); if (f !== null && f !== undefined && ev.target.classList.contains("boton")) { estado.filtroAl = f; tabAlertas(); return; }
+      var d = ev.target.closest ? ev.target.closest(".item") : null; if (!d) return;
+      var lat = +d.getAttribute("data-lat"), lon = +d.getAttribute("data-lon"), c = +d.getAttribute("data-c");
+      if (MAPA) { MAPA.irA(lat, lon, 9); MAPA.marcar(lat, lon); }
+      var k = Q.meses.indexOf(d.getAttribute("data-mes"));
+      if (k >= 0) { estado.mapa = { tipo: "mes", k: k }; pintarMapa(); }
+    };
+  }
+  function verificada(a) { var E = Q.evidencia; if (!E) return false; var b = E.bbox, m0 = E.fechas_fuego[0].slice(0, 7), m1 = E.fechas_fuego[1].slice(0, 7);
+    return a.lon >= b[0] - G / 2 && a.lon <= b[2] + G / 2 && a.lat >= b[1] - G / 2 && a.lat <= b[3] + G / 2 && a.mes >= m0 && a.mes <= m1; }
+
+  // ---------- Rules (official calendar) & fire type ----------
+  var EX = null;
+  window.EXTRA_LISTO = function (clave, d) { EX = d; if (estado.tab === "reglas") tabReglas(); };
+  (function () { var sc = document.createElement("script"); sc.src = "data/extra/" + M.clave + ".js"; document.head.appendChild(sc); })();
+  function fechaCorta(mmdd) { var m = +mmdd.slice(0, 2), d = +mmdd.slice(3, 5); return EN ? NOML[m - 1] + " " + d : d + " de " + NOML[m - 1]; }
+  function tabReglas() {
+    if (!EX) { $("tab-reglas").innerHTML = '<div class="tarjeta"><p class="lead">' + t("Cargando…", "Loading…") + "</p></div>"; return; }
+    var h = "", O = EX.oficial;
+    if (O) {
+      var permitido = O.tipo === "permitido", P = O.por_anio, ys = Object.keys(P).map(Number).filter(function (a) { return a >= 2001; }).sort(function (a, b) { return a - b; });
+      function noPerm(a) { var v = P[a]; return permitido ? v.total - v.dentro : v.dentro; }
+      var ua = ys[ys.length - 1], vua = noPerm(ua) / P[ua].total, lugar = 1 + ys.filter(function (a) { return a !== ua && noPerm(a) / P[a].total > vua; }).length;
+      var W = 400, H = 170, L = 34, B = 22, Tp = 10, mx = 0; ys.forEach(function (a) { mx = Math.max(mx, noPerm(a) / P[a].total); }); mx = Math.max(0.1, Math.ceil(mx * 10) / 10);
+      var bw = (W - L - 4) / ys.length; function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+      var g = ['<svg viewBox="0 0 ' + W + " " + H + '" style="width:100%;height:auto" id="barReglas">'];
+      for (var e = 0; e <= 2; e++) { var yy = Y(mx * e / 2); g.push('<line x1="' + L + '" x2="' + (W - 4) + '" y1="' + yy + '" y2="' + yy + '" stroke="#ece9e2"/><text x="' + (L - 4) + '" y="' + (yy + 3) + '" font-size="9" text-anchor="end" fill="#6b7486">' + Math.round(mx * e / 2 * 100) + "%</text>"); }
+      ys.forEach(function (a, i) { var v = noPerm(a) / P[a].total; g.push('<rect x="' + (L + i * bw + 1) + '" y="' + Y(v) + '" width="' + Math.max(1, bw - 2) + '" height="' + (H - B - Y(v)) + '" rx="2" fill="' + (a === ua ? "#e8692e" : "#b9c3d3") + '" data-tip="' + esc("<b>" + a + "</b><br>" + Math.round(v * 1000) / 10 + t("% del fuego cuando no se permite quemar", "% of fire when burning is not allowed")) + '"/>');
+        if (a % 5 === 0) g.push('<text x="' + (L + i * bw + bw / 2) + '" y="' + (H - 7) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + a + "</text>"); });
+      g.push("</svg>");
+      h += '<div class="tarjeta"><h3>' + t("¿El fuego respeta el calendario oficial de quemas?", "Does fire follow the official burn calendar?") + "</h3>" +
+        '<p class="lead">' + (permitido ? t("En ", "In ") + "<b>" + esc(EN ? O.zona_en : O.zona) + "</b>" + t(" la ley permite quemar del ", " the law allows burning from ") + fechaCorta(O.inicio) + t(" al ", " to ") + fechaCorta(O.fin) + "."
+          : t("En ", "In ") + "<b>" + esc(EN ? O.zona_en : O.zona) + "</b>" + t(" está prohibido quemar del ", " burning is banned from ") + fechaCorta(O.inicio) + t(" al ", " to ") + fechaCorta(O.fin) + ".") + "</p>" +
+        '<div class="grandes">' + Math.round(vua * 1000) / 10 + "%</div><p class=\"lead\" style=\"margin-top:4px\">" + t("del fuego de ", "of the fire in ") + ua + t(" ocurrió cuando no se permite quemar", " happened when burning is not allowed") +
+        (lugar === 1 ? " — <b>" + t("la cifra más alta en ", "the highest in ") + ys.length + t(" años", " years") + "</b>." : t(" (lugar ", " (rank ") + lugar + t(" de ", " of ") + ys.length + ").") + "</p>" + g.join("") +
+        '<button class="boton" id="verZona" style="margin-top:8px">' + t("Ver la zona en el mapa", "Show the zone on the map") + "</button>" +
+        "<details><summary>" + t("Fuente y límites", "Source and limits") + "</summary><p>" + esc(O.fuente) + " " + esc(EN ? O.nota_en : O.nota) + "</p></details></div>";
+    }
+    var E = EX.eventos;
+    if (E) {
+      var en = {}; celdasSel().forEach(function (c) { en[c] = 1; }); var tot = [0, 0, 0], A = E.celda_mes;
+      for (var i = 0; i < A.length; i += 5) if (en[A[i]]) for (var c = 0; c < 3; c++) tot[c] += A[i + 2 + c];
+      var suma = tot[0] + tot[1] + tot[2], grandes = E.grandes.filter(function (x) { return en[x[5]]; });
+      var CL = [["#6ece58", t("Quemas pequeñas de un día", "Small one-day burns"), t("típico de quemas agrícolas o controladas", "typical of agricultural or controlled burning")], ["#31688e", t("Intermedias", "Intermediate"), ""], ["#440154", t("Incendios grandes o largos", "Large or long fires"), t("típico de incendios forestales", "typical of wildfires")]];
+      var ang = 0, R = 52, cx = 60, cy = 60, arcs = "";
+      tot.forEach(function (v, k) { if (!suma || !v) return; var a0 = ang, a1 = ang + v / suma * Math.PI * 2; ang = a1; var large = a1 - a0 > Math.PI ? 1 : 0;
+        var p = (a1 - a0 >= Math.PI * 2 - 1e-6) ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="' + CL[k][0] + '"/>' : '<path d="M' + cx + " " + cy + "L" + (cx + R * Math.sin(a0)) + " " + (cy - R * Math.cos(a0)) + "A" + R + " " + R + " 0 " + large + " 1 " + (cx + R * Math.sin(a1)) + " " + (cy - R * Math.cos(a1)) + 'Z" fill="' + CL[k][0] + '"/>';
+        arcs += p.replace("/>", ' data-tip="' + esc("<b>" + CL[k][1] + "</b><br>" + Math.round(v / suma * 100) + "%") + '"/>'); });
+      h += '<div class="tarjeta"><h3>' + t("¿Quema agrícola o incendio?", "Agricultural burn or wildfire?") + "</h3>" + (suma ? '<div class="fila" style="align-items:center;flex-wrap:nowrap"><svg viewBox="0 0 120 120" width="120" height="120" id="dona">' + arcs + '<circle cx="60" cy="60" r="30" fill="#fff"/></svg><div>' +
+        CL.map(function (q, k) { return '<div style="margin:4px 0;font-size:13px"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;background:' + q[0] + ';margin-right:6px"></span><b>' + Math.round(tot[k] / suma * 100) + "%</b> " + q[1] + (q[2] ? '<br><span style="color:#6b7486;margin-left:16px">' + q[2] + "</span>" : "") + "</div>"; }).join("") + "</div></div>"
+        : '<p class="lead">' + t("Sin detecciones VIIRS en esta zona.", "No VIIRS detections in this area.") + "</p>") +
+        (grandes.length ? '<p class="lead" style="margin-top:8px"><b>' + grandes.length.toLocaleString(LOC) + "</b>" + t(" incendios grandes o largos desde 2018. Los mayores (clic para verlos):", " large or long fires since 2018. The largest (click to see them):") + "</p>" +
+          grandes.slice(0, 8).map(function (x) { return '<div class="item" data-lat="' + x[3] + '" data-lon="' + x[4] + '" style="border-left-color:#440154"><span class="t">' + x[0] + (x[1] !== x[0] ? " → " + x[1] : "") + "</span> · " + x[2].toLocaleString(LOC) + t(" detecciones", " detections") + "</div>"; }).join("") : "") +
+        "<details><summary>" + t("¿Cómo se clasifica?", "How is it classified?") + "</summary><p>" + t("Los puntos de calor VIIRS a menos de 1 km y a no más de 1 día de distancia forman un evento. Pequeño: hasta 3 detecciones en un solo día. Grande o largo: 30 detecciones o más, o 4 días o más. Es una estimación: un punto de calor no dice la causa. En Portugal, donde quemar está prohibido en verano, el 98% de los incendios grandes cae en ese periodo y la mayoría de las quemas pequeñas, fuera.",
+          "VIIRS hot spots less than 1 km and at most 1 day apart form one event. Small: up to 3 detections in a single day. Large or long: 30 detections or more, or 4 days or more. It is an estimate: a hot spot does not tell the cause. In Portugal, where burning is banned in summer, 98% of large fires fall in that period and most small burns fall outside it.") + "</p></details></div>";
+    }
+    $("tab-reglas").innerHTML = h;
+    if ($("barReglas")) conTip($("barReglas")); if ($("dona")) conTip($("dona"));
+    var vz = $("verZona"); if (vz) vz.addEventListener("click", function () { if (MAPA) { MAPA.zona(O.anillos); MAPA.encuadrar(cajaAnillos(O.anillos)); } });
+    $("tab-reglas").onclick = function (ev) { var d = ev.target.closest ? ev.target.closest(".item[data-lat]") : null; if (!d || !MAPA) return; var lat = +d.getAttribute("data-lat"), lon = +d.getAttribute("data-lon"); MAPA.irA(lat, lon, 10); MAPA.marcar(lat, lon); };
+  }
+
+  // ---------- Weekly risk ----------
+  function tabRiesgo() {
+    var R = Q.riesgo;
+    if (!R) { $("tab-riesgo").innerHTML = '<div class="tarjeta"><p class="lead">' + t("Esta región todavía no tiene datos de clima para el riesgo semanal.", "This region does not have climate data for the weekly risk yet.") + "</p></div>"; return; }
+    var mejor = 0, mv = -1; R.fuego.forEach(function (f, w) { var s = 0; f.forEach(function (v) { s += v; }); if (s > mv) { mv = s; mejor = w; } });
+    var w = estado.semRiesgo !== undefined ? estado.semRiesgo : mejor, m = R.metricas;
+    $("tab-riesgo").innerHTML = '<div class="tarjeta"><h3>' + t("¿Dónde poner atención la próxima semana?", "Where to look next week?") + '</h3><p class="lead">' + t("Para cada cuadro y semana estimamos la probabilidad de fuego con lo que se sabía la semana anterior. Mueve la barra y mira el mapa.", "For each square and week we estimate the chance of fire with what was known the week before. Move the slider and watch the map.") + "</p>" +
+      '<input type="range" id="semR" min="0" max="' + (R.semanas.length - 1) + '" value="' + w + '" style="width:100%;accent-color:#e8692e"><div class="fila" style="justify-content:space-between"><b id="semRtxt"></b><button class="link" id="semMax">' + t("Semana con más fuego", "Week with the most fire") + "</button></div>" +
+      '<div class="fila" style="margin-top:8px"><button class="boton prim" id="vRiesgo">' + t("Riesgo estimado", "Estimated risk") + '</button><button class="boton" id="vFuego">' + t("Fuego que hubo", "Fire that happened") + '</button></div><p class="lead" id="semRnota" style="margin-top:8px"></p>' +
+      '<div class="stats"><div class="stat"><div class="n">' + Math.round(m.fuego_reciente.captura_top10) + '%</div><div class="l">' + t("del fuego cayó en el 10% de cuadros-semana con más riesgo (prueba 2023-2025)", "of fire fell in the 10% of square-weeks with the highest risk (2023-2025 test)") + '</div></div><div class="stat"><div class="n">' + R.temporadas.correlaciones.suelo + '</div><div class="l">' + t("correlación entre suelo seco en primavera y la fuerza de la temporada (25 años)", "correlation between dry spring soil and how strong the season is (25 years)") + "</div></div></div>" +
+      "<details><summary>" + t("Lo que aprendimos (también lo que no funcionó)", "What we learned (including what did not work)") + "</summary><ul><li>" + t("Solo el calendario ya ubica bien el fuego: ", "The calendar alone already places fire well: ") + Math.round(m.calendario.captura_top10) + "%.</li><li>" + t("El clima semanal a 55 km no mejora el pronóstico local.", "Weekly weather at 55 km does not improve the local forecast.") + "</li><li>" + t("Una ola de calor sola no anticipa el fuego: ", "A heat wave alone does not anticipate fire: ") + R.bolsas.pct_fuego_con_bolsa + "% vs " + R.bolsas.pct_fuego_sin_bolsa + "%.</li><li>" + t("Casi todos los fuegos los inicia una persona; la sequedad decide cuánto crecen.", "Almost all fires are started by people; dryness decides how much they grow.") + "</li></ul></details></div>";
+    var vista = estado.vistaR || "riesgo";
+    function poner() { var ww = +$("semR").value; estado.semRiesgo = ww; var d = new Date(R.semanas[ww] + "T12:00:00");
+      $("semRtxt").textContent = EN ? "Week of " + NOML[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() : "Semana del " + d.getDate() + " de " + NOML[d.getMonth()] + " de " + d.getFullYear();
+      var f = R.fuego[ww], tot = 0; f.forEach(function (v) { tot += v; });
+      var orden = []; for (var c = 0; c < NC; c++) if (Q.tierra[c]) orden.push(c); orden.sort(function (a, b) { return R.riesgo[ww][b] - R.riesgo[ww][a]; });
+      var n = Math.max(1, Math.round(orden.length * 0.2)), dentro = 0; for (var k = 0; k < n; k++) dentro += f[orden[k]];
+      $("semRnota").textContent = tot > 0 ? t("Esa semana hubo ", "That week had ") + tot.toLocaleString(LOC) + t(" detecciones; el ", " detections; ") + Math.round(dentro / tot * 100) + t("% cayó en el 20% de cuadros con más riesgo.", "% fell in the 20% of squares with the highest risk.") : t("Esa semana no hubo detecciones.", "No detections that week.");
+      if (vista === "riesgo") estado.mapa = { tipo: "riesgo", valores: R.riesgo[ww].slice() }; else estado.mapa = { tipo: "semana", valores: f.slice() };
+      $("vRiesgo").className = "boton" + (vista === "riesgo" ? " prim" : ""); $("vFuego").className = "boton" + (vista !== "riesgo" ? " prim" : "");
+      pararReplay(); pintarMapa(); }
+    $("semR").addEventListener("input", poner);
+    $("semMax").addEventListener("click", function () { $("semR").value = mejor; poner(); });
+    $("vRiesgo").addEventListener("click", function () { vista = estado.vistaR = "riesgo"; poner(); });
+    $("vFuego").addEventListener("click", function () { vista = estado.vistaR = "fuego"; poner(); });
+    poner();
+  }
+
+  // ---------- Protected areas ----------
+  function tabAreas() {
+    var AP = Q.areas;
+    if (!AP || !AP.areas.length) { $("tab-areas").innerHTML = '<div class="tarjeta"><p class="lead">' + t("Sin áreas protegidas en esta región.", "No protected areas in this region.") + "</p></div>"; return; }
+    var L = AP.areas.slice().sort(function (a, b) { return (b.ultimo - b.mediana_anual) - (a.ultimo - a.mediana_anual); });
+    var pc = AP.pct_dentro, ys = Object.keys(pc).map(Number).sort(), uy = ys[ys.length - 1];
+    $("tab-areas").innerHTML = '<div class="tarjeta"><h3>' + t("Fuego en áreas protegidas", "Fire in protected areas") + '</h3><p class="lead">' + t("En ", "In ") + uy + t(", el ", ", ") + "<b>" + pc[uy] + "%</b>" + t(" del fuego de la región cayó dentro de un área protegida. Ordenadas por cuánto se salió de lo normal su último año. Haz clic en una para explorarla.", " of the region's fire fell inside a protected area. Sorted by how far their latest year departed from normal. Click one to explore it.") + "</p>" +
+      L.map(function (a) { var v = a.veces; return '<div class="item" data-a="' + a.id + '" style="border-left-color:' + (v !== null && v >= 2 ? "#b3261e" : v !== null && v >= 1.25 ? "#b7791f" : "#31688e") + '"><div class="t">' + esc(nombreA(a)) + "</div><div>" + a.ultimo_anio + ": " + fmt(a.ultimo) + t(" detecciones", " detections") + (v !== null ? " · <b>" + fmt(v) + "×</b> " + t("lo normal", "normal") : "") + t(" · lugar ", " · rank ") + a.lugar + "/" + a.anios + "</div></div>"; }).join("") + "</div>";
+    if (MAPA) MAPA.areas(AP.areas, estado.sel.tipo === "area" ? estado.sel.area.id : null);
+    $("tab-areas").onclick = function (ev) { var d = ev.target.closest ? ev.target.closest(".item[data-a]") : null; if (!d) return; var id = +d.getAttribute("data-a"); var a = AP.areas.filter(function (x) { return x.id === id; })[0]; if (a) { seleccionarArea(a); document.querySelector(".panel").scrollTo({ top: 0, behavior: "smooth" }); } };
+  }
+
+  // ---------- Verified from space ----------
+  function tabPrueba() {
+    var E = Q.evidencia;
+    if (!E) { $("tab-prueba").innerHTML = '<div class="tarjeta"><p class="lead">' + t("La comprobación con imágenes está hecha para la Península de Yucatán (junio de 2024).", "The check with imagery was done for the Yucatán Peninsula (June 2024).") + ' <a href="?region=yucatan&lang=' + (EN ? "en" : "es") + '">' + t("Ver en Yucatán", "See it in Yucatán") + "</a></p></div>"; return; }
+    var P = E.prueba, im = E.imagenes, b = E.bbox, Wv = 1000, Hv = Math.round(Wv * (b[3] - b[1]) / (b[2] - b[0]));
+    function ex(l) { return (l - b[0]) / (b[2] - b[0]) * Wv; } function ey(l) { return (b[3] - l) / (b[3] - b[1]) * Hv; }
+    var pts = '<svg viewBox="0 0 ' + Wv + " " + Hv + '" preserveAspectRatio="none" style="pointer-events:none" id="ptsEv">' + E.puntos.map(function (q) { return '<circle cx="' + ex(q[0]).toFixed(1) + '" cy="' + ey(q[1]).toFixed(1) + '" r="4" fill="#ff5a1f" stroke="#fff" stroke-width="1"/>'; }).join("") + "</svg>";
+    $("tab-prueba").innerHTML = '<div class="tarjeta"><h3>' + t("Junio de 2024: una alerta comprobada desde el espacio", "June 2024: an alert verified from space") + '</h3><p class="lead">' + t("La herramienta marcó fuego fuera de temporada en el norte de Quintana Roo, junto a Yum Balam. ¿Era real? Desliza para comparar antes y después.", "The tool flagged out-of-season fire in northern Quintana Roo, next to Yum Balam. Was it real? Slide to compare before and after.") + "</p>" +
+      '<div class="compara" id="cmp" style="aspect-ratio:' + (Wv / Hv).toFixed(3) + '"><img src="' + im[1].src + '" alt="' + esc(EN ? im[1].en : im[1].es) + '"><img class="antes" id="cmpAntes" src="' + im[0].src + '" alt="' + esc(EN ? im[0].en : im[0].es) + '">' + pts +
+      '<span class="eti" style="left:8px">' + t("Antes · ", "Before · ") + im[0].fecha + '</span><span class="eti" style="right:8px">' + t("Después · ", "After · ") + im[1].fecha + '</span><div class="barra" id="cmpBarra"></div><div class="asa" id="cmpAsa">⇆</div><input type="range" id="cmpR" min="0" max="100" value="50" aria-label="Before/after"></div>' +
+      '<div class="fila" style="margin-top:8px"><label class="toggle"><input type="checkbox" id="chkPts" checked> ' + t("Puntos de calor del evento", "Event hot spots") + '</label><button class="boton" id="evMapa">' + t("Ver sobre el mapa", "Show on the map") + "</button></div>" +
+      '<div class="stats" style="margin-top:10px"><div class="stat"><div class="n">' + P.pixel_exacto.evento + '%</div><div class="l">' + t("de los puntos cae sobre vegetación perdida (producto OPERA de la NASA)", "of the hot spots fall on lost vegetation (NASA OPERA product)") + '</div></div><div class="stat"><div class="n">' + P.pixel_exacto.azar + '%</div><div class="l">' + t("con puntos al azar en la misma zona", "with random points in the same area") + '</div></div><div class="stat"><div class="n">' + E.n_detecciones + '</div><div class="l">' + t("detecciones del evento", "event detections") + '</div></div><div class="stat"><div class="n">' + E.dentro_area + '</div><div class="l">' + t("dentro del área protegida Yum Balam", "inside the Yum Balam protected area") + "</div></div></div>" +
+      "<details><summary>" + t("Ver también la pérdida de vegetación (OPERA)", "Also see vegetation loss (OPERA)") + '</summary><img src="' + im[2].src + '" alt="' + esc(EN ? im[2].en : im[2].es) + '" style="width:100%;border-radius:10px;margin-top:8px"><p>' + esc(EN ? im[2].layer : im[2].capa) + "</p></details>" +
+      '<p style="font-size:12px;color:#6b7486;margin-top:8px">' + esc(EN ? E.source : E.fuente) + "</p></div>";
+    $("cmpR").addEventListener("input", function () { var v = this.value; $("cmpAntes").style.clipPath = "inset(0 " + (100 - v) + "% 0 0)"; $("cmpBarra").style.left = v + "%"; $("cmpAsa").style.left = v + "%"; });
+    $("chkPts").addEventListener("change", function () { $("ptsEv").style.display = this.checked ? "" : "none"; });
+    $("evMapa").addEventListener("click", function () { if (!MAPA) return; MAPA.imagen(im[1].src, b, E.puntos); MAPA.encuadrar(b); });
+  }
+
+  // ---------- Does it work? ----------
+  function tabComo() {
+    var V = Q.validacion, r = V.resultados, m = r[V.metodo_elegido], c = r.modis_crudo, S2 = V.serie, W = 400, H = 190, L = 44, B = 22, Tp = 26, mx = 1;
+    S2.forEach(function (d) { mx = Math.max(mx, d.viirs_real, d.armonizado); });
+    function X(i) { return L + (W - L - 6) * i / Math.max(1, S2.length - 1); } function Y(v) { return H - B - (H - B - Tp) * v / mx; }
+    function linea(k, col, dash, w) { return '<path d="M' + S2.map(function (d, i) { return X(i).toFixed(1) + " " + Y(d[k]).toFixed(1); }).join("L") + '" fill="none" stroke="' + col + '" stroke-width="' + w + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : "") + "/>"; }
+    var g = ['<svg viewBox="0 0 ' + W + " " + H + '" style="width:100%;height:auto">'];
+    S2.forEach(function (d, i) { if (d.mes.slice(5) === "01") g.push('<text x="' + X(i) + '" y="' + (H - 6) + '" font-size="9" text-anchor="middle" fill="#6b7486">' + d.mes.slice(0, 4) + "</text>"); });
+    g.push(linea("modis_crudo", "#9aa4b1", "2 3", 1.5), linea("viirs_real", "#14213D", "", 2.2), linea("armonizado", "#e8692e", "6 3", 2));
+    g.push('<g font-size="9" fill="#14213D"><line x1="' + L + '" x2="' + (L + 18) + '" y1="10" y2="10" stroke="#14213D" stroke-width="2.2"/><text x="' + (L + 22) + '" y="13">' + t("VIIRS real", "Actual VIIRS") + '</text><line x1="' + (L + 100) + '" x2="' + (L + 118) + '" y1="10" y2="10" stroke="#e8692e" stroke-width="2" stroke-dasharray="6 3"/><text x="' + (L + 122) + '" y="13">' + t("Estimado desde MODIS", "Estimated from MODIS") + '</text><line x1="' + (L + 250) + '" x2="' + (L + 268) + '" y1="10" y2="10" stroke="#9aa4b1" stroke-width="1.5" stroke-dasharray="2 3"/><text x="' + (L + 272) + '" y="13">' + t("MODIS sin corregir", "Uncorrected MODIS") + "</text></g></svg>");
+    $("tab-como").innerHTML = '<div class="tarjeta"><h3>' + t("¿Cómo sabemos que funciona?", "How do we know it works?") + '</h3><p class="lead">' + t("Escondimos un año completo de VIIRS, lo estimamos solo con MODIS y lo comparamos con el dato real. Repetimos con cada año.", "We hid one full year of VIIRS, estimated it from MODIS alone and compared it with the real data. We repeated this for every year.") + "</p>" +
+      '<div class="stats"><div class="stat"><div class="n" style="color:#6b7486">' + c.error_pct_mediano_mensual.toFixed(1) + '%</div><div class="l">' + t("error sin armonizar", "error without harmonization") + '</div></div><div class="stat"><div class="n">' + m.error_pct_mediano_mensual.toFixed(1) + '%</div><div class="l">' + t("error con nuestro método (de 5 probados)", "error with our method (best of 5)") + "</div></div></div>" + g.join("") +
+      "<details><summary>" + t("Detalles y límites", "Details and limits") + "</summary><ul><li>" + t("Error mediano mensual del total de la región; en un solo cuadro es mayor.", "Median monthly error for the regional total; it is larger for a single square.") + "</li><li>R² " + m.r2_mensual_region + t(" · meses en común: ", " · months in common: ") + V.meses_comunes + "</li><li>" + t("De agosto a noviembre de 2026 los datos son casi en tiempo real y pueden cambiar un poco.", "August to November 2026 are near-real-time data and may change slightly.") + "</li><li>" + t("Más detalle en la vista técnica.", "More detail in the technical view.") + "</li></ul></details></div>";
+  }
+
+  // =====================================================================
+  //  Season replay (timeline on the map)
+  // =====================================================================
+  var SEM = null, repTimer = null, cacheSem = {};
+  window.SEMANAL_LISTO = function (clave, datos) { SEM = datos; iniciarReplay(); };
+  (function () { var sc = document.createElement("script"); sc.src = "data/semanal/" + M.clave + ".js"; sc.onerror = function () { $("tiempo").style.display = "none"; }; document.head.appendChild(sc); })();
+  function semanasDe(y) { var a = SEM[y] || [], w = []; for (var i = 0; i < 52; i++) w.push({}); for (var k = 0; k < a.length; k += 3) w[a[k]][a[k + 1]] = a[k + 2] / 10; return w; }
+  function iniciarReplay() {
+    var ys = Object.keys(SEM).map(Number).sort(function (a, b) { return b - a; });
+    $("repAnio").innerHTML = ys.map(function (y) { return "<option>" + y + "</option>"; }).join("");
+    $("repAnio").value = ys.indexOf(2024) >= 0 ? 2024 : ys[0];
+    $("repTxt").textContent = t("Reproduce una temporada", "Replay a season");
+    $("repAnio").addEventListener("change", function () { pararReplay(); cuadro(); });
+    $("repSem").addEventListener("input", function () { pararReplay(); cuadro(); });
+    $("play").addEventListener("click", function () { if (repTimer) pararReplay(); else reproducir(); });
+  }
+  function cuadro() {
+    var y = +$("repAnio").value, s = +$("repSem").value, W = cacheSem[y] || (cacheSem[y] = semanasDe(y)), v = new Array(NC).fill(0), tot = 0;
+    for (var c in W[s]) { v[c] = W[s][c]; tot += W[s][c]; }
+    var d0 = new Date(Date.UTC(y, 0, 1 + 7 * s));
+    $("repTxt").textContent = (EN ? NOML[d0.getUTCMonth()] + " " + d0.getUTCDate() + ", " + y : d0.getUTCDate() + " de " + NOML[d0.getUTCMonth()] + " de " + y) + " · " + fmt(tot);
+    estado.mapa = { tipo: "semana", valores: v }; pintarMapa();
+  }
+  function reproducir() {
+    var sl = $("repSem"); if (+sl.value >= 51) sl.value = 0; $("play").textContent = "❚❚"; cuadro();
+    repTimer = setInterval(function () { if (+sl.value >= 51) { pararReplay(); return; } sl.value = +sl.value + 1; cuadro(); }, 260);
+  }
+  function pararReplay() { if (repTimer) { clearInterval(repTimer); repTimer = null; } var p = $("play"); if (p) p.textContent = "▶"; }
+
+  // =====================================================================
+  //  Welcome card and shortcuts
+  // =====================================================================
+  var ATAJOS = M.clave === "yucatan" ? [
+    { n: "Yum Balam 2024 🔥", lat: 21.33, lon: -87.07, prueba: true, prim: true }, { n: "Mérida", lat: 20.97, lon: -89.62 }, { n: "Calakmul", lat: 18.37, lon: -89.6 }, { n: "Sian Ka'an", lat: 19.6, lon: -87.6 }, { n: "Tizimín", lat: 21.14, lon: -88.15 }
+  ] : [{ n: "Pedrógão Grande", lat: 39.92, lon: -8.15, prim: true }, { n: "Monchique", lat: 37.32, lon: -8.55 }, { n: "Coimbra", lat: 40.2, lon: -8.42 }, { n: "Porto", lat: 41.15, lon: -8.61 }];
+  $("bTit").textContent = t("¿Cuándo y cuánto se quema aquí?", "When and how much does it burn here?");
+  $("bTxt").textContent = t("25 años de fuego visto por satélites de la NASA, en una sola escala. Busca un lugar arriba, haz clic en el mapa o prueba un ejemplo:", "25 years of fire seen by NASA satellites, on one consistent scale. Search a place above, click the map, or try an example:");
+  $("atajos").innerHTML = ATAJOS.map(function (a, i) { return '<button class="atajo' + (a.prim ? " prim" : "") + '" data-i="' + i + '">' + esc(a.n) + "</button>"; }).join("") + '<button class="atajo" data-i="-1">' + t("Toda la región", "Whole region") + "</button>";
+  function cerrarBienvenida() { $("bienvenida").style.display = "none"; }
+  $("cerrarBienv").addEventListener("click", cerrarBienvenida);
+  $("atajos").addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; cerrarBienvenida();
+    var i = +b.getAttribute("data-i"); if (i < 0) { seleccionarRegion(); return; }
+    var a = ATAJOS[i]; if (MAPA) MAPA.irA(a.lat, a.lon, 9); estado.escala = 1; seleccionarPunto(a.lat, a.lon, a.n, true);
+    if (a.prueba) abrirTab("prueba");
+  });
+
+  // =====================================================================
+  //  Refresh everything that depends on the selection
+  // =====================================================================
+  function actualizar() {
+    pararSon(); dibujarLugar(); dibujarRespuestas();
+    if (MAPA) pintarMapa();
+    abrirTab(estado.tab);
+  }
+
+  // ---------- start ----------
+  try { MAPA = window.L ? crearLeaflet() : crearSvg(); } catch (e) { console.error(e); $("mapa").innerHTML = ""; MAPA = crearSvg(); }
+  if (MAPA.tipo === "leaflet") {
+    $("capas").innerHTML = Object.keys(BASES).map(function (k) { return '<button data-k="' + k + '" class="' + (k === "sat" ? "on" : "") + '">' + BASES[k].nombre + "</button>"; }).join("");
+    $("capas").addEventListener("click", function (ev) { var b = ev.target.closest ? ev.target.closest("button") : null; if (b) MAPA.base(b.getAttribute("data-k")); });
+    $("fecha").value = "2024-05-25"; $("fecha").max = new Date().toISOString().slice(0, 10); $("fecha").min = "2018-01-01";
+    $("fecha").addEventListener("change", function () { if (this.value) MAPA.fecha(this.value); });
+  }
+  MAPA.alClic(function (lat, lon) { cerrarBienvenida(); seleccionarPunto(lat, lon); });
+  actualizar();
+})();
