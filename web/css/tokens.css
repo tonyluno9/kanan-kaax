@@ -1,5 +1,5 @@
 /*
-  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Kanan Ka'ax (Burn Calendar) · team La Com · NASA Space Apps Challenge 2026
   Challenge: Harmonization of MODIS and VIIRS Hot Spots.
   AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
   and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
@@ -58,9 +58,10 @@
   --ramp: linear-gradient(90deg, var(--v0), var(--v1), var(--v2), var(--v3), var(--v4), var(--v5), var(--v6), var(--v7), var(--v8), var(--v9));
 
   /* ---------- type ---------- */
-  --font-ui: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  /* NASA Horizon Design System typefaces (nasa/hds-core): Public Sans body, Inter headings, DM Mono data */
+  --font-ui: "Public Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-serif: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif; /* headings (name kept for compatibility) */
   --fs-11: 11px; --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-15: 15px; --fs-16: 16px;
   --fs-20: 20px; --fs-24: 24px; --fs-32: 32px; --fs-40: 40px; --fs-56: 56px;
   --tracking-kicker: .14em;
@@ -106,7 +107,7 @@ h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -.01em; }
 a { color: var(--accent-hi); text-underline-offset: 3px; }
 b, strong { font-weight: 600; color: var(--text); }
 .mono, .num { font-family: var(--font-mono); font-feature-settings: "tnum" 1, "zero" 0; letter-spacing: -.01em; }
-.serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -.005em; }
+.serif { font-family: var(--font-serif); font-weight: 700; letter-spacing: -.025em; }
 .kicker {
   font: 500 var(--fs-11)/1 var(--font-mono); letter-spacing: var(--tracking-kicker);
   text-transform: uppercase; color: var(--text-3);

@@ -1,5 +1,5 @@
 /*
-  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Kanan Ka'ax (Burn Calendar · Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
   Challenge: Harmonization of MODIS and VIIRS Hot Spots.
   AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
   and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
@@ -63,9 +63,10 @@
     });
     return "#" + r.join("");
   }
-  // Cells read as data tiles: opacity follows the value (low ≈ 0.15, nearly see-through; high ≈ 0.75), so the satellite
-  // stays clean and only the places with fire stand out. x is the value as a share of the map's maximum (0–1).
-  function opacidad(x) { return 0.15 + 0.6 * Math.min(1, Math.max(0, x || 0)); }
+  // Cells read as data tiles. Every land square is visible: little fire is a clear purple (never see-through, so it does not
+  // look like "nothing happened") and the opacity rises gently with the value (0.62 → 0.9). x is the share of the maximum (0–1).
+  function opacidad(x) { return 0.62 + 0.28 * Math.min(1, Math.max(0, x || 0)); }
+  var MORADO_MIN = 0.1; // lowest point of the viridis ramp used on the map: a purple that reads on the dark satellite
   // One cell as a tile: inset ~0.8 px per side (a 1–2 px gap between neighbours) with slightly rounded corners.
   function tesela(x, y, w, h) {
     var g = Math.min(0.8, w * 0.08, h * 0.08); x += g; y += g; w -= 2 * g; h -= 2 * g;
@@ -129,9 +130,11 @@
   //  Static texts
   // =====================================================================
   document.documentElement.lang = EN ? "en" : "es";
-  document.title = t("Calendario de quemas", "Burn Calendar") + " · " + NOMBRE_REGION;
-  $("titulo").textContent = t("Calendario de quemas", "Burn Calendar");
-  $("subtitulo").textContent = t("Fuego visto desde el espacio", "Fire seen from space");
+  // Official name: Kanan Ka'ax (Yucatec Maya, "guardian of the forest"); "Burn Calendar" stays as the descriptor.
+  document.title = "Kanan Ka'ax · " + NOMBRE_REGION;
+  $("titulo").textContent = "Kanan Ka'ax";
+  $("titulo").setAttribute("title", t("Kanan Ka'ax: «guardián del monte» en maya", "Kanan Ka'ax: “guardian of the forest” in Yucatec Maya"));
+  $("subtitulo").textContent = t("Calendario de quemas desde el espacio", "Burn calendar from space");
   $("logo").innerHTML = I("logo", 30);
   $("lupa").innerHTML = I("search", 18);
   $("btnIr").innerHTML = I("arrow", 18);
@@ -140,22 +143,18 @@
   // Language switch shows both options, the current one highlighted: "ES · EN"
   $("btnIdioma").innerHTML = I("globe", 16) + '<span class="idi' + (EN ? "" : " on") + '" lang="es">ES</span><span class="idi-sep" aria-hidden="true">·</span><span class="idi' + (EN ? " on" : "") + '" lang="en">EN</span>';
   $("btnIdioma").setAttribute("aria-label", EN ? "Cambiar a español" : "Switch to English");
-  $("lnkTec").innerHTML = I("lab", 16) + '<span class="lnk-largo">' + t("Vista técnica", "Technical view") + "</span>";
-  $("lnkTec").setAttribute("aria-label", t("Vista técnica", "Technical view"));
-  $("lnkTec").href = "tecnico.html?region=" + M.clave + "&lang=" + (EN ? "en" : "es");
   $("kResp").textContent = t("Lo más importante", "The short answer");
   $("lFecha").textContent = t("Fecha de la foto", "Photo date");
   $("lugarPin").innerHTML = I("pin", 20);
   $("modoX").innerHTML = I("x", 14);
   $("cerrarBienv").innerHTML = I("x", 18);
   $("play").innerHTML = I("play", 20);
-  $("repKick").textContent = t("Ver un año pasar", "Watch a year go by");
-  $("pie").innerHTML = '<div class="pie-marca">' + I("logo", 16) + "Burn Calendar · La Com · NASA Space Apps 2026</div>" + t("Datos: NASA FIRMS (MODIS y VIIRS NOAA-20), NASA POWER y NASA GIBS. Mapas: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, etiquetas © Esri. Búsqueda: OpenStreetMap Nominatim. ",
+  $("repKick").textContent = t("Reproducir", "Play");
+  $("pie").innerHTML = '<div class="pie-marca">' + I("logo", 16) + "Kanan Ka'ax · La Com · NASA Space Apps 2026</div>" + t("Datos: NASA FIRMS (MODIS y VIIRS NOAA-20), NASA POWER y NASA GIBS. Mapas: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, etiquetas © Esri. Búsqueda: OpenStreetMap Nominatim. ",
     "Data: NASA FIRMS (MODIS and VIIRS NOAA-20), NASA POWER and NASA GIBS. Maps: NASA GIBS (Blue Marble, VIIRS), © OpenStreetMap, labels © Esri. Search: OpenStreetMap Nominatim. ") +
     t("Áreas protegidas: WDPA (Protected Planet). Imágenes de la prueba: NASA HLS y OPERA. ", "Protected areas: WDPA (Protected Planet). Evidence imagery: NASA HLS and OPERA. ") +
     t("Equipo La Com (Mérida): Angel Antonio Perez Reyes, Gabriel Chi Vidal, Alan Flores Denegri, Alessandro Novelo Diaz y Daniel Esquivel Gomez. ", "Team La Com (Mérida): Angel Antonio Perez Reyes, Gabriel Chi Vidal, Alan Flores Denegri, Alessandro Novelo Diaz and Daniel Esquivel Gomez. ") +
-    t("Declaración de IA: el código se generó con ayuda de una herramienta de IA (Claude) y fue revisado por el equipo La Com. ", "AI disclosure: the code was generated with the assistance of an AI tool (Claude) and reviewed by team La Com. ") +
-    '<a href="' + $("lnkTec").href + '">' + t("Vista técnica completa", "Full technical view") + "</a>.";
+    t("Declaración de IA: el código se generó con ayuda de una herramienta de IA (Claude) y fue revisado por el equipo La Com. ", "AI disclosure: the code was generated with the assistance of an AI tool (Claude) and reviewed by team La Com.");
   $("modo").insertAdjacentHTML("afterend", '<div class="flot pista-mapa" id="pistaMapa" role="note">' + I("pin", 16) + (TACTIL ? t("Toca el mapa o busca tu pueblo", "Tap the map or search your town") : t("Haz clic en el mapa o busca tu pueblo", "Click the map or search your town")) + "</div>");
   if (M.sintetico) $("avisoSint").innerHTML = '<div class="aviso">' + t("DATOS SINTÉTICOS DE PRUEBA: no son observaciones reales.", "SYNTHETIC TEST DATA: not real observations.") + "</div>";
   $("btnIdioma").addEventListener("click", function () { location.search = "?region=" + M.clave + "&lang=" + (EN ? "es" : "en"); });
@@ -219,23 +218,181 @@
       rects[c].addTo(map);
     }
     if (!QUIETO) map.getPane("celdas").classList.add("celdas-ocultas");
+    // Coastline clip: the squares follow the shape of the land exactly (Natural Earth 1:10m outline in Q.costa),
+    // so coastal squares are cut by the shoreline instead of spilling into the sea. Pure presentation: values are unchanged.
+    // Runs when the map is ready: before the first setView Leaflet has not created the cells' SVG container yet.
+    map.whenReady(function () {
+      var anillos = []; (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { anillos.push(r); }); });
+      if (!anillos.length || !renCeldas._container) return;
+      var NS = "http://www.w3.org/2000/svg", defs = document.createElementNS(NS, "defs"), cp = document.createElementNS(NS, "clipPath"), cpath = document.createElementNS(NS, "path");
+      cp.setAttribute("id", "clipTierra"); cp.setAttribute("clipPathUnits", "userSpaceOnUse"); cpath.setAttribute("clip-rule", "nonzero");
+      cp.appendChild(cpath); defs.appendChild(cp); renCeldas._container.insertBefore(defs, renCeldas._container.firstChild);
+      renCeldas._rootGroup.setAttribute("clip-path", "url(#clipTierra)");
+      var origen = null;
+      function recortar() {
+        var o = map.getPixelOrigin(), z = map.getZoom(), clave = z + ":" + o.x + ":" + o.y; if (clave === origen) return; origen = clave;
+        cpath.setAttribute("d", anillos.map(function (r) {
+          return "M" + r.map(function (q) { var pt = map.latLngToLayerPoint([q[1], q[0]]); return pt.x.toFixed(1) + " " + pt.y.toFixed(1); }).join("L") + "Z";
+        }).join(""));
+      }
+      recortar(); map.on("zoomend viewreset resize", recortar); renCeldas.on("update", recortar);
+    });
     var selCapa = null, zonaCapa = null, areasCapa = null, imgCapa = null, ptsCapa = null, marca = null;
     function anillosLL(an) { return an.map(function (r) { return r.map(function (q) { return [q[1], q[0]]; }); }); }
     // Map framing keeps the sheet's space free: padding on the sheet side (right on desktop, bottom on mobile).
     function relleno() {
       if (MOVIL()) return { paddingTopLeft: [24, 80], paddingBottomRight: [24, 200] };
-      var w = $("panel").offsetWidth || 420;
+      var w = document.body.classList.contains("panel-oculto") ? 0 : ($("panel").offsetWidth || 420);
       return { paddingTopLeft: [40, 100], paddingBottomRight: [w + 48, 130] };
     }
     function desplazado(lat, lon, z) { // centre so that (lat, lon) sits in the middle of the free map area
       var r = relleno(), dx = (r.paddingBottomRight[0] - r.paddingTopLeft[0]) / 2, dy = (r.paddingBottomRight[1] - r.paddingTopLeft[1]) / 2;
       return map.unproject(map.project([lat, lon], z).add([dx, dy]), z);
     }
+    // ---------- Heat map (thermal style) ----------
+    // The grid values are interpolated into a smooth field, coloured with the same viridis ramp, softened and clipped to the
+    // land outline, then shown as one image under the (now invisible) squares, which keep the tooltips and clicks.
+    // Pure presentation: the values are the same ones the squares showed.
+    map.createPane("termico"); map.getPane("termico").style.zIndex = 415; map.getPane("termico").style.pointerEvents = "none";
+    var termico = null, TW = 820;
+    // The heat image covers the whole land on screen (Yucatán Peninsula and its neighbours), not only the study box.
+    // Inside the box the colours are the data; outside it they only continue the nearest edge, muted (illustrative).
+    var EXT = [LON0, LAT0, LON1, LAT1];
+    (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { r.forEach(function (q) {
+      if (q[0] < EXT[0]) EXT[0] = q[0]; if (q[1] < EXT[1]) EXT[1] = q[1]; if (q[0] > EXT[2]) EXT[2] = q[0]; if (q[1] > EXT[3]) EXT[3] = q[1]; }); }); });
+    function mercY(lat) { var r = lat * Math.PI / 180; return Math.log(Math.tan(Math.PI / 4 + r / 2)); }
+    var MY0 = mercY(EXT[1]), MY1 = mercY(EXT[3]), TH = Math.max(40, Math.round(TW * (MY1 - MY0) / ((EXT[2] - EXT[0]) * Math.PI / 180)));
+    var filaF = new Float32Array(TH), colF = new Float32Array(TW), fuera = new Float32Array(TW * TH), yy, xx;
+    var latF = new Float32Array(TH), lonF = new Float32Array(TW);
+    for (yy = 0; yy < TH; yy++) { var myy = MY1 - (yy + 0.5) / TH * (MY1 - MY0); latF[yy] = (2 * Math.atan(Math.exp(myy)) - Math.PI / 2) * 180 / Math.PI; filaF[yy] = (latF[yy] - LAT0) / G - 0.5; }
+    for (xx = 0; xx < TW; xx++) { lonF[xx] = EXT[0] + (xx + 0.5) / TW * (EXT[2] - EXT[0]); colF[xx] = (lonF[xx] - LON0) / G - 0.5; }
+    // how far outside the study box each pixel is (0 inside, 1 at ~5 squares or more): drives the "illustrative" muting
+    for (yy = 0; yy < TH; yy++) for (xx = 0; xx < TW; xx++) {
+      var dx = Math.max(0, LON0 - lonF[xx], lonF[xx] - LON1), dy = Math.max(0, LAT0 - latF[yy], latF[yy] - LAT1);
+      fuera[yy * TW + xx] = Math.min(1, Math.sqrt(dx * dx + dy * dy) / (10 * G)); }
+    var mascara = document.createElement("canvas"); mascara.width = TW; mascara.height = TH;
+    (function () { var mx = mascara.getContext("2d"); mx.fillStyle = "#000"; mx.beginPath();
+      (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { r.forEach(function (q, i) {
+        var x = (q[0] - EXT[0]) / (EXT[2] - EXT[0]) * TW, y = (MY1 - mercY(q[1])) / (MY1 - MY0) * TH; if (i) mx.lineTo(x, y); else mx.moveTo(x, y); }); mx.closePath(); }); });
+      mx.fill("nonzero");
+      // soft fade at the outer edges of the image (where the land outline is cut), never a hard straight line
+      var fd = document.createElement("canvas"); fd.width = TW; fd.height = TH; var fx = fd.getContext("2d"), fi = fx.createImageData(TW, TH), F = Math.round(TW * 0.07);
+      for (var y = 0; y < TH; y++) for (var x = 0; x < TW; x++) { var a = Math.min(1, (x + 0.5) / F, (TW - x - 0.5) / F, (y + 0.5) / F, (TH - y - 0.5) / F); fi.data[(y * TW + x) * 4 + 3] = Math.round(255 * a * a * (3 - 2 * a)); }
+      fx.putImageData(fi, 0, 0); mx.globalCompositeOperation = "destination-in"; mx.drawImage(fd, 0, 0); mx.globalCompositeOperation = "source-over"; })();
+    var LUT = []; for (var li = 0; li < 256; li++) { var hx = color(MORADO_MIN + (1 - MORADO_MIN) * li / 255); LUT.push([parseInt(hx.substr(1, 2), 16), parseInt(hx.substr(3, 2), 16), parseInt(hx.substr(5, 2), 16)]); }
+    var lienzoA = document.createElement("canvas"), lienzoB = document.createElement("canvas"); lienzoA.width = lienzoB.width = TW; lienzoA.height = lienzoB.height = TH;
+    var TERMICO_OK = !!(Q.costa && Q.costa.length && lienzoA.getContext);
+    function pintarTermico(valores, normDe) {
+      var f = new Float32Array(NC), ok = new Uint8Array(NC), c2, it;
+      for (c2 = 0; c2 < NC; c2++) if (rects[c2]) { var nv = normDe(valores[c2]); f[c2] = nv > 1 ? 1 : (nv > 0 ? nv : 0); ok[c2] = 1; }
+      // fill the sea squares next to the coast with their land neighbours, so the coastline has no dark fringe
+      for (it = 0; it < 3; it++) { var nf = f.slice(), nok = ok.slice();
+        for (c2 = 0; c2 < NC; c2++) { if (ok[c2]) continue; var j = Math.floor(c2 / NX), i = c2 % NX, s = 0, n = 0;
+          for (var dj = -1; dj <= 1; dj++) for (var di = -1; di <= 1; di++) { var jj = j + dj, ii = i + di; if (jj < 0 || jj >= NY || ii < 0 || ii >= NX) continue; var k2 = jj * NX + ii; if (ok[k2]) { s += f[k2]; n++; } }
+          if (n) { nf[c2] = s / n; nok[c2] = 1; } }
+        f = nf; ok = nok; }
+      var MEDIA = 0, nm = 0; for (c2 in rects) { MEDIA += f[c2]; nm++; } MEDIA = nm ? MEDIA / nm : 0;
+      function val(j, i) { j = j < 0 ? 0 : (j >= NY ? NY - 1 : j); i = i < 0 ? 0 : (i >= NX ? NX - 1 : i); return f[j * NX + i]; }
+      var ax = lienzoA.getContext("2d"), img = ax.createImageData(TW, TH), d = img.data;
+      for (var y = 0; y < TH; y++) { var rf = filaF[y], j0 = Math.floor(rf), ty = rf - j0;
+        for (var x = 0; x < TW; x++) { var cf = colF[x], i0 = Math.floor(cf), tx = cf - i0;
+          var v = (val(j0, i0) * (1 - tx) + val(j0, i0 + 1) * tx) * (1 - ty) + (val(j0 + 1, i0) * (1 - tx) + val(j0 + 1, i0 + 1) * tx) * ty;
+          var m = fuera[y * TW + x]; if (m > 0) v = v * (1 - m) + MEDIA * m; // outside: fade from the edge towards the regional average (no stripes)
+          var o = (y * TW + x) * 4, cl = LUT[Math.round(v * 255)], al = opacidad(v);
+          if (m > 0) { // outside the study box: same hue, pulled towards a quiet night purple and a bit more see-through
+            var k = 0.2 * m, gr = (cl[0] + cl[1] + cl[2]) / 3;
+            d[o] = Math.round((cl[0] * 0.8 + gr * 0.2) * (1 - k) + 46 * k); d[o + 1] = Math.round((cl[1] * 0.8 + gr * 0.2) * (1 - k) + 38 * k); d[o + 2] = Math.round((cl[2] * 0.8 + gr * 0.2) * (1 - k) + 92 * k);
+            d[o + 3] = Math.round(255 * al * (1 - 0.12 * m));
+          } else { d[o] = cl[0]; d[o + 1] = cl[1]; d[o + 2] = cl[2]; d[o + 3] = Math.round(255 * al); } } }
+      ax.putImageData(img, 0, 0);
+      var bx = lienzoB.getContext("2d"); bx.clearRect(0, 0, TW, TH); bx.filter = "blur(3px)"; bx.drawImage(lienzoA, 0, 0); bx.filter = "none";
+      bx.globalCompositeOperation = "destination-in"; bx.drawImage(mascara, 0, 0); bx.globalCompositeOperation = "source-over";
+      var url = lienzoB.toDataURL("image/png");
+      if (!termico) termico = L.imageOverlay(url, [[EXT[1], EXT[0]], [EXT[3], EXT[2]]], { pane: "termico", interactive: false, className: "termico" }).addTo(map);
+      else termico.setUrl(url);
+    }
+    // ---------- Squares view: lines that group neighbouring squares with similar fire ----------
+    // Four groups on the same scale as the colours (little · medium · high · very high). A line is drawn only on the edge
+    // between two land squares of different groups, so each group reads as one shape. Clipped to the coast like the squares.
+    var zonasCapa = null, VISTA = TERMICO_OK ? "calor" : "cuadros";
+    function grupo(x) { return x < 0.25 ? 0 : x < 0.5 ? 1 : x < 0.75 ? 2 : 3; }
+    function dibujarZonas(valores, normDe) {
+      if (zonasCapa) { map.removeLayer(zonasCapa); zonasCapa = null; }
+      if (!normDe) return;
+      var gr = {}, segs = [], c4;
+      for (c4 in rects) gr[c4] = grupo(normDe(valores[c4]));
+      for (c4 in rects) {
+        var cn = +c4, j = Math.floor(cn / NX), i = cn % NX, y0 = LAT0 + j * G, x0 = LON0 + i * G;
+        if (i + 1 < NX && rects[cn + 1] && gr[cn + 1] !== gr[cn]) segs.push([[y0, x0 + G], [y0 + G, x0 + G]]);   // east edge
+        if (j + 1 < NY && rects[cn + NX] && gr[cn + NX] !== gr[cn]) segs.push([[y0 + G, x0], [y0 + G, x0 + G]]); // north edge
+      }
+      if (segs.length) zonasCapa = L.polyline(segs, { pane: "celdas", renderer: renCeldas, color: "#F4F1EA", weight: 1.8, opacity: 0.85, lineCap: "square", interactive: false, className: "zona-borde" }).addTo(map);
+    }
+    // ---------- Squares view outside the study area (illustrative) ----------
+    // Same 0.25° lattice, on the land around the region (Tabasco, Chiapas, Petén, Belize...), so the squares view also
+    // fills the screen like the heat map. Their colour only continues the nearest edge, muted, and they hold no data:
+    // no tooltip, no click (a click there still says the place is outside the study area).
+    var fantasmas = [], fantasmasCapa = L.layerGroup();
+    (function () {
+      var an = []; (Q.costa || []).forEach(function (p) { p.anillos.forEach(function (r) { an.push(r); }); });
+      if (!an.length) return;
+      var i0 = Math.floor((EXT[0] - LON0) / G), i1 = Math.ceil((EXT[2] - LON0) / G), j0 = Math.floor((EXT[1] - LAT0) / G), j1 = Math.ceil((EXT[3] - LAT0) / G);
+      for (var jj = j0; jj < j1; jj++) for (var ii = i0; ii < i1; ii++) {
+        if (ii >= 0 && ii < NX && jj >= 0 && jj < NY) continue; // inside the study grid: real squares only
+        var x0 = LON0 + ii * G, y0 = LAT0 + jj * G, h = G / 2, tierra = false;
+        [[x0 + h, y0 + h], [x0 + .1 * G, y0 + .1 * G], [x0 + .9 * G, y0 + .1 * G], [x0 + .1 * G, y0 + .9 * G], [x0 + .9 * G, y0 + .9 * G]].forEach(function (q) { if (!tierra && dentroAnillos(q[0], q[1], an)) tierra = true; });
+        if (!tierra) continue;
+        var dx = Math.max(0, -ii - 0.5, ii + 0.5 - NX), dy = Math.max(0, -jj - 0.5, jj + 0.5 - NY);
+        // m: how far from the study grid (blends to the regional average within ~4 squares: no stripes);
+        // e: fade towards the outer edge of the drawn area (no hard straight end)
+        var e = Math.min(1, Math.min(x0 + h - EXT[0], EXT[2] - x0 - h, y0 + h - EXT[1], EXT[3] - y0 - h) / (3 * G));
+        fantasmas.push({ j: jj, i: ii, m: Math.min(1, Math.sqrt(dx * dx + dy * dy) / 4), e: Math.max(0, e),
+          r: new Celda([[y0, x0], [y0 + G, x0 + G]], { pane: "celdas", renderer: renCeldas, stroke: false, fillOpacity: 0, interactive: false, className: "celda celda-fantasma" }).addTo(fantasmasCapa) });
+      }
+    })();
+    function apagado(hex, m) { // same muting as the heat map outside the study area
+      var c = [1, 3, 5].map(function (k) { return parseInt(hex.substr(k, 2), 16); }), gr = (c[0] + c[1] + c[2]) / 3, k = 0.2 * m, base = [46, 38, 92];
+      return "#" + c.map(function (v, n) { return Math.round((v * 0.8 + gr * 0.2) * (1 - k) + base[n] * k).toString(16).padStart(2, "0"); }).join("");
+    }
+    function pintarFantasmas(valores, normDe) {
+      if (!fantasmas.length) return;
+      if (!map.hasLayer(fantasmasCapa)) fantasmasCapa.addTo(map);
+      var f = new Float32Array(NC), ok = new Uint8Array(NC), c5, media = 0, n5 = 0;
+      for (c5 in rects) { var nv = normDe(valores[c5]); f[c5] = nv > 1 ? 1 : (nv > 0 ? nv : 0); ok[c5] = 1; media += f[c5]; n5++; }
+      media = n5 ? media / n5 : 0;
+      function borde(j, i) { // nearest real square to (j, i) along the edge of the grid
+        j = j < 0 ? 0 : (j >= NY ? NY - 1 : j); i = i < 0 ? 0 : (i >= NX ? NX - 1 : i);
+        for (var r = 0; r < 4; r++) for (var dj = -r; dj <= r; dj++) for (var di = -r; di <= r; di++) {
+          var jj = j + dj, ii = i + di; if (jj < 0 || jj >= NY || ii < 0 || ii >= NX) continue; var k = jj * NX + ii; if (ok[k]) return f[k]; }
+        return media;
+      }
+      fantasmas.forEach(function (g) {
+        var v = borde(g.j, g.i) * (1 - g.m) + media * g.m;
+        g.r.setStyle({ fillColor: apagado(color(MORADO_MIN + (1 - MORADO_MIN) * v), g.m), fillOpacity: opacidad(v) * (1 - 0.12 * g.m) * g.e * g.e * (3 - 2 * g.e) });
+      });
+    }
     var api = {
       tipo: "leaflet",
-      pintar: function (valores, colorDe, opacDe) {
+      pintar: function (valores, colorDe, opacDe, normDe) {
+        if (normDe && TERMICO_OK && VISTA === "calor") {
+          pintarTermico(valores, normDe);
+          if (termico) termico.setOpacity(1);
+          if (map.hasLayer(fantasmasCapa)) map.removeLayer(fantasmasCapa);
+          dibujarZonas(null, null);
+          map.getPane("celdas").classList.add("modo-termico");
+          for (var c3 in rects) rects[c3].setStyle({ fillColor: "#000", fillOpacity: 0 });
+          return;
+        }
+        if (termico) termico.setOpacity(0);
+        map.getPane("celdas").classList.remove("modo-termico");
         for (var cc in rects) { var v = valores[cc]; var f = colorDe(v); rects[cc].setStyle({ fillColor: f || "#000", fillOpacity: f ? opacDe(v) : 0 }); }
+        if (normDe) pintarFantasmas(valores, normDe);
+        dibujarZonas(valores, normDe);
       },
+      // keep what is on screen centred in the free area when the right panel is hidden or shown
+      desplazar: function (dx) { map.panBy([dx, 0], { animate: !QUIETO, duration: 0.6 }); },
+      // "calor" (smooth heat map) or "cuadros" (squares + lines around zones with similar fire)
+      vista: function (v) { if (v) VISTA = TERMICO_OK ? v : "cuadros"; return VISTA; },
       seleccion: function (cs, anillos) {
         if (selCapa) map.removeLayer(selCapa); selCapa = null;
         if (anillos) selCapa = L.polygon(anillosLL(anillos), { pane: "contornos", color: "#FF6B2C", weight: 2.5, fill: false });
@@ -261,39 +418,11 @@
       alClic: function (fn) { map.on("click", function (e) { fn(e.latlng.lat, e.latlng.lng); }); },
       base: ponerBase,
       fecha: function (d) { capas.dia.options.time = d; capas.dia.redraw(); },
-      // Cinematic entrance: start over the whole Earth and fly to the region; cells appear in a wave from the centre.
-      // Any key or click skips it; with prefers-reduced-motion there is no animation.
+      // Entrance: the map opens already framed on the region, with the cells visible (no fly-in animation).
       entrada: function (listo) {
-        var caja = [[LAT0, LON0], [LAT1, LON1]], fin = false, olaHecha = false;
-        function ola() {
-          if (olaHecha) return; olaHecha = true;
-          var pane = map.getPane("celdas"), cx = (NX - 1) / 2, cy = (NY - 1) / 2, dm = Math.sqrt(cx * cx + cy * cy) || 1;
-          for (var cc in rects) { var p = rects[cc]._path; if (!p) continue; var jj = Math.floor(cc / NX), ii = cc % NX;
-            p.style.transitionDelay = "0ms, 0ms, " + Math.round(Math.sqrt((ii - cx) * (ii - cx) + (jj - cy) * (jj - cy)) / dm * 500) + "ms, 0ms"; }
-          pane.classList.remove("celdas-ocultas");
-          setTimeout(function () { for (var cc in rects) if (rects[cc]._path) rects[cc]._path.style.transitionDelay = ""; }, 1600);
-        }
-        function terminar(saltar) {
-          if (fin) return; fin = true;
-          document.removeEventListener("keydown", saltarK, true); document.removeEventListener("pointerdown", saltarP, true);
-          if (saltar) { map.stop(); map.fitBounds(caja, relleno()); }
-          ola(); listo();
-        }
-        function saltarK(ev) { if (ev.key === "Tab" || ev.key === "Shift") return; terminar(true); }
-        function saltarP() { terminar(true); }
-        if (QUIETO) { map.fitBounds(caja, relleno()); terminar(false); return; }
-        map.setView([(LAT0 + LAT1) / 2, (LON0 + LON1) / 2], 2.25, { animate: false });
-        document.addEventListener("keydown", saltarK, true); document.addEventListener("pointerdown", saltarP, true);
-        // Budget: the hero is sharp at once (it does not wait for the flight); the flight, the cell wave and
-        // the chrome fade-in all finish within 3 s of the page load. A hard cap ends it even if "moveend" never fires.
-        setTimeout(function () {
-          if (fin) return;
-          var o = relleno(); o.duration = 1.6; o.easeLinearity = 0.2;
-          map.once("moveend", function () { terminar(false); });
-          map.flyToBounds(caja, o);
-          setTimeout(function () { if (!fin) ola(); }, 700);
-        }, 80);
-        setTimeout(function () { terminar(false); }, 2200);
+        map.fitBounds([[LAT0, LON0], [LAT1, LON1]], relleno());
+        map.getPane("celdas").classList.remove("celdas-ocultas");
+        listo();
       }
     };
     map.fitBounds([[LAT0, LON0], [LAT1, LON1]], relleno());
@@ -413,8 +542,9 @@
     else if (m.tipo === "riesgo") { VALORES = m.valores; }
     else { var n = Math.max(1, aniosComp.length); for (c = 0; c < NC; c++) { var s = 0; for (k = 0; k < T; k++) if (completo[ANIO[k]]) s += F[c][k]; VALORES[c] = s / n; } }
     MAXV = 1; for (c = 0; c < NC; c++) if (VALORES[c] > MAXV) MAXV = VALORES[c];
-    if (m.tipo === "riesgo") MAPA.pintar(VALORES, function (v) { return v > 0 ? color(Math.max(0.03, v / 100)) : null; }, function (v) { return opacidad(v / 100); });
-    else MAPA.pintar(VALORES, function (v) { return v > 0 ? color(0.08 + 0.92 * Math.sqrt(v / MAXV)) : null; }, function (v) { return opacidad(v / MAXV); }); // linear: only the hot zones turn solid
+    var normRiesgo = function (v) { return Math.max(0, (v || 0) / 100); }, normFuego = function (v) { return Math.sqrt(Math.max(0, v || 0) / MAXV); };
+    if (m.tipo === "riesgo") MAPA.pintar(VALORES, function (v) { return color(MORADO_MIN + (1 - MORADO_MIN) * normRiesgo(v)); }, function (v) { return opacidad(v / 100); }, normRiesgo);
+    else MAPA.pintar(VALORES, function (v) { return color(MORADO_MIN + (1 - MORADO_MIN) * normFuego(v)); }, function (v) { return opacidad(v / MAXV); }, normFuego); // no fire = purple, not empty
     leyenda();
     var mt = $("modo");
     if (m.tipo === "promedio") mt.style.display = "none";
@@ -425,11 +555,35 @@
       : m.tipo === "semana" ? t("Fuego en esa semana", "Fire that week") : t("Fuego en un año normal", "Fire in a normal year");
     var max = m.tipo === "riesgo" ? "100%" : fmt(MAXV), rie = m.tipo === "riesgo";
     $("leyenda").setAttribute("title", t("Máximo en el mapa: ", "Map maximum: ") + max);
-    $("leyenda").innerHTML = "<b>" + tit + "</b>" + (estado.crudo ? ' <span class="semaforo" style="--c:var(--warn)">' + t("datos sin corregir", "uncorrected data") + "</span>" : "") +
+    $("leyenda").classList.toggle("plegada", LEY_PLEGADA);
+    if (LEY_PLEGADA) {
+      $("leyenda").innerHTML = '<button type="button" class="ley-abrir" data-ley="abrir" aria-expanded="false" title="' + t("Mostrar la leyenda", "Show the legend") + '">' +
+        '<i class="rampa"></i><span>' + t("Leyenda", "Legend") + "</span>" + I("chevron", 14) + "</button>";
+      return;
+    }
+    $("leyenda").innerHTML = '<button type="button" class="ley-cerrar" data-ley="cerrar" aria-expanded="true" aria-label="' + t("Ocultar la leyenda", "Hide the legend") + '" title="' + t("Ocultar", "Hide") + '">' + I("chevron", 16) + "</button>" +
+      "<b>" + tit + "</b>" + (estado.crudo ? ' <span class="semaforo" style="--c:var(--warn)">' + t("datos sin corregir", "uncorrected data") + "</span>" : "") +
       '<div class="ley-fila"><span>' + (rie ? t("Poca", "Low") : t("Poco fuego", "Little fire")) + '</span><div class="rampa"></div><span>' + (rie ? t("Mucha", "High") : t("Mucho fuego", "Lots of fire")) + "</span></div>" +
-      '<div class="nota-ley">' + t("Cada cuadro = una zona de 27 km", "Each square = a 27 km area") + "</div>";
+      '<div class="nota-ley">' + (vistaMapa() === "cuadros" ? t("Cada cuadro = zona de 27 km. Las líneas encierran zonas con fuego parecido.", "Each square = a 27 km area. Lines group areas with similar fire.")
+        : t("Mapa de calor con datos de satélite de la NASA. Fuera de la zona de estudio el color es solo ilustrativo.", "Heat map from NASA satellite data. Outside the study area the colour is illustrative only.")) + "</div>" +
+      (MAPA && MAPA.vista && MAPA.vista() !== null && MAPA.tipo === "leaflet" ? '<div class="vista-sw" role="group" aria-label="' + t("Ver el mapa como", "Show the map as") + '">' +
+        '<span>' + t("Ver como", "Show as") + "</span>" +
+        '<button type="button" data-vista="calor" class="' + (vistaMapa() === "calor" ? "on" : "") + '" aria-pressed="' + (vistaMapa() === "calor") + '">' + t("Mapa de calor", "Heat map") + "</button>" +
+        '<button type="button" data-vista="cuadros" class="' + (vistaMapa() === "cuadros" ? "on" : "") + '" aria-pressed="' + (vistaMapa() === "cuadros") + '">' + t("Cuadros", "Squares") + "</button></div>" : "");
   }
-  $("modoX").addEventListener("click", function () { pararReplay(); estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
+  function vistaMapa() { return MAPA && MAPA.vista ? MAPA.vista() : "cuadros"; }
+  var LEY_PLEGADA = false; // legend panel: shown or hidden (only the small "Legend" pill stays)
+  $("leyenda").addEventListener("click", function (ev) {
+    var tg = ev.target.closest ? ev.target.closest("[data-ley]") : null;
+    if (tg) { ev.stopPropagation(); var abrir = tg.getAttribute("data-ley") === "abrir";
+      setTimeout(function () { LEY_PLEGADA = !abrir; leyenda(); var nb = document.querySelector("#leyenda [data-ley]"); if (nb) nb.focus({ preventScroll: true }); }, 0); return; }
+    var b = ev.target.closest ? ev.target.closest("[data-vista]") : null; if (!b || !MAPA || !MAPA.vista) return;
+    // keep the click away from the map (otherwise it would also select the spot under the legend), and redraw after
+    // the event has finished: the legend is rebuilt by pintarMapa and the button would be detached mid-event
+    ev.stopPropagation(); var v = b.getAttribute("data-vista");
+    setTimeout(function () { MAPA.vista(v); pintarMapa(); var nb = document.querySelector('.vista-sw [data-vista="' + v + '"]'); if (nb) nb.focus({ preventScroll: true }); }, 0);
+  });
+  $("modoX").addEventListener("click", function () { pararReplay(); if (SEM) { $("repSem").value = 0; pista($("repSem")); etiquetaReproducir(); } estado.mapa = { tipo: "promedio" }; marcarCalendario(); pintarMapa(); });
 
   // =====================================================================
   //  Selection
@@ -751,7 +905,7 @@
     var s = serieSel(), filas = anios.slice().reverse(), orden = s.slice().sort(function (a, b) { return a - b; }), tope = orden[Math.floor(orden.length * 0.99)] || 1, pc = periodoCritico(s), cr = pc ? pc.meses : [];
     var cw = 58, ch = 22, L = 60, Tp = 78, W = L + 12 * cw + 90, H = Tp + filas.length * ch + 40, k;
     var g = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" font-family="Arial, Helvetica, sans-serif"><rect width="100%" height="100%" fill="#ffffff"/>',
-      '<text x="' + L + '" y="28" font-size="18" font-weight="700" fill="#14213D">' + esc(t("Calendario de quemas", "Burn Calendar") + " · " + descZona()) + "</text>",
+      '<text x="' + L + '" y="28" font-size="18" font-weight="700" fill="#14213D">' + esc("Kanan Ka'ax · " + t("Calendario de quemas", "Burn calendar") + " · " + descZona()) + "</text>",
       '<text x="' + L + '" y="48" font-size="12" fill="#6b7486">' + esc((EN ? (M.unidad_en || M.unidad) : M.unidad) + (estado.crudo ? t(" · SIN ARMONIZAR", " · UNHARMONIZED") : "")) + "</text>"];
     NOM.forEach(function (m, i) { var c = cr.indexOf(i) >= 0; if (c) g.push('<rect x="' + (L + i * cw + 3) + '" y="' + (Tp - 19) + '" width="' + (cw - 6) + '" height="16" rx="3" fill="#e8692e"/>');
       g.push('<text x="' + (L + i * cw + cw / 2) + '" y="' + (Tp - 7) + '" font-size="11" text-anchor="middle" fill="' + (c ? "#fff" : "#6b7486") + '">' + esc(m) + "</text>"); });
@@ -1026,13 +1180,18 @@
     var ys = Object.keys(SEM).map(Number).sort(function (a, b) { return b - a; });
     $("repAnio").innerHTML = ys.map(function (y) { return "<option>" + y + "</option>"; }).join("");
     $("repAnio").value = ys.indexOf(2024) >= 0 ? 2024 : ys[0];
-    $("repTxt").textContent = t("Ver cómo se mueve el fuego", "See how fire moves");
+    etiquetaReproducir();
     // Month marks under the week track (week w starts on Jan 1 + 7w)
     $("repMeses").innerHTML = NOM.map(function (n, m) { var dia = (Date.UTC(2001, m, 1) - Date.UTC(2001, 0, 1)) / 864e5; return '<span style="left:' + (Math.min(51, dia / 7) / 51 * 100).toFixed(2) + '%">' + n.slice(0, 1) + "</span>"; }).join("");
     pista($("repSem"));
-    $("repAnio").addEventListener("change", function () { pararReplay(); cuadro(); });
+    $("repAnio").addEventListener("change", function () { pararReplay(); $("repSem").value = 0; pista($("repSem")); etiquetaReproducir(); });
     $("repSem").addEventListener("input", function () { pararReplay(); cuadro(); });
     $("play").addEventListener("click", function () { if (repTimer) pararReplay(); else reproducir(); });
+  }
+  // Label at rest: says which year will play (it changes with the year selector)
+  function etiquetaReproducir() {
+    var y = $("repAnio").value || "";
+    $("repTxt").textContent = t("Ver el fuego de " + y + " mes a mes", "Watch " + y + "\u2019s fire, month by month");
   }
   function cuadro() {
     var y = +$("repAnio").value, s = +$("repSem").value, W = cacheSem[y] || (cacheSem[y] = semanasDe(y)), v = new Array(NC).fill(0), tot = 0;
@@ -1064,27 +1223,27 @@
   ] : [{ n: "Pedrógão Grande", lat: 39.92, lon: -8.15, prim: true }, { n: "Monchique", lat: 37.32, lon: -8.55 }, { n: "Coimbra", lat: 40.2, lon: -8.42 }, { n: "Porto", lat: 41.15, lon: -8.61 }];
   // Hero: every figure is computed from window.QUEMAS (nothing typed by hand).
   var TOTDET = 0; TOTAL.forEach(function (v) { TOTDET += v; });
-  $("bKick").textContent = "NASA Space Apps 2026 · La Com";
+  $("bKick").textContent = "NASA Space Apps 2026";
   // Short map key inside the hero, so the squares read as data even while the hero is open (it never overlaps it).
-  if (!$("bLey")) $("bKick").insertAdjacentHTML("beforebegin", '<div class="b-ley" id="bLey"><i class="rampa-op"></i><span>' + t("Cada cuadro = una zona de 27 km · más color, más fuego", "Each square = a 27 km area · more colour, more fire") + "</span></div>");
+  // (the map key is no longer shown inside the welcome card)
   $("bTit").innerHTML = t(NSPAN + " años de fuego, <em>vistos desde el espacio</em>", NSPAN + " years of fire, <em>seen from space</em>");
   $("bTxt").textContent = t("Mira cuándo y cuánto se quema cualquier lugar del mapa, con " + NSPAN + " años de fotos de satélite de la NASA.",
     "See when and how much any place on the map burns, with " + NSPAN + " years of NASA satellite photos.");
-  var pt = partes(TOTDET);
-  $("bCifras").innerHTML = [
-    [cuenta(NSPAN, NSPAN), t("años de fotos de satélite", "years of satellite photos")],
-    ['<span title="' + esc(fmt(TOTDET)) + '">' + cuenta(pt[0], pt[0].toLocaleString(LOC), pt[2]) + (pt[1] ? "<small> " + pt[1] + "</small>" : "") + "</span>", t("fuegos vistos", "fires seen")]
-  ].map(function (x) { return '<div class="b-cifra"><div class="n">' + x[0] + '</div><div class="l">' + x[1] + "</div></div>"; }).join("");
-  var CASO = ATAJOS.filter(function (a) { return a.prim; })[0];
-  $("atajos").innerHTML = '<button class="atajo grande prim" data-accion="buscar">' + I("search", 20) + '<span class="a-txt">' + t("Busca tu pueblo", "Find your town") + "</span></button>" +
-    (CASO ? '<button class="atajo grande" data-i="' + ATAJOS.indexOf(CASO) + '">' + I("flame", 20) + '<span class="a-txt">' + (CASO.prueba ? t("Ver un caso real: incendio de ", "See a real case: the ") + esc(CASO.n) + t("", " fire") : t("Ver un ejemplo: ", "See an example: ") + esc(CASO.n)) + "</span></button>" : "");
-  $("bPista").innerHTML = "<span><kbd>" + $("kbdK").textContent + "</kbd>" + t("buscar", "search") + "</span><span><kbd>" + t("Espacio", "Space") + "</kbd>" + t("ver un año pasar", "watch a year go by") + "</span><span><kbd>← →</kbd>" + t("pestañas", "tabs") + "</span>";
-  contar($("bCifras"), 1600);
+  // Welcome: title, one sentence and a single Continue button that hides it.
+  // It is moved to <body> so it covers the whole screen, centred, above the bar and the panel.
+  document.body.appendChild($("bienvenida"));
+  $("bCifras").innerHTML = "";
+  $("bPista").innerHTML = "";
+  $("atajos").innerHTML = '<button class="atajo continuar" data-accion="continuar">' + t("Continuar", "Continue") + I("arrow", 20) + "</button>";
   function cerrarBienvenida() { $("bienvenida").style.display = "none"; document.body.classList.remove("con-heroe"); }
+  // No welcome screen: the app opens straight on the map (the markup stays, hidden, in case it is wanted again).
+  cerrarBienvenida();
+  setTimeout(function () { var c = document.querySelector("#atajos .continuar"); if (c && $("bienvenida").style.display !== "none") c.focus({ preventScroll: true }); }, 50);
   $("cerrarBienv").addEventListener("click", cerrarBienvenida);
   document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && $("bienvenida").style.display !== "none" && document.activeElement !== $("q")) cerrarBienvenida(); });
   $("atajos").addEventListener("click", function (ev) {
     var b = ev.target.closest ? ev.target.closest("button") : null; if (!b) return; cerrarBienvenida();
+    if (b.getAttribute("data-accion") === "continuar") return;
     if (b.getAttribute("data-accion") === "buscar") { $("q").focus(); return; }
     var i = +b.getAttribute("data-i"); if (i < 0) { seleccionarRegion(); return; }
     var a = ATAJOS[i]; if (MAPA) MAPA.irA(a.lat, a.lon, 9); estado.escala = 1; seleccionarPunto(a.lat, a.lon, a.n, true); abrirHoja(1);
@@ -1152,6 +1311,21 @@
   MAPA.alClic(function (lat, lon) { cerrarBienvenida(); seleccionarPunto(lat, lon); });
   actualizar();
   // Cinematic entrance; the bar, sheet and dock fade in when the camera arrives (or at once if skipped / reduced motion).
+  // Right panel: hide / show on desktop, so the map can fill the screen (handy when presenting).
+  (function () {
+    var cab = document.querySelector("#panel .panel-cab"); if (!cab) return;
+    cab.insertAdjacentHTML("afterbegin", '<button type="button" class="panel-ocultar" id="panelOcultar" aria-controls="panel" aria-expanded="true" aria-label="' + t("Ocultar el panel", "Hide the panel") + '" title="' + t("Ocultar el panel", "Hide the panel") + '">' + I("chevron", 16) + "</button>");
+    document.body.insertAdjacentHTML("beforeend", '<button type="button" class="panel-mostrar" id="panelMostrar" aria-controls="panel" aria-expanded="false">' + I("chevron", 16) + "<span>" + t("Mostrar el panel", "Show the panel") + "</span></button>");
+    function ponerPanel(oculto) {
+      var w = $("panel").offsetWidth || 0;
+      document.body.classList.toggle("panel-oculto", oculto);
+      if (MAPA && MAPA.desplazar && w) MAPA.desplazar(oculto ? -w / 2 : w / 2);
+      $("panelOcultar").setAttribute("aria-expanded", String(!oculto)); $("panelMostrar").setAttribute("aria-expanded", String(!oculto));
+      setTimeout(function () { (oculto ? $("panelMostrar") : $("panelOcultar")).focus({ preventScroll: true }); }, 50);
+    }
+    $("panelOcultar").addEventListener("click", function () { ponerPanel(true); });
+    $("panelMostrar").addEventListener("click", function () { ponerPanel(false); });
+  })();
   function listo() { document.body.classList.remove("entrando"); setTimeout(moverIndicador, 320); }
   if (MAPA.entrada) MAPA.entrada(listo); else listo();
 })();

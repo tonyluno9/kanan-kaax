@@ -98,7 +98,6 @@ DEBE = {
     "NASA GIBS credit": r"NASA GIBS",
     "OpenStreetMap credit": r"OpenStreetMap",
     "Esri label credit": r"Esri",
-    "link to the technical view": r"tecnico\.html",
     "Leaflet map": r"L\.map\(",
     "offline SVG fallback map": r"crearSvg|svgmapa",
     "Nominatim search": r"nominatim\.openstreetmap\.org",

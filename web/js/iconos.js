@@ -1,5 +1,5 @@
 /*
-  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Kanan Ka'ax (Burn Calendar) · team La Com · NASA Space Apps Challenge 2026
   Challenge: Harmonization of MODIS and VIIRS Hot Spots.
   AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
   and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.

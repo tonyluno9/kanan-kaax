@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Kanan Ka'ax (Burn Calendar · Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
   Challenge: Harmonization of MODIS and VIIRS Hot Spots.
   AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
   and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
@@ -10,21 +10,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Burn Calendar</title>
+<title>Kanan Ka'ax</title>
 <meta name="description" content="25 years of satellite fire, harmonized from MODIS and VIIRS, for any place. Search an address, see when it burns, whether this year is normal and what is unusual.">
-<meta property="og:title" content="Burn Calendar: 25 years of satellite fire for any place">
+<meta property="og:title" content="Kanan Ka'ax: 25 years of satellite fire for any place">
 <meta property="og:description" content="Harmonized MODIS + VIIRS burning activity calendar with NASA satellite maps, address search, critical periods, anomalies, weekly risk and an alert verified from space.">
 <meta property="og:image" content="data/evidencia/yb_despues.jpg">
 <meta name="theme-color" content="#05070D">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
+<!-- NASA Horizon Design System typefaces: Inter (headings), Public Sans (body), DM Mono (numbers and data) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&family=Public+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<link rel="stylesheet" href="css/tokens.css">
-<link rel="stylesheet" href="css/app.css">
-<script src="js/iconos.js"></script>
+<link rel="stylesheet" href="css/tokens.css?v=20261115v">
+<link rel="stylesheet" href="css/app.css?v=20261115v">
+<script src="js/iconos.js?v=20261115v"></script>
 </head>
 <body class="entrando con-heroe">
 <a class="sr-only" href="#panel">Skip to results</a>
@@ -60,7 +61,7 @@
 
 <!-- ============ Floating top bar ============ -->
 <header class="top" id="barra">
-  <div class="brand"><span class="logo" id="logo"></span><div class="brand-txt"><h1 id="titulo">Burn Calendar</h1><small id="subtitulo"></small></div></div>
+  <div class="brand"><span class="logo" id="logo"></span><div class="brand-txt"><h1 id="titulo">Kanan Ka'ax</h1><small id="subtitulo"></small></div></div>
   <form class="search" id="formBuscar" autocomplete="off" role="search">
     <span class="lupa" id="lupa" aria-hidden="true"></span>
     <input id="q" type="search" aria-label="Search" aria-controls="resultados" aria-autocomplete="none">
@@ -71,7 +72,6 @@
   <div class="acciones">
     <label class="sel-wrap"><span class="sr-only">Region</span><select class="chipbtn" id="selRegion" aria-label="Region"></select></label>
     <button class="chipbtn" id="btnIdioma"></button>
-    <a class="chipbtn ocultar-movil" id="lnkTec" href="tecnico.html"></a>
   </div>
 </header>
 
@@ -119,6 +119,6 @@
     document.write('<script src="data/' + window.CLAVE_REGION + '.js"><\/script>');
   })();
 </script>
-<script src="js/app.js"></script>
+<script src="js/app.js?v=20261115v"></script>
 </body>
 </html>

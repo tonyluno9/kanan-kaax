@@ -1,5 +1,5 @@
 /*
-  Burn Calendar (Calendario de quemas) · team La Com · NASA Space Apps Challenge 2026
+  Kanan Ka'ax (Burn Calendar) · team La Com · NASA Space Apps Challenge 2026
   Challenge: Harmonization of MODIS and VIIRS Hot Spots.
   AI disclosure: this file was generated with the assistance of an AI tool (Claude, by Anthropic)
   and reviewed by the team. Data: NASA FIRMS, NASA POWER, NASA GIBS. Map tiles: NASA GIBS, OpenStreetMap; labels: Esri.
@@ -174,7 +174,7 @@ details li { margin: 4px 0; }
 .leyenda .ext { display: flex; justify-content: space-between; color: var(--text-3); font: 500 var(--fs-11) var(--font-mono); }
 .leyenda .nota-ley { color: var(--text-3); margin-top: 8px; font-size: var(--fs-11); line-height: 1.45; }
 .modo {
-  left: calc((100% - var(--sheet-w) - var(--gap)) / 2); transform: translateX(-50%); top: calc(var(--bar-h) + var(--gap) * 2);
+  left: calc((100% - var(--sheet-ocupa, var(--sheet-w)) - var(--gap)) / 2); transform: translateX(-50%); top: calc(var(--bar-h) + var(--gap) * 2);
   background: var(--surface-1); border: 1px solid rgba(255, 107, 44, .45); color: var(--text); border-radius: var(--r-pill);
   padding: 4px 4px 4px 14px; font: 500 var(--fs-13) var(--font-mono); display: none; box-shadow: 0 0 24px rgba(255, 107, 44, .18), var(--shadow-1);
   align-items: center; gap: 10px; white-space: nowrap; animation: caer var(--t-med) var(--ease);
@@ -185,7 +185,7 @@ details li { margin: 4px 0; }
 
 /* ======================= 7. Season replay dock ======================= */
 .tiempo {
-  left: var(--gap); right: calc(var(--sheet-w) + var(--gap) * 2); bottom: 30px; max-width: 920px;
+  left: var(--gap); right: calc(var(--sheet-ocupa, var(--sheet-w)) + var(--gap) * 2); bottom: 30px; max-width: 920px;
   display: flex; align-items: center; gap: var(--s-4); padding: 10px 16px 10px 10px;
   background: var(--surface-1); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--shadow-2);
 }
@@ -208,7 +208,7 @@ details li { margin: 4px 0; }
 
 /* ======================= 8. Hero (welcome banner) ======================= */
 .bienvenida {
-  left: var(--gap); right: calc(var(--sheet-w) + var(--gap) * 2); top: calc(var(--bar-h) + var(--gap) * 2); bottom: 108px;
+  left: var(--gap); right: calc(var(--sheet-ocupa, var(--sheet-w)) + var(--gap) * 2); top: calc(var(--bar-h) + var(--gap) * 2); bottom: 108px;
   z-index: 900; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0 clamp(20px, 4vw, 56px) clamp(16px, 3vh, 40px); border-radius: var(--r-xl);
   /* only as much shade as the text needs: dark in the lower-left corner behind the copy, clear satellite elsewhere */
@@ -260,7 +260,7 @@ details li { margin: 4px 0; }
 .respuesta:hover { border-color: var(--line-2); }
 .respuesta .q { font-size: var(--fs-13); color: var(--text-2); font-weight: 500; display: flex; align-items: center; gap: 8px; }
 .respuesta .q .ico { color: var(--accent); }
-.respuesta .a { font: 400 30px/1.05 var(--font-serif); margin: 10px 0 8px; color: var(--text); letter-spacing: -.005em; }
+.respuesta .a { font: 700 26px/1.12 var(--font-serif); margin: 10px 0 8px; color: var(--text); letter-spacing: -.025em; }
 .respuesta .d { font-size: var(--fs-14); color: var(--text-2); line-height: 1.55; }
 .respuesta .d b { font-weight: 700; color: var(--text); } /* plain bold: easier to read than mono */
 .respuesta.entra { animation: subir 420ms var(--ease) both; }
@@ -308,7 +308,7 @@ details li { margin: 4px 0; }
 .item b { font-family: var(--font-mono); font-weight: 500; }
 .etq { display: inline-flex; align-items: center; gap: 4px; font: 500 10px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding: 4px 7px; border-radius: 6px; background: rgba(255, 255, 255, .07); color: var(--text-2); }
 .etq.v { background: rgba(61, 220, 151, .12); color: var(--ok); }
-.grandes { font: 400 64px/1 var(--font-serif); letter-spacing: -.02em; background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 4px 0 2px; display: inline-block; }
+.grandes { font: 700 54px/1 var(--font-serif); letter-spacing: -.02em; background: var(--accent-grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding: 4px 0 2px; display: inline-block; }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .stat { background: rgba(5, 7, 13, .4); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
 .stat .n { font: 500 26px/1.1 var(--font-mono); color: var(--accent-hi); letter-spacing: -.03em; }
@@ -387,12 +387,12 @@ details li { margin: 4px 0; }
 
 /* ======================= 16. Leaflet ======================= */
 .leaflet-container { font: inherit; background: var(--bg); outline: 0; }
-.leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--gap) * 2 - 10px); right: calc(var(--sheet-w) + var(--gap) * 2 - 10px); }
+.leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--gap) * 2 - 10px); right: calc(var(--sheet-ocupa, var(--sheet-w)) + var(--gap) * 2 - 10px); }
 .leaflet-bar { border: 1px solid var(--line-2) !important; border-radius: var(--r-md) !important; overflow: hidden; box-shadow: var(--shadow-1) !important; }
 .leaflet-bar a, .leaflet-bar a:hover { background: var(--surface-1); color: var(--text-2); border-bottom: 1px solid var(--line) !important; width: 34px !important; height: 34px !important; line-height: 34px !important; font: 400 18px/34px var(--font-ui) !important; }
 .leaflet-bar a:hover { background: var(--surface-3); color: var(--text); }
 .leaflet-bar a.leaflet-disabled { background: var(--surface-1); color: var(--text-3); opacity: .5; }
-.leaflet-bottom.leaflet-right { right: calc(var(--sheet-w) + var(--gap) * 2 - 10px); }
+.leaflet-bottom.leaflet-right { right: calc(var(--sheet-ocupa, var(--sheet-w)) + var(--gap) * 2 - 10px); }
 .leaflet-control-attribution { background: rgba(5, 7, 13, .7) !important; color: var(--text-3) !important; font: 400 10.5px var(--font-ui); border-radius: 6px 6px 0 0; padding: 2px 8px !important; }
 .leaflet-control-attribution a { color: var(--text-2) !important; }
 .celda { transition: fill var(--t-slow) var(--ease), fill-opacity var(--t-slow) var(--ease), opacity 520ms var(--ease), stroke var(--t-fast); }
@@ -472,7 +472,7 @@ details.leer { margin: 4px 0 12px; }
 .ley-fila { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: var(--fs-12); color: var(--text-2); white-space: nowrap; }
 .ley-fila .rampa { flex: 1; min-width: 40px; margin: 0 !important; }
 /* map hint until the first tap */
-.pista-mapa { top: calc(var(--bar-h) + var(--gap) * 2); left: calc((100% - var(--sheet-w) - var(--gap)) / 2); transform: translateX(-50%); pointer-events: none;
+.pista-mapa { top: calc(var(--bar-h) + var(--gap) * 2); left: calc((100% - var(--sheet-ocupa, var(--sheet-w)) - var(--gap)) / 2); transform: translateX(-50%); pointer-events: none;
   display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--r-pill); background: var(--surface-1); border: 1px solid rgba(255, 107, 44, .5);
   color: var(--text); font-size: var(--fs-14); font-weight: 500; white-space: nowrap; box-shadow: 0 0 24px rgba(255, 107, 44, .2), var(--shadow-1); animation: caer var(--t-med) var(--ease); }
 .pista-mapa .ico { color: var(--accent); }
@@ -613,3 +613,100 @@ details.leer { margin: 4px 0 12px; }
   .cal .c { height: 18px; }
   .cal .y { line-height: 18px; }
 }
+
+
+/* ======================= 22. Welcome: centred intro with a single Continue button ======================= */
+/* Last in the file on purpose: overrides the earlier hero rules on every screen size. */
+.bienvenida {
+  position: fixed !important; inset: 0 !important; left: 0 !important; right: 0 !important; top: 0 !important; bottom: 0 !important;
+  z-index: 5000 !important; pointer-events: auto !important; overflow-y: auto;
+  display: flex; flex-direction: column; align-items: center; justify-content: center !important; text-align: center;
+  padding: 24px !important; border-radius: 0 !important;
+  background: rgba(5, 7, 13, .86) !important; text-shadow: 0 1px 14px rgba(5, 7, 13, .7);
+}
+.bienvenida > * { max-width: 760px; }
+.bienvenida .x, .b-ley, .b-cifras, .b-pista { display: none !important; }
+.bienvenida .b-kick { display: flex !important; justify-content: center; margin: 0 0 18px; }
+.bienvenida .b-kick::after { content: ""; width: 28px; height: 1px; background: currentColor; }
+.bienvenida h2 { font-size: clamp(36px, 5.4vw, 84px) !important; font-weight: 700; letter-spacing: -.035em; line-height: 1.02 !important; }
+.bienvenida p { margin: 20px auto 0 !important; font-size: clamp(17px, 1.5vw, 21px) !important; max-width: 600px; }
+.bienvenida .atajos { justify-content: center; margin-top: 36px !important; flex-direction: row !important; }
+.atajo.continuar {
+  min-height: 56px; padding: 0 30px !important; border-radius: var(--r-pill); gap: 12px; width: auto !important;
+  font: 600 18px var(--font-ui); color: #1a0c05; border: 0; background: var(--accent-grad);
+  box-shadow: 0 10px 34px rgba(255, 107, 44, .35);
+}
+.atajo.continuar .ico { color: #1a0c05; }
+.atajo.continuar:hover { transform: translateY(-1px); box-shadow: 0 14px 40px rgba(255, 107, 44, .5); background: var(--accent-grad); }
+.atajo.continuar:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media (max-width: 699px) {
+  .bienvenida h2 { font-size: 40px !important; }
+  .atajo.continuar { width: 100% !important; max-width: 320px; justify-content: center; }
+}
+
+/* ======================= 23. Titles in uppercase (NASA style) ======================= */
+/* Every title is set in capitals: brand, welcome, place name, the big answers and the card titles. */
+h1, h2, h3, .serif, .respuesta .a { text-transform: uppercase; }
+.brand h1 { letter-spacing: .04em; }
+.bienvenida h2 { font-size: clamp(32px, 4.6vw, 72px) !important; letter-spacing: -.01em !important; line-height: 1.04 !important; }
+.lugar h2 { font-size: 26px; letter-spacing: 0; line-height: 1.08; }
+.respuesta .a { font-size: 22px; letter-spacing: 0; line-height: 1.15; }
+.tarjeta h3 { font-family: var(--font-serif); font-weight: 700; font-size: var(--fs-15); letter-spacing: .02em; }
+@media (min-width: 1800px) {
+  .lugar h2 { font-size: 30px; }
+  .respuesta .a { font-size: 25px; }
+}
+
+/* ======================= 24. Map ramp: solid purple at the low end ======================= */
+/* The cells are no longer see-through at low values, so the legend ramp is solid too (purple = little fire). */
+.leyenda .rampa, .rampa-op { -webkit-mask-image: none !important; mask-image: none !important;
+  background: linear-gradient(90deg, #482777, var(--v2), var(--v3), var(--v4), var(--v5), var(--v6), var(--v7), var(--v8), var(--v9)) !important; }
+
+/* ======================= 25. Heat map mode ======================= */
+/* The colour comes from the smooth heat image; the squares stay invisible on top only for tooltips and clicks. */
+.modo-termico .celda, .modo-termico .celda:hover { stroke: none !important; filter: none !important; }
+.leaflet-termico-pane .termico { image-rendering: auto; transition: opacity 300ms var(--ease); }
+
+/* ======================= 26. Map view switch (heat map · squares) ======================= */
+.vista-sw { display: flex; align-items: center; gap: 4px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.vista-sw span { font: 500 var(--fs-11) var(--font-mono); color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+.vista-sw button { border: 1px solid var(--line-2); background: transparent; color: var(--text-2); border-radius: var(--r-pill); padding: 5px 12px;
+  font: 600 var(--fs-12) var(--font-ui); cursor: pointer; transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease); }
+.vista-sw button:hover { border-color: rgba(255, 107, 44, .6); color: var(--text); }
+.vista-sw button.on { background: var(--accent-grad); color: var(--accent-ink); border-color: transparent; }
+.vista-sw button:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+.zona-borde { filter: drop-shadow(0 0 1.5px rgba(5, 7, 13, .9)); }
+
+/* ======================= 27. Legend: hide / show ======================= */
+.leyenda { position: absolute; }
+.leyenda .ley-cerrar { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: var(--r-pill); border: 1px solid var(--line-2);
+  background: transparent; color: var(--text-2); display: grid; place-items: center; cursor: pointer; transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+.leyenda .ley-cerrar:hover { background: var(--surface-3); color: var(--text); }
+.leyenda > b { display: block; padding-right: 34px; }
+.leyenda.plegada { width: auto !important; padding: 0 !important; background: transparent; border: 0; box-shadow: none; }
+.ley-abrir { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px 0 12px; border-radius: var(--r-pill);
+  border: 1px solid var(--line-2); background: var(--surface-1); color: var(--text); font: 600 var(--fs-13) var(--font-ui); cursor: pointer; box-shadow: var(--shadow-1); }
+.ley-abrir .rampa { display: block; width: 46px; height: 8px; margin: 0 !important; border-radius: 4px; }
+.ley-abrir svg { transform: rotate(-90deg); color: var(--text-2); }   /* chevron up: open */
+.leyenda .ley-cerrar svg { transform: rotate(90deg); }                /* chevron down: hide */
+.ley-abrir:hover { border-color: rgba(255, 107, 44, .6); }
+.ley-abrir:focus-visible, .leyenda .ley-cerrar:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+
+
+/* ======================= 28. Right panel: hide / show (desktop) ======================= */
+.panel-cab { position: relative; }
+.panel-ocultar { position: absolute; top: 12px; right: 12px; z-index: 2; width: 32px; height: 32px; border-radius: var(--r-pill); border: 1px solid var(--line-2);
+  background: transparent; color: var(--text-2); display: grid; place-items: center; cursor: pointer; transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease); }
+.panel-ocultar:hover { background: var(--surface-3); color: var(--text); }
+.panel-mostrar { position: fixed; z-index: var(--z-sheet); top: calc(var(--bar-h) + var(--gap) * 2); right: var(--gap); display: none; align-items: center; gap: 8px;
+  height: 40px; padding: 0 16px 0 12px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: var(--surface-1); color: var(--text);
+  font: 600 var(--fs-13) var(--font-ui); cursor: pointer; box-shadow: var(--shadow-1); animation: caer var(--t-med) var(--ease); }
+.panel-mostrar svg { transform: rotate(180deg); color: var(--accent-hi); }
+.panel-mostrar:hover { border-color: rgba(255, 107, 44, .6); }
+.panel-ocultar:focus-visible, .panel-mostrar:focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 2px; }
+body.panel-oculto { --sheet-ocupa: calc(-1 * var(--gap)); }
+body.panel-oculto .panel { translate: calc(100% + var(--gap) * 2) 0; opacity: 0; pointer-events: none; }
+body.panel-oculto .panel-mostrar { display: inline-flex; }
+@media (max-width: 699px) { .panel-ocultar, .panel-mostrar { display: none !important; } }
+/* with the panel hidden, the zoom buttons sit under the "Show the panel" pill instead of behind it */
+body.panel-oculto .leaflet-top.leaflet-right { top: calc(var(--bar-h) + var(--gap) * 2 + 44px); }
