@@ -243,7 +243,7 @@
           if (olaHecha) return; olaHecha = true;
           var pane = map.getPane("celdas"), cx = (NX - 1) / 2, cy = (NY - 1) / 2, dm = Math.sqrt(cx * cx + cy * cy) || 1;
           for (var cc in rects) { var p = rects[cc]._path; if (!p) continue; var jj = Math.floor(cc / NX), ii = cc % NX;
-            p.style.transitionDelay = "0ms, 0ms, " + Math.round(Math.sqrt((ii - cx) * (ii - cx) + (jj - cy) * (jj - cy)) / dm * 900) + "ms, 0ms"; }
+            p.style.transitionDelay = "0ms, 0ms, " + Math.round(Math.sqrt((ii - cx) * (ii - cx) + (jj - cy) * (jj - cy)) / dm * 500) + "ms, 0ms"; }
           pane.classList.remove("celdas-ocultas");
           setTimeout(function () { for (var cc in rects) if (rects[cc]._path) rects[cc]._path.style.transitionDelay = ""; }, 1600);
         }
@@ -258,13 +258,16 @@
         if (QUIETO) { map.fitBounds(caja, relleno()); terminar(false); return; }
         map.setView([(LAT0 + LAT1) / 2, (LON0 + LON1) / 2], 2.25, { animate: false });
         document.addEventListener("keydown", saltarK, true); document.addEventListener("pointerdown", saltarP, true);
+        // Budget: the hero is sharp at once (it does not wait for the flight); the flight, the cell wave and
+        // the chrome fade-in all finish within 3 s of the page load. A hard cap ends it even if "moveend" never fires.
         setTimeout(function () {
           if (fin) return;
-          var o = relleno(); o.duration = 2.5; o.easeLinearity = 0.15;
+          var o = relleno(); o.duration = 1.6; o.easeLinearity = 0.2;
           map.once("moveend", function () { terminar(false); });
           map.flyToBounds(caja, o);
-          setTimeout(function () { if (!fin) ola(); }, 1500);
-        }, 450);
+          setTimeout(function () { if (!fin) ola(); }, 700);
+        }, 80);
+        setTimeout(function () { terminar(false); }, 2200);
       }
     };
     map.fitBounds([[LAT0, LON0], [LAT1, LON1]], relleno());
